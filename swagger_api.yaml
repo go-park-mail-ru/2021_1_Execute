@@ -2,9 +2,16 @@ openapi: "3.0.0"
 info:
   title: "Бэкенд для Trello"
   version: "0.1.0"
+tags:
+  - name: User
+  - name: Board
+  - name: Row
+  - name: Task
 paths:
   /auth:
     post:
+      tags:
+        - User
       description: Авторизация пользователя
       requestBody:
         content:
@@ -21,7 +28,14 @@ paths:
           description: Авторизация неуспешна
   /users:
     post:
+      tags:
+        - User
       description: Регистрация нового пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegistrationRequest"
       responses:
         200: 
           description: Пользователь успешно зарегистрирован
@@ -38,6 +52,8 @@ paths:
         schema:
           type: integer
     get:
+      tags:
+        - User
       description: Получение информации о пользователе
       responses:
         200:
@@ -47,6 +63,8 @@ paths:
         404:
           description: Пользователь не найден
     patch:
+      tags:
+        - User
       description: Получение информации о пользователе
       responses:
         200:
@@ -58,6 +76,8 @@ paths:
         400:
           description: Запрос сформирован неверно
     delete:
+      tags:
+        - User
       description: Получение информации о пользователе
       responses:
         200:
@@ -69,6 +89,8 @@ paths:
           
   /boards:
     get:
+      tags:
+        - Board
       description: Получение списка досок пользователя
       responses:
         200:
@@ -76,7 +98,14 @@ paths:
         401:
           description: Неавторизованный запрос
     post:
+      tags:
+        - Board
       description: Создание доски
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostBoardsRequest"
       responses:
         200:
           description: Доска успешно создана
@@ -93,6 +122,8 @@ paths:
         schema:
           type: integer
     get:
+      tags:
+        - Board
       description: Получение доски
       responses:
         200:
@@ -102,6 +133,8 @@ paths:
         404:
           description: Доска не найдена
     patch:
+      tags:
+        - Board
       description: Изменение доски
       responses:
         200:
@@ -113,6 +146,8 @@ paths:
         400:
           description: Запрос сформирован неверно
     delete:
+      tags:
+        - Board
       description: Удалeние доски
       responses:
         200:
@@ -123,7 +158,14 @@ paths:
           description: Недостаточно прав
   /rows:
     post:
+      tags:
+        - Row
       description: Добавление столбца на доску
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostRowsRequest"
       responses:
         200:
           description: Столбец добавлен
@@ -140,6 +182,8 @@ paths:
         schema:
           type: integer
     get:
+      tags:
+        - Row
       description: Получение содержимого столбца
       responses:
         200:
@@ -149,6 +193,8 @@ paths:
         404:
           description: Столбец не найден
     patch:
+      tags:
+        - Row
       description: Изменение столбца
       responses:
         200:
@@ -160,6 +206,8 @@ paths:
         400:
           description: Запрос сформирован неверно
     delete:
+      tags:
+        - Row
       description: Удаление столбца
       responses:
         200:
@@ -170,7 +218,14 @@ paths:
           description: Столбец не найден
   /tasks:
     post:
+      tags:
+        - Task
       description: Добавление задания
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostTasksRequest"
       responses:
         200:
           description: Задание добавлено
@@ -187,6 +242,8 @@ paths:
         schema:
           type: integer
     get:
+      tags:
+        - Task
       description: Получение задания
       responses:
         200:
@@ -196,6 +253,8 @@ paths:
         404:
           description: Задание не найдено
     patch:
+      tags:
+        - Task
       description: Изменение задания
       responses:
         200:
@@ -207,6 +266,8 @@ paths:
         400:
           description: Запрос сформирован неверно
     delete:
+      tags:
+        - Task
       description: Удаление задания
       responses:
         200:
@@ -238,6 +299,30 @@ components:
         avatar:
           type: string
           format: binary
+      required:
+        - email
+        - password
+        - username
+    PostBoardsRequest:
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    PostRowsRequest:
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    PostTasksRequest:
+      properties:
+        name:
+          type: string
+      required:
+        - name
+        
+
     
 
   securitySchemes:
