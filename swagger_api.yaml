@@ -3,15 +3,15 @@ info:
   title: "Бэкенд для Trello"
   version: "0.1.0"
 tags:
-  - name: User
-  - name: Board
-  - name: Row
-  - name: Task
+  - name: Users
+  - name: Boards
+  - name: Rows
+  - name: Tasks
 paths:
   /auth:
     post:
       tags:
-        - User
+        - Users
       description: Авторизация пользователя
       requestBody:
         content:
@@ -29,7 +29,7 @@ paths:
   /users:
     post:
       tags:
-        - User
+        - Users
       description: Регистрация нового пользователя
       requestBody:
         content:
@@ -53,18 +53,22 @@ paths:
           type: integer
     get:
       tags:
-        - User
+        - Users
       description: Получение информации о пользователе
       responses:
         200:
           description: Информация получена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserByIdResponse"
         401:
           description: Неавторизованный запрос
         404:
           description: Пользователь не найден
     patch:
       tags:
-        - User
+        - Users
       description: Получение информации о пользователе
       responses:
         200:
@@ -77,7 +81,7 @@ paths:
           description: Запрос сформирован неверно
     delete:
       tags:
-        - User
+        - Users
       description: Получение информации о пользователе
       responses:
         200:
@@ -90,16 +94,20 @@ paths:
   /boards:
     get:
       tags:
-        - Board
+        - Boards
       description: Получение списка досок пользователя
       responses:
         200:
           description: Доски успешно получены
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetBoardsResponse"
         401:
           description: Неавторизованный запрос
     post:
       tags:
-        - Board
+        - Boards
       description: Создание доски
       requestBody:
         content:
@@ -109,6 +117,10 @@ paths:
       responses:
         200:
           description: Доска успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostResponses"
         401:
           description: Неавторизованный запрос
         400:
@@ -123,18 +135,22 @@ paths:
           type: integer
     get:
       tags:
-        - Board
+        - Boards
       description: Получение доски
       responses:
         200:
           description: Доска успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetBoardByIdResponse"
         401:
           description: Неавторизованный запрос
         404:
           description: Доска не найдена
     patch:
       tags:
-        - Board
+        - Boards
       description: Изменение доски
       responses:
         200:
@@ -147,7 +163,7 @@ paths:
           description: Запрос сформирован неверно
     delete:
       tags:
-        - Board
+        - Boards
       description: Удалeние доски
       responses:
         200:
@@ -159,7 +175,7 @@ paths:
   /rows:
     post:
       tags:
-        - Row
+        - Rows
       description: Добавление столбца на доску
       requestBody:
         content:
@@ -169,6 +185,10 @@ paths:
       responses:
         200:
           description: Столбец добавлен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostResponses"
         401:
           description: Неавторизованный запрос
         400:
@@ -183,18 +203,22 @@ paths:
           type: integer
     get:
       tags:
-        - Row
+        - Rows
       description: Получение содержимого столбца
       responses:
         200:
           description: Столбец получен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetRowByIdResponse"
         401:
           description: Неавторизованный запрос
         404:
           description: Столбец не найден
     patch:
       tags:
-        - Row
+        - Rows
       description: Изменение столбца
       responses:
         200:
@@ -207,7 +231,7 @@ paths:
           description: Запрос сформирован неверно
     delete:
       tags:
-        - Row
+        - Rows
       description: Удаление столбца
       responses:
         200:
@@ -219,7 +243,7 @@ paths:
   /tasks:
     post:
       tags:
-        - Task
+        - Tasks
       description: Добавление задания
       requestBody:
         content:
@@ -229,6 +253,10 @@ paths:
       responses:
         200:
           description: Задание добавлено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostResponses"
         401:
           description: Неавторизованный запрос
         400:
@@ -243,18 +271,22 @@ paths:
           type: integer
     get:
       tags:
-        - Task
+        - Tasks
       description: Получение задания
       responses:
         200:
           description: Задание получено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTaskByIdResponse"
         401:
           description: Неавторизованный запрос
         404:
           description: Задание не найдено
     patch:
       tags:
-        - Task
+        - Tasks
       description: Изменение задания
       responses:
         200:
@@ -267,7 +299,7 @@ paths:
           description: Запрос сформирован неверно
     delete:
       tags:
-        - Task
+        - Tasks
       description: Удаление задания
       responses:
         200:
@@ -276,15 +308,16 @@ paths:
           description: Неавторизованный запрос
         404:
           description: Задание не найдено
-    #добавить патчи и действия со столбцами
 components:
   schemas:
     LoginRequest:
       properties:
         email:
           type: string
+          format: email
         password:
           type: string
+          format: password
       required:
         - email
         - password
@@ -292,8 +325,10 @@ components:
       properties:
         email:
           type: string
+          format: email
         password: 
           type: string
+          format: password
         username:
           type: string
         avatar:
@@ -321,7 +356,72 @@ components:
           type: string
       required:
         - name
-        
+    GetUserByIdResponse:
+      type: object
+      properties:
+        username:
+          type: string
+    GetBoardsResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/BoardOutter"
+    GetBoardByIdResponse:
+      $ref: "#/components/schemas/Board"
+    GetRowByIdResponse:
+      $ref: "#/components/schemas/Row"
+    GetTaskByIdResponse:
+      $ref: "#/components/schemas/Task"
+    PostResponses:
+      type: object
+      properties:
+        id:
+          type: integer
+    
+
+    Board:
+      type: object
+      properties:
+        name:
+          type: string
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              row:
+                $ref: "#/components/schemas/Row"
+    Row:
+      type: object
+      properties:
+        name:
+          type: string
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskOutter"
+    BoardOutter:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+    Task:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    TaskOutter:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
 
     
 
