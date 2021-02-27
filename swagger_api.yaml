@@ -8,7 +8,7 @@ tags:
   - name: Rows
   - name: Tasks
 paths:
-  /auth:
+  /login:
     post:
       tags:
         - Users
@@ -26,6 +26,16 @@ paths:
           description: Запрос сформирован неверно
         403:
           description: Авторизация неуспешна
+  /logout:
+    delete:
+      tags:
+        - Users
+      description: Выход из сессии
+      responses:
+        200:
+          description: Выход прошел успешно
+        401:
+          description: Неавторизованный запрос
   /users:
     post:
       tags:
