@@ -69,7 +69,7 @@ paths:
     patch:
       tags:
         - Users
-      description: Получение информации о пользователе
+      description: Изменение информации о пользователе
       responses:
         200:
           description: Информация получена
@@ -82,7 +82,7 @@ paths:
     delete:
       tags:
         - Users
-      description: Получение информации о пользователе
+      description: Удаление пользователя
       responses:
         200:
           description: Информация получена
