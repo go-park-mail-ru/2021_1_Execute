@@ -138,7 +138,7 @@ paths:
   /boards/{id}:
     parameters:
       - name: id
-        description: Уникальный идентификатор доски
+        description: ID доски
         in: path
         required: true
         schema:
@@ -182,7 +182,14 @@ paths:
           description: Неавторизованный запрос
         403:
           description: Недостаточно прав
-  /rows:
+  /boards/{b_id}/rows:
+    parameters:
+      - name: b_id
+        description: ID доски
+        in: path
+        required: true
+        schema:
+          type: integer
     post:
       tags:
         - Rows
@@ -203,10 +210,16 @@ paths:
           description: Неавторизованный запрос
         400:
           description: Запрос сформирован неверно
-  /rows/{id}:
+  /boards/{b_id}/rows/{id}:
     parameters:
       - name: id
         description: ID столбца
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: b_id
+        description: ID доски
         in: path
         required: true
         schema:
@@ -250,7 +263,20 @@ paths:
           description: Неавторизованный запрос
         404:
           description: Столбец не найден
-  /tasks:
+  /boards/{b_id}/rows/{r_id}/tasks:
+    parameters:
+      - name: r_id
+        description: ID столбца
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: b_id
+        description: ID доски
+        in: path
+        required: true
+        schema:
+          type: integer
     post:
       tags:
         - Tasks
@@ -271,8 +297,20 @@ paths:
           description: Неавторизованный запрос
         400:
           description: Запрос сформирован неверно
-  /tasks/{id}:
+  /boards/{b_id}/rows/{r_id}/tasks/{id}:
     parameters:
+      - name: r_id
+        description: ID столбца
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: b_id
+        description: ID доски
+        in: path
+        required: true
+        schema:
+          type: integer
       - name: id
         description: ID задания
         in: path
