@@ -409,6 +409,9 @@ components:
       properties:
         username:
           type: string
+        email:
+          type: string
+          format: email
     GetBoardsResponse:
       type: array
       items:
