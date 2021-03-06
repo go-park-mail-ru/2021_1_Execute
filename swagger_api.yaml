@@ -8,7 +8,7 @@ tags:
   - name: Rows
   - name: Tasks
 paths:
-  /login:
+  /api/login:
     post:
       tags:
         - Users
@@ -26,7 +26,7 @@ paths:
           description: Запрос сформирован неверно
         403:
           description: Авторизация неуспешна
-  /logout:
+  /api/logout:
     delete:
       tags:
         - Users
@@ -36,7 +36,7 @@ paths:
           description: Выход прошел успешно
         401:
           description: Неавторизованный запрос
-  /users:
+  /api/users:
     post:
       tags:
         - Users
@@ -53,7 +53,7 @@ paths:
           description: Запрос сформирован неверно
         409:
           description: Уже создан пользователь с таким email
-  /users/{id}:
+  /api/users/{id}:
     parameters:
       - name: id
         description: ID пользователя
@@ -101,7 +101,7 @@ paths:
         403:
           description: Недостаточно прав
           
-  /boards:
+  /api/boards:
     get:
       tags:
         - Boards
@@ -135,7 +135,7 @@ paths:
           description: Неавторизованный запрос
         400:
           description: Запрос сформирован неверно
-  /boards/{id}:
+  /api/boards/{id}:
     parameters:
       - name: id
         description: ID доски
@@ -182,7 +182,7 @@ paths:
           description: Неавторизованный запрос
         403:
           description: Недостаточно прав
-  /boards/{b_id}/rows:
+  /api/boards/{b_id}/rows:
     parameters:
       - name: b_id
         description: ID доски
@@ -210,7 +210,7 @@ paths:
           description: Неавторизованный запрос
         400:
           description: Запрос сформирован неверно
-  /boards/{b_id}/rows/{id}:
+  /api/boards/{b_id}/rows/{id}:
     parameters:
       - name: id
         description: ID столбца
@@ -263,7 +263,7 @@ paths:
           description: Неавторизованный запрос
         404:
           description: Столбец не найден
-  /boards/{b_id}/rows/{r_id}/tasks:
+  /api/boards/{b_id}/rows/{r_id}/tasks:
     parameters:
       - name: r_id
         description: ID столбца
@@ -297,7 +297,7 @@ paths:
           description: Неавторизованный запрос
         400:
           description: Запрос сформирован неверно
-  /boards/{b_id}/rows/{r_id}/tasks/{id}:
+  /api/boards/{b_id}/rows/{r_id}/tasks/{id}:
     parameters:
       - name: r_id
         description: ID столбца
@@ -407,21 +407,36 @@ components:
     GetUserByIdResponse:
       type: object
       properties:
-        username:
-          type: string
-        email:
-          type: string
-          format: email
+        user:
+          type: object
+          properties:
+            username:
+              type: string
+            email:
+              type: string
+              format: email
     GetBoardsResponse:
-      type: array
-      items:
-        $ref: "#/components/schemas/BoardOutter"
+      type: object
+      properties:
+        boards:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoardOutter"
     GetBoardByIdResponse:
-      $ref: "#/components/schemas/Board"
+      type: object
+      properties:
+        board:
+          $ref: "#/components/schemas/Board"
     GetRowByIdResponse:
-      $ref: "#/components/schemas/Row"
+      type: object
+      properties:
+        row:
+          $ref: "#/components/schemas/Row"
     GetTaskByIdResponse:
-      $ref: "#/components/schemas/Task"
+      type: object
+      properties:
+        task:
+          $ref: "#/components/schemas/Task"
     PostResponses:
       type: object
       properties:
