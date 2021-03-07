@@ -26,19 +26,19 @@ type RegistrationResponse struct {
 	ID uint64 `json:"id"`
 }
 
-func CreateRegistrationResponse(user User) RegistrationResponse {
+func CreateLoginResponse(user User) RegistrationResponse {
 	return RegistrationResponse{ID: user.ID}
 }
 
 func (db *Database) CreateUser(input *UserRegistrationRequest) (User, error, int) {
-	if !IsEmailValid((*input).Email) {
+	if !IsEmailValid(input.Email) {
 		return User{}, errors.New("Invalid email"), 400
 	}
 	if !IsPasswordValid((*input).Password) {
 		return User{}, errors.New("Invalid password"), 400
 	}
 	for _, user := range *db.Users {
-		if user.Email == (*input).Email {
+		if user.Email == input.Email {
 			return User{}, errors.New("Email not unique"), 409
 		}
 	}
@@ -48,12 +48,21 @@ func (db *Database) CreateUser(input *UserRegistrationRequest) (User, error, int
 	}
 	newUser := User{
 		ID:       uint64(len(*db.Users)),
-		Email:    (*input).Email,
-		Username: (*input).Username,
+		Email:    input.Email,
+		Username: input.Username,
 		Password: string(passwordHashBytes),
 	}
 	*db.Users = append(*db.Users, newUser)
-	return newUser, nil, 0
+	return newUser, nil, 200
+}
+
+func (db *Database) IsCredentialsCorect(input *UserLoginRequest) (bool, User) {
+	for _, user := range *db.Users {
+		if user.Email == input.Email && bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)) == nil {
+			return true, user
+		}
+	}
+	return false, User{}
 }
 
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")

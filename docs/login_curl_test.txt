@@ -1,0 +1,21 @@
+Регистрация
+curl -X POST http://localhost:1323/api/users/ \
+-H 'Content-Type: application/json' \
+-d '{"email": "user@example.com","password": "stringc","username": "string"}'
+
+Обычная авторизация 200
+curl -X POST http://localhost:1323/api/login/ \
+-H 'Content-Type: application/json' \
+-d '{"email": "user@example.com","password": "stringc"}'
+
+400
+curl -X POST http://localhost:1323/api/login/ \
+-H 'Content-Type: application/json' \
+-d '{"email": 1,"password": "stringc"}'
+
+403
+curl -X POST http://localhost:1323/api/login/ \
+-H 'Content-Type: application/json' \
+-d '{"email": "user@example.com","password": "stcringc"}'
+
+
