@@ -120,7 +120,7 @@ func DeleteUserByID(c echo.Context) error {
 	}
 	err = db.DeleteUser(userID)
 	if err != nil {
-		return nil
+		return err
 	}
 	err = DeteleSesssion(c)
 	if err != nil {
