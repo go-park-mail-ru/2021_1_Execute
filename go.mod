@@ -1,4 +1,4 @@
-module server
+module 2021_1_Execute
 
 go 1.13
 
@@ -7,5 +7,6 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	github.com/stretchr/testify v1.4.0
+	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 )

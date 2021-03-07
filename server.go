@@ -1,8 +1,8 @@
 package main
 
 import (
+	"2021_1_Execute/src/api"
 	"net/http"
-	"server/api"
 
 	"github.com/labstack/echo"
 )
@@ -29,9 +29,3 @@ func main() {
 	})
 	e.Logger.Fatal(e.Start(":1323"))
 }
-
-/*
-curl -X POST http://localhost:1323/api/users/ \
--H 'Content-Type: application/json' \
--d '{"email": "user@example.com","password": "stringc","username": "string"}'
-*/

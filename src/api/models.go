@@ -31,10 +31,10 @@ func CreateRegistrationResponse(user User) RegistrationResponse {
 }
 
 func (db *Database) CreateUser(input *UserRegistrationRequest) (User, error, int) {
-	if !isEmailValid((*input).Email) {
+	if !IsEmailValid((*input).Email) {
 		return User{}, errors.New("Invalid email"), 400
 	}
-	if !isPasswordValid((*input).Password) {
+	if !IsPasswordValid((*input).Password) {
 		return User{}, errors.New("Invalid password"), 400
 	}
 	for _, user := range *db.Users {
@@ -58,15 +58,15 @@ func (db *Database) CreateUser(input *UserRegistrationRequest) (User, error, int
 
 var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
-func isEmailValid(email string) bool {
+func IsEmailValid(email string) bool {
 	if len(email) < 3 && len(email) > 254 {
 		return false
 	}
 	return emailRegex.MatchString(email)
 }
 
-func isPasswordValid(password string) bool {
-	return !(len(password) < 6 && len(password) > 50)
+func IsPasswordValid(password string) bool {
+	return len(password) >= 6 && len(password) < 50
 }
 
 type UserRegistrationRequest struct {
