@@ -41,19 +41,3 @@ func DeteleSesssion(c echo.Context) error {
 	c.SetCookie(session)
 	return c.NoContent(http.StatusOK)
 }
-
-func (db *Database) IsAuthorized(c echo.Context) (bool, User) {
-	session, err := c.Cookie(CookieName)
-	if err != nil {
-		return false, User{}
-	}
-	userID, isAuthorized := (*db.Sessions)[session.Value]
-	if isAuthorized {
-		for _, user := range *db.Users {
-			if user.ID == userID {
-				return true, user
-			}
-		}
-	}
-	return false, User{}
-}
