@@ -1,0 +1,48 @@
+Вместо sessionID подставляем свой токен, предварительно зарегавшись и залогиневшись
+Вместо {id} подставляем id юзера
+
+GET:
+  200:
+    curl -H "Cookie: trello_session=sessionID" -X GET http://localhost:1323/api/user/{id}
+
+  401:
+    curl -H "Cookie: trello_session=wHaTeVeR-yOu-WaNt" -X GET http://localhost:1323/api/user/{id}
+
+  Вместо {wrongID} подставляем id другого юзера
+  404:
+    curl -H "Cookie: trello_session=sessionID" -X GET http://localhost:1323/api/user/{wrongID}
+
+PATCH:
+  200:
+    curl -H "Cookie: trello_session=sessionID" \
+-X PATCH http://localhost:1323/api/user/{id} \
+-H "Content-Type: application/json" \
+-d '{"password": "abracadabra"}'
+
+  403:
+    curl -H "Cookie: trello_session=wHaTeVeR-yOu-WaNt" \
+-X PATCH http://localhost:1323/api/user/{id} \
+-H "Content-Type: application/json" \
+-d '{"password": "abracadabra"}'
+
+  404:
+    curl -H "Cookie: trello_session=sessionID" \
+-X PATCH http://localhost:1323/api/user/{wrongID} \
+-H "Content-Type: application/json" \
+-d '{"password": "abracadabra"}'
+
+  400:
+    curl -H "Cookie: trello_session=sessionID" \
+-X PATCH http://localhost:1323/api/user/{id} \
+-H "Content-Type: application/json" \
+-d '{"password": "1", "email": "BadMail"}'
+
+DELETE:
+  200:
+    curl -H "Cookie: trello_session=sessionID" -X DELETE http://localhost:1323/api/user/{id}
+
+  403:
+    curl -H "Cookie: trello_session=wHaTeVeR-yOu-WaNt" -X DELETE http://localhost:1323/api/user/{id}
+
+  404:
+    curl -H "Cookie: trello_session=sessionID" -X DELETE http://localhost:1323/api/user/{wrongID}
