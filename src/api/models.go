@@ -17,6 +17,10 @@ type User struct {
 	Password string `json:"password"`
 }
 
+type HttpError struct {
+	Code uint
+}
+
 type UserRegistrationRequest struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`

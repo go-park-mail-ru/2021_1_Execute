@@ -25,4 +25,5 @@ func SetCookie(c echo.Context, userID uint64) error {
 	cookie.Expires = time.Now().Add(12 * time.Hour)
 	cookie.Path = "/"
 	c.SetCookie(cookie)
+	return nil
 }
