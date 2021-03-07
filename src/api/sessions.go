@@ -11,7 +11,7 @@ import (
 
 const CookieName = "trello_session"
 
-func SetCookie(c echo.Context, userID uint64) error {
+func SetSession(c echo.Context, userID uint64) error {
 	cookie := new(http.Cookie)
 	sessionUUID, err := uuid.NewRandom()
 	if err != nil {
@@ -28,4 +28,32 @@ func SetCookie(c echo.Context, userID uint64) error {
 	cookie.Path = "/"
 	c.SetCookie(cookie)
 	return nil
+}
+
+func DeteleSesssion(c echo.Context) error {
+	db := c.(*Database)
+	session, err := c.Cookie(CookieName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+	}
+	delete(*db.Sessions, session.Value)
+	session.Expires = time.Now().AddDate(0, 0, -1)
+	c.SetCookie(session)
+	return c.NoContent(http.StatusOK)
+}
+
+func (db *Database) IsAuthorized(c echo.Context) (bool, User) {
+	session, err := c.Cookie(CookieName)
+	if err != nil {
+		return false, User{}
+	}
+	userID, isAuthorized := (*db.Sessions)[session.Value]
+	if isAuthorized {
+		for _, user := range *db.Users {
+			if user.ID == userID {
+				return true, user
+			}
+		}
+	}
+	return false, User{}
 }

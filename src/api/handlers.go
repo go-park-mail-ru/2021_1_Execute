@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo"
 )
@@ -23,7 +22,7 @@ func registration(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(code, err.Error())
 	}
-	err = SetCookie(c, newUser.ID)
+	err = SetSession(c, newUser.ID)
 	if err != nil {
 		return err
 	}
@@ -38,7 +37,7 @@ func login(c echo.Context) error {
 	}
 	flag, user := db.IsCredentialsCorect(input)
 	if flag {
-		err := SetCookie(c, user.ID)
+		err := SetSession(c, user.ID)
 		if err != nil {
 			return err
 		}
@@ -48,13 +47,5 @@ func login(c echo.Context) error {
 }
 
 func logout(c echo.Context) error {
-	db := c.(*Database)
-	session, err := c.Cookie(CookieName)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-	}
-	delete(*db.Sessions, session.Value)
-	session.Expires = time.Now().AddDate(0, 0, -1)
-	c.SetCookie(session)
-	return c.NoContent(http.StatusOK)
+	return DeteleSesssion(c)
 }
