@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -17,6 +18,38 @@ type UserPatchRequest struct {
 	NewEmail    string `json:"email,omitempty"`
 	NewUsername string `json:"username,omitempty"`
 	NewPassword string `json:"password,omitempty"`
+}
+
+func (db *Database) UpdateUser(userID uint64, username, email, password string) error {
+	for i := 0; i < len(*db.Users); i++ {
+		if userID == (*db.Users)[i].ID {
+			if username != "" {
+				(*db.Users)[i].Username = username
+			}
+			if email != "" {
+				(*db.Users)[i].Email = email
+			}
+			if password != "" {
+				hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+				if err != nil {
+					return err
+				}
+				(*db.Users)[i].Password = string(hash)
+				return nil
+			}
+		}
+	}
+	return errors.New("No such user")
+}
+
+func (db *Database) DeleteUser(userID uint64) error {
+	for i, user := range *db.Users {
+		if user.ID == userID {
+			*db.Users = append((*db.Users)[:i], (*db.Users)[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("No such user")
 }
 
 func createGetUserResponse(user User) UserGetResponse {
@@ -65,23 +98,9 @@ func PatchUserByID(c echo.Context) error {
 	case input.NewPassword != "" && !IsPasswordValid(input.NewPassword):
 		return echo.NewHTTPError(http.StatusBadRequest, "Wrong format of password")
 	}
-	for i := 0; i < len(*db.Users); i++ {
-		if userID == (*db.Users)[i].ID {
-			if input.NewEmail != "" {
-				(*db.Users)[i].Email = input.NewEmail
-			}
-			if input.NewUsername != "" {
-				(*db.Users)[i].Username = input.NewUsername
-			}
-			if input.NewPassword != "" {
-				hash, err := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.MinCost)
-				if err != nil {
-					return nil
-				}
-				(*db.Users)[i].Password = string(hash)
-			}
-			break
-		}
+	err = db.UpdateUser(userID, input.NewUsername, input.NewEmail, input.NewPassword)
+	if err != nil {
+		return err
 	}
 	return c.NoContent(http.StatusOK)
 }
@@ -99,15 +118,13 @@ func DeleteUserByID(c echo.Context) error {
 	if userID != user.ID {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found")
 	}
-	for i, el := range *db.Users {
-		if el.ID == userID {
-			*db.Users = append((*db.Users)[:i], (*db.Users)[i+1:]...)
-			err := DeteleSesssion(c)
-			if err != nil {
-				return err
-			}
-			break
-		}
+	err = db.DeleteUser(userID)
+	if err != nil {
+		return nil
+	}
+	err = DeteleSesssion(c)
+	if err != nil {
+		return err
 	}
 	return c.NoContent(http.StatusOK)
 }
