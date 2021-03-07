@@ -17,11 +17,11 @@ func registration(c echo.Context) error {
 	db := c.(*Database)
 	input := new(UserRegistrationRequest)
 	if err := c.Bind(input); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	newUser, err, code := db.CreateUser(input)
 	if err != nil {
-		return echo.NewHTTPError(code, err)
+		return echo.NewHTTPError(code, err.Error())
 	}
 	err = SetCookie(c, newUser.ID)
 	if err != nil {
@@ -34,7 +34,7 @@ func login(c echo.Context) error {
 	db := c.(*Database)
 	input := new(UserLoginRequest)
 	if err := c.Bind(input); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	flag, user := db.IsCredentialsCorect(input)
 	if flag {
@@ -51,7 +51,7 @@ func logout(c echo.Context) error {
 	db := c.(*Database)
 	session, err := c.Cookie(CookieName)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err)
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 	delete(*db.Sessions, session.Value)
 	session.Expires = time.Now().AddDate(0, 0, -1)

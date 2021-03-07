@@ -19,3 +19,9 @@ curl -X POST http://localhost:1323/api/login/ \
 -d '{"email": "user@example.com","password": "stcringc"}'
 
 
+logout 200
+сюда вставляем свою токен
+curl -H "Cookie: trello_session=2f793b18-31f8-47a4-af83-3eeaefeb640a" -X DELETE http://localhost:1323/api/logout/ 
+ 401
+curl -X DELETE http://localhost:1323/api/logout/ 
+
