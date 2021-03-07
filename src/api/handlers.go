@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -16,11 +17,11 @@ func registration(c echo.Context) error {
 	db := c.(*Database)
 	input := new(UserRegistrationRequest)
 	if err := c.Bind(input); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 	newUser, err, code := db.CreateUser(input)
 	if err != nil {
-		return echo.NewHTTPError(code, err.Error())
+		return echo.NewHTTPError(code, err)
 	}
 	err = SetCookie(c, newUser.ID)
 	if err != nil {
@@ -33,7 +34,7 @@ func login(c echo.Context) error {
 	db := c.(*Database)
 	input := new(UserLoginRequest)
 	if err := c.Bind(input); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 	flag, user := db.IsCredentialsCorect(input)
 	if flag {
@@ -45,6 +46,15 @@ func login(c echo.Context) error {
 	}
 	return echo.NewHTTPError(http.StatusForbidden, "Wrong pair: password, email")
 }
+
 func logout(c echo.Context) error {
-	return c.String(http.StatusOK, "logout")
+	db := c.(*Database)
+	session, err := c.Cookie(CookieName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, err)
+	}
+	delete(*db.Sessions, session.Value)
+	session.Expires = time.Now().AddDate(0, 0, -1)
+	c.SetCookie(session)
+	return c.NoContent(http.StatusOK)
 }

@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const CookieName = "trello_session"
+
 func SetCookie(c echo.Context, userID uint64) error {
 	cookie := new(http.Cookie)
 	sessionUUID, err := uuid.NewRandom()
@@ -20,7 +22,7 @@ func SetCookie(c echo.Context, userID uint64) error {
 	(*db.Sessions)[sessionToken] = userID
 
 	cookie.HttpOnly = true
-	cookie.Name = "trello_session"
+	cookie.Name = CookieName
 	cookie.Value = sessionToken
 	cookie.Expires = time.Now().Add(12 * time.Hour)
 	cookie.Path = "/"
