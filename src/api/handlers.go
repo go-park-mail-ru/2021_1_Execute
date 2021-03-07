@@ -13,7 +13,21 @@ func Router(e *echo.Echo) {
 }
 
 func registration(c echo.Context) error {
-	return c.String(http.StatusOK, "reg")
+	db := c.(*Database)
+	input := new(UserRegistrationRequest)
+	if err := c.Bind(input); err != nil {
+		return err
+	}
+	newUser, err, code := db.CreateUser(input)
+	if err != nil {
+		return echo.NewHTTPError(code, err.Error())
+	}
+	err = SetCookie(c, newUser.ID)
+	if err != nil {
+		return err
+	}
+	response := CreateRegistrationResponse(newUser)
+	return c.JSON(http.StatusOK, response)
 }
 func login(c echo.Context) error {
 	return c.String(http.StatusOK, "login")

@@ -8,16 +8,16 @@ import (
 )
 
 func main() {
-	users:=make([]api.User)
-	sessions:=make([]api.SessionsMap)
+	users := make([]api.User, 0)
+	sessions := make(api.SessionsMap, 0)
 	e := echo.New()
 	//This middleware should be registered before any other middleware.
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cc := &api.Database{
-				Context:	c, 
-				Users:		&users,
-				Sessions:	&sessions
+				Context:  c,
+				Users:    &users,
+				Sessions: &sessions,
 			}
 			return next(cc)
 		}
@@ -29,3 +29,9 @@ func main() {
 	})
 	e.Logger.Fatal(e.Start(":1323"))
 }
+
+/*
+curl -X POST http://localhost:1323/api/users/ \
+-H 'Content-Type: application/json' \
+-d '{"email": "user@example.com","password": "stringc","username": "string"}'
+*/
