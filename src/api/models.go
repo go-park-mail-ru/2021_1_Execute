@@ -4,23 +4,23 @@ import (
 	"github.com/labstack/echo"
 )
 
-type SessionsMap map[string]uint64
+type Sessions map[string]int
 
 type Database struct {
 	echo.Context
 	Users    *[]User
-	Sessions *SessionsMap
+	Sessions *Sessions
 }
 
 type User struct {
-	ID       uint64 `json:"id"`
+	ID       int    `json:"id"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 type RegistrationResponse struct {
-	ID uint64 `json:"id"`
+	ID int `json:"id"`
 }
 
 type UserRegistrationRequest struct {

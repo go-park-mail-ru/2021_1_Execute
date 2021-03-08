@@ -12,12 +12,14 @@ func CreateLoginResponse(user User) RegistrationResponse {
 
 func login(c echo.Context) error {
 	db := c.(*Database)
+
 	input := new(UserLoginRequest)
 	if err := c.Bind(input); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	flag, user := db.IsCredentialsCorrect(input)
-	if flag {
+
+	user, isCorrect := db.IsCredentialsCorrect(input)
+	if isCorrect {
 		err := SetSession(c, user.ID)
 		if err != nil {
 			return err
@@ -28,5 +30,5 @@ func login(c echo.Context) error {
 }
 
 func logout(c echo.Context) error {
-	return DeteleSesssion(c)
+	return DeteleSession(c)
 }

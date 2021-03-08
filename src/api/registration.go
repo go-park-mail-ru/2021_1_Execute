@@ -12,10 +12,12 @@ func registration(c echo.Context) error {
 	if err := c.Bind(input); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	newUser, err, code := db.CreateUser(input)
+
+	newUser, err := db.CreateUser(input)
 	if err != nil {
-		return echo.NewHTTPError(code, err.Error())
+		return err
 	}
+
 	err = SetSession(c, newUser.ID)
 	if err != nil {
 		return err

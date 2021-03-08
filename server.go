@@ -2,7 +2,6 @@ package main
 
 import (
 	"2021_1_Execute/src/api"
-	"net/http"
 
 	"github.com/labstack/echo"
 )
@@ -24,8 +23,5 @@ func main() {
 	})
 
 	api.Router(e)
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
 	e.Logger.Fatal(e.Start(":1323"))
 }
