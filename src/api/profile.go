@@ -57,6 +57,7 @@ func (db *Database) UpdateUser(userID int, username, email, password string) err
 			}
 		}
 	}
+
 	return errors.New("No such user")
 }
 
@@ -158,7 +159,7 @@ func DeleteUserByID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	err = DeteleSesssion(c)
+	err = DeleteSesssion(c)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
