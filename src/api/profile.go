@@ -79,6 +79,7 @@ func createGetUserByIdResponse(user User) GetUserByIdResponse {
 
 func GetUserByID(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("id"))
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -86,9 +87,11 @@ func GetUserByID(c echo.Context) error {
 	db := c.(*Database)
 
 	ok, user := db.IsAuthorized(c)
+
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
 	}
+
 	if userID != user.ID {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found")
 	}
@@ -98,11 +101,13 @@ func GetUserByID(c echo.Context) error {
 
 func PatchUserByID(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("id"))
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	input := new(PatchUserRequest)
+
 	if err := c.Bind(input); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -110,14 +115,17 @@ func PatchUserByID(c echo.Context) error {
 	db := c.(*Database)
 
 	ok, user := db.IsAuthorized(c)
+
 	if !ok {
 		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
 	}
+
 	if userID != user.ID {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found")
 	}
 
 	err = db.UpdateUser(userID, input.NewUsername, input.NewEmail, input.NewPassword)
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, errors.Wrap(err, "Invalid format").Error())
 	}
@@ -127,6 +135,7 @@ func PatchUserByID(c echo.Context) error {
 
 func DeleteUserByID(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("id"))
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -134,19 +143,23 @@ func DeleteUserByID(c echo.Context) error {
 	db := c.(*Database)
 
 	ok, user := db.IsAuthorized(c)
+
 	if !ok {
 		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
 	}
+
 	if userID != user.ID {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found")
 	}
 
 	err = db.DeleteUser(userID)
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	err = DeteleSesssion(c)
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
