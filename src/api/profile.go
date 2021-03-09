@@ -159,7 +159,7 @@ func DeleteUserByID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	err = DeleteSesssion(c)
+	err = DeleteSession(c)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
