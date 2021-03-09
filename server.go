@@ -2,8 +2,10 @@ package main
 
 import (
 	"2021_1_Execute/src/api"
+	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func main() {
@@ -21,6 +23,13 @@ func main() {
 			return next(cc)
 		}
 	})
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPatch, http.MethodPost, http.MethodDelete},
+		AllowHeaders:     []string{echo.HeaderAccept, echo.HeaderOrigin, echo.HeaderContentType},
+		AllowCredentials: true,
+	}))
 
 	api.Router(e)
 	e.Logger.Fatal(e.Start(":1323"))
