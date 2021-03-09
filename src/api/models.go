@@ -34,3 +34,14 @@ type UserLoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type GetUserByIdResponse struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+}
+
+type PatchUserRequest struct {
+	NewEmail    string `json:"email,omitempty"`
+	NewUsername string `json:"username,omitempty"`
+	NewPassword string `json:"password,omitempty"`
+}

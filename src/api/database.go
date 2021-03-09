@@ -62,3 +62,54 @@ func (db *Database) IsAuthorized(c echo.Context) (User, bool) {
 	}
 	return User{}, false
 }
+
+func (db *Database) IsEmailUniq(userID int, email string) bool {
+	for _, user := range *db.Users {
+		if userID != user.ID && user.Email == email {
+			return false
+		}
+	}
+	return true
+}
+
+func (db *Database) UpdateUser(userID int, username, email, password string) error {
+	switch {
+	case email != "" && !IsEmailValid(email):
+		return errors.New("Invalid email")
+	case email != "" && !db.IsEmailUniq(userID, email):
+		return errors.New("Non-uniq email")
+	case password != "" && !IsPasswordValid(password):
+		return errors.New("Invalid password")
+	}
+
+	for i, user := range *db.Users {
+		if userID == user.ID {
+			if username != "" {
+				(*db.Users)[i].Username = username
+			}
+			if email != "" {
+				(*db.Users)[i].Email = email
+			}
+			if password != "" {
+				hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+				if err != nil {
+					return errors.Wrap(err, "Error while hashing")
+				}
+				(*db.Users)[i].Password = string(hash)
+				return nil
+			}
+		}
+	}
+
+	return errors.New("No such user")
+}
+
+func (db *Database) DeleteUser(userID int) error {
+	for i, user := range *db.Users {
+		if user.ID == userID {
+			*db.Users = append((*db.Users)[:i], (*db.Users)[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("No such user")
+}
