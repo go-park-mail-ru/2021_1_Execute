@@ -2,13 +2,12 @@ package main
 
 import (
 	"2021_1_Execute/src/api"
-	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
-var allowOrigins = []string{"http://localhost:3000"}
+var allowOrigins = []string{"http://127.0.0.1:3000", "http://localhost:3000"}
 
 func main() {
 	users := make([]api.User, 0)
@@ -28,8 +27,7 @@ func main() {
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     allowOrigins,
-		AllowMethods:     []string{http.MethodGet, http.MethodPatch, http.MethodPost, http.MethodDelete},
-		AllowHeaders:     []string{echo.HeaderAccept, echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderCookie, echo.HeaderSetCookie},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowCredentials: true,
 	}))
 
