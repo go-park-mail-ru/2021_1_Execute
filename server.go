@@ -8,6 +8,8 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
+var allowOrigins = []string{"http://localhost:3000"}
+
 func main() {
 	users := make([]api.User, 0)
 	sessions := make(api.Sessions, 0)
@@ -25,9 +27,9 @@ func main() {
 	})
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     allowOrigins,
 		AllowMethods:     []string{http.MethodGet, http.MethodPatch, http.MethodPost, http.MethodDelete},
-		AllowHeaders:     []string{echo.HeaderAccept, echo.HeaderOrigin, echo.HeaderContentType},
+		AllowHeaders:     []string{echo.HeaderAccept, echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderCookie, echo.HeaderSetCookie},
 		AllowCredentials: true,
 	}))
 
