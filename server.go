@@ -8,7 +8,7 @@ import (
 
 func main() {
 	users := make([]api.User, 0)
-	sessions := make(api.SessionsMap, 0)
+	sessions := make(api.Sessions, 0)
 	e := echo.New()
 	//This middleware should be registered before any other middleware.
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
