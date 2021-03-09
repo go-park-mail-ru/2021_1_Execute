@@ -87,7 +87,7 @@ func GetUserByID(c echo.Context) error {
 
 	db := c.(*Database)
 
-	ok, user := db.IsAuthorized(c)
+	user, ok := db.IsAuthorized(c)
 
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
@@ -97,7 +97,9 @@ func GetUserByID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found")
 	}
 
-	return c.JSON(http.StatusOK, struct{ user GetUserByIdResponse }{createGetUserByIdResponse(user)})
+	return c.JSON(http.StatusOK, struct {
+		User GetUserByIdResponse `json:"user"`
+	}{User: createGetUserByIdResponse(user)})
 }
 
 func PatchUserByID(c echo.Context) error {
@@ -115,7 +117,7 @@ func PatchUserByID(c echo.Context) error {
 
 	db := c.(*Database)
 
-	ok, user := db.IsAuthorized(c)
+	user, ok := db.IsAuthorized(c)
 
 	if !ok {
 		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
@@ -143,7 +145,7 @@ func DeleteUserByID(c echo.Context) error {
 
 	db := c.(*Database)
 
-	ok, user := db.IsAuthorized(c)
+	user, ok := db.IsAuthorized(c)
 
 	if !ok {
 		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
