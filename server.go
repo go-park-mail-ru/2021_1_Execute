@@ -1,0 +1,27 @@
+package main
+
+import (
+	"2021_1_Execute/src/api"
+
+	"github.com/labstack/echo"
+)
+
+func main() {
+	users := make([]api.User, 0)
+	sessions := make(api.Sessions, 0)
+	e := echo.New()
+	//This middleware should be registered before any other middleware.
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			cc := &api.Database{
+				Context:  c,
+				Users:    &users,
+				Sessions: &sessions,
+			}
+			return next(cc)
+		}
+	})
+
+	api.Router(e)
+	e.Logger.Fatal(e.Start(":1323"))
+}
