@@ -21,7 +21,7 @@ func GetCurrentUser(c echo.Context) error {
 	db := c.(*Database)
 
 	user, ok := db.IsAuthorized(c)
-	log.Println(user)
+	log.Println(user, ok)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
 	}

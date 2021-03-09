@@ -13,7 +13,6 @@ func CreateLoginResponse(user User) RegistrationResponse {
 func login(c echo.Context) error {
 	db := c.(*Database)
 
-	user, ok := db.IsAuthorized(c)
 	input := new(UserLoginRequest)
 	if err := c.Bind(input); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
