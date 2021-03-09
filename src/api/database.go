@@ -1,29 +1,28 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (db *Database) CreateUser(input *UserRegistrationRequest) (User, error) {
 	if !IsEmailValid(input.Email) {
-		return User{}, echo.NewHTTPError(http.StatusBadRequest, "Invalid email")
+		return User{}, &BadRequestError{"Invalid email"}
 	}
 	if !IsPasswordValid((*input).Password) {
-		return User{}, echo.NewHTTPError(http.StatusBadRequest, "Invalid password")
+		return User{}, &BadRequestError{"Invalid password"}
 	}
 
 	for _, user := range *db.Users {
 		if user.Email == input.Email {
-			return User{}, echo.NewHTTPError(http.StatusConflict, "Email not unique")
+			return User{}, &ConflictError{"Email not unique"}
 		}
 	}
 
 	passwordHashBytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 	if err != nil {
-		return User{}, echo.NewHTTPError(http.StatusInternalServerError, "Error while hashing: "+err.Error())
+		return User{}, errors.Wrap(err, "Error while hashing")
 	}
 
 	newUser := User{

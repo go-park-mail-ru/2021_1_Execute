@@ -15,12 +15,12 @@ func registration(c echo.Context) error {
 
 	newUser, err := db.CreateUser(input)
 	if err != nil {
-		return err
+		return GetEchoError(err)
 	}
 
 	err = SetSession(c, newUser.ID)
 	if err != nil {
-		return err
+		return GetEchoError(err)
 	}
 	return c.JSON(http.StatusOK, CreateLoginResponse(newUser))
 }

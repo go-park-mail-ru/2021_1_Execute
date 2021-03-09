@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 )
 
 const CookieName = "trello_session"
@@ -17,7 +18,7 @@ func SetSession(c echo.Context, userID int) error {
 
 	sessionUUID, err := uuid.NewRandom()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Error while create UUID: "+err.Error())
+		return errors.Wrap(err, "Error while create UUID")
 	}
 	sessionToken := sessionUUID.String()
 
@@ -32,16 +33,16 @@ func SetSession(c echo.Context, userID int) error {
 	return nil
 }
 
-func DeteleSession(c echo.Context) error {
+func DeleteSession(c echo.Context) error {
 	db := c.(*Database)
 
 	session, err := c.Cookie(CookieName)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
+		return &UnauthorizedError{err.Error()}
 	}
 
 	delete(*db.Sessions, session.Value)
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	c.SetCookie(session)
-	return c.NoContent(http.StatusOK)
+	return nil
 }

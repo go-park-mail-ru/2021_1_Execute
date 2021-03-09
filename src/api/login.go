@@ -22,7 +22,7 @@ func login(c echo.Context) error {
 	if isCorrect {
 		err := SetSession(c, user.ID)
 		if err != nil {
-			return err
+			return GetEchoError(err)
 		}
 		return c.JSON(http.StatusOK, CreateLoginResponse(user))
 	}
@@ -30,5 +30,9 @@ func login(c echo.Context) error {
 }
 
 func logout(c echo.Context) error {
-	return DeteleSession(c)
+	err := DeleteSession(c)
+	if err != nil {
+		return GetEchoError(err)
+	}
+	return c.NoContent(http.StatusOK)
 }
