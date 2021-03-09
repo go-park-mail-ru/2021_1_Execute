@@ -34,5 +34,6 @@ func logout(c echo.Context) error {
 	if err != nil {
 		return GetEchoError(err)
 	}
+
 	return c.NoContent(http.StatusOK)
 }

@@ -10,6 +10,7 @@ func (db *Database) CreateUser(input *UserRegistrationRequest) (User, error) {
 	if !IsEmailValid(input.Email) {
 		return User{}, &BadRequestError{"Invalid email"}
 	}
+
 	if !IsPasswordValid((*input).Password) {
 		return User{}, &BadRequestError{"Invalid password"}
 	}

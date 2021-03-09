@@ -34,6 +34,7 @@ func GetEchoError(err error) error {
 	if err == nil {
 		return nil
 	}
+
 	switch err.(type) {
 	case *UnauthorizedError:
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
