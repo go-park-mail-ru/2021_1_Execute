@@ -97,7 +97,7 @@ func GetUserByID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "User not found")
 	}
 
-	return c.JSON(http.StatusOK, createGetUserByIdResponse(user))
+	return c.JSON(http.StatusOK, struct{ user GetUserByIdResponse }{createGetUserByIdResponse(user)})
 }
 
 func PatchUserByID(c echo.Context) error {
