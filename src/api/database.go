@@ -96,8 +96,8 @@ func (db *Database) UpdateUser(userID int, username, email, password string) err
 					return errors.Wrap(err, "Error while hashing")
 				}
 				(*db.Users)[i].Password = string(hash)
-				return nil
 			}
+			return nil
 		}
 	}
 
