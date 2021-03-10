@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
-var allowOrigins = []string{"http://127.0.0.1:3000", "http://localhost:3000", "http://localhost:1323"}
+var allowOrigins = []string{"http://127.0.0.1:3000", "http://localhost:3000", "http://localhost:1323", "http://89.208.199.114:3000"}
 
 func main() {
 	users := make([]api.User, 0)
