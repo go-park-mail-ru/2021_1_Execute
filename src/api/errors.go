@@ -30,6 +30,14 @@ func (e *BadRequestError) Error() string {
 	return e.Message
 }
 
+type NotFoundError struct {
+	Message string
+}
+
+func (e *NotFoundError) Error() string {
+	return e.Message
+}
+
 func GetEchoError(err error) error {
 	if err == nil {
 		return nil
@@ -42,6 +50,8 @@ func GetEchoError(err error) error {
 		return echo.NewHTTPError(http.StatusConflict, err.Error())
 	case *BadRequestError:
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	case *NotFoundError:
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	default:
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

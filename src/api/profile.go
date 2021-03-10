@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo"
-	"github.com/pkg/errors"
 )
 
 func createGetUserByIdResponse(user User) GetUserByIdResponse {
@@ -56,15 +55,8 @@ func GetUserByID(c echo.Context) error {
 	}{User: createGetUserByIdResponse(user)})
 }
 
-func PatchUserByID(c echo.Context) error {
-	userID, err := strconv.Atoi(c.Param("id"))
-
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-
+func PatchUser(c echo.Context) error {
 	input := new(PatchUserRequest)
-
 	if err := c.Bind(input); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -72,19 +64,14 @@ func PatchUserByID(c echo.Context) error {
 	db := c.(*Database)
 
 	user, ok := db.IsAuthorized(c)
-
 	if !ok {
 		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
 	}
 
-	if userID != user.ID {
-		return echo.NewHTTPError(http.StatusNotFound, "User not found")
-	}
-
-	err = db.UpdateUser(userID, input.NewUsername, input.NewEmail, input.NewPassword)
+	err := db.UpdateUser(user.ID, input.NewUsername, input.NewEmail, input.NewPassword)
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, errors.Wrap(err, "Invalid format").Error())
+		return GetEchoError(err)
 	}
 
 	return c.NoContent(http.StatusOK)

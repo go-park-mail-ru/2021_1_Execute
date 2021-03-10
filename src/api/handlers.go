@@ -10,6 +10,6 @@ func Router(e *echo.Echo) {
 	e.DELETE("/api/logout/", logout)
 	e.GET("/api/users/", GetCurrentUser)
 	e.GET("/api/users/:id", GetUserByID)
-	e.PATCH("/api/users/:id", PatchUserByID)
+	e.PATCH("/api/users/", PatchUser)
 	e.DELETE("/api/users/:id", DeleteUserByID)
 }

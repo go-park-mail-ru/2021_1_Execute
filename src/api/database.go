@@ -75,11 +75,11 @@ func (db *Database) IsEmailUniq(userID int, email string) bool {
 func (db *Database) UpdateUser(userID int, username, email, password string) error {
 	switch {
 	case email != "" && !IsEmailValid(email):
-		return errors.New("Invalid email")
+		return &BadRequestError{"Invalid email"}
 	case email != "" && !db.IsEmailUniq(userID, email):
-		return errors.New("Non-uniq email")
+		return &BadRequestError{"Non-uniq email"}
 	case password != "" && !IsPasswordValid(password):
-		return errors.New("Invalid password")
+		return &BadRequestError{"Invalid password"}
 	}
 
 	for i, user := range *db.Users {
@@ -101,7 +101,7 @@ func (db *Database) UpdateUser(userID int, username, email, password string) err
 		}
 	}
 
-	return errors.New("No such user")
+	return &NotFoundError{"No such user"}
 }
 
 func (db *Database) DeleteUser(userID int) error {
