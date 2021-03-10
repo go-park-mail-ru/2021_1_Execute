@@ -77,7 +77,7 @@ func (db *Database) UpdateUser(userID int, username, email, password string) err
 	case email != "" && !IsEmailValid(email):
 		return &BadRequestError{"Invalid email"}
 	case email != "" && !db.IsEmailUniq(userID, email):
-		return &BadRequestError{"Non-uniq email"}
+		return &ConflictError{"Non-uniq email"}
 	case password != "" && !IsPasswordValid(password):
 		return &BadRequestError{"Invalid password"}
 	}
