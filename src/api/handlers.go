@@ -12,4 +12,6 @@ func Router(e *echo.Echo) {
 	e.GET("/api/users/:id", GetUserByID)
 	e.PATCH("/api/users/", PatchUser)
 	e.DELETE("/api/users/:id", DeleteUserByID)
+	e.POST("/api/upload/", upload)
+	e.GET("/api/static/", download)
 }

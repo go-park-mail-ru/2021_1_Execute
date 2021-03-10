@@ -72,7 +72,7 @@ func (db *Database) IsEmailUniq(userID int, email string) bool {
 	return true
 }
 
-func (db *Database) UpdateUser(userID int, username, email, password string) error {
+func (db *Database) UpdateUser(userID int, username, email, password, avatar string) error {
 	switch {
 	case email != "" && !IsEmailValid(email):
 		return &BadRequestError{"Invalid email"}
@@ -96,6 +96,9 @@ func (db *Database) UpdateUser(userID int, username, email, password string) err
 					return errors.Wrap(err, "Error while hashing")
 				}
 				(*db.Users)[i].Password = string(hash)
+			}
+			if avatar != "" {
+				(*db.Users)[i].Avatar = avatar
 			}
 			return nil
 		}

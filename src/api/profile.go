@@ -68,7 +68,7 @@ func PatchUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
 	}
 
-	err := db.UpdateUser(user.ID, input.NewUsername, input.NewEmail, input.NewPassword)
+	err := db.UpdateUser(user.ID, input.NewUsername, input.NewEmail, input.NewPassword, "")
 
 	if err != nil {
 		return GetEchoError(err)
