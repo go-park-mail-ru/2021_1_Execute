@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-const destinationFolder = "/static/"
+const destinationFolder = "../static/"
 
 func upload(c echo.Context) error {
 
@@ -20,13 +20,11 @@ func upload(c echo.Context) error {
 	}
 
 	file, err := c.FormFile("file")
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	src, err := file.Open()
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -45,7 +43,7 @@ func upload(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	err = db.UpdateUser(user.ID, "", "", "", file.Filename)
+	err = db.UpdateUser(user.ID, "", "", "", destinationFolder+file.Filename)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -55,14 +53,15 @@ func upload(c echo.Context) error {
 }
 
 func download(c echo.Context) error {
+
 	db := c.(*Database)
 
-	user, ok := db.IsAuthorized(c)
+	_, ok := db.IsAuthorized(c)
 	if !ok {
 		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
 	}
 
-	filename := user.Avatar
+	filename := c.Param("filename")
 
 	if filename == "" {
 		return c.NoContent(http.StatusOK)

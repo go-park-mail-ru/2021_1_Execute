@@ -11,8 +11,9 @@ import (
 
 func createGetUserByIdResponse(user User) GetUserByIdResponse {
 	return GetUserByIdResponse{
-		Email:    user.Email,
-		Username: user.Username,
+		Email:     user.Email,
+		Username:  user.Username,
+		AvatarURL: user.Avatar,
 	}
 }
 
