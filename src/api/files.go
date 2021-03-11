@@ -12,12 +12,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-const destinationFolder = "../static/"
+const destinationFolder = "../../static/"
 
 func getExtension(filename string) string {
 	splitted := strings.Split(filename, ".")
 	if len(splitted) > 1 {
-		return splitted[len(splitted)-1]
+		return "." + splitted[len(splitted)-1]
 	}
 	return ""
 }
