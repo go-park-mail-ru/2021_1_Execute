@@ -98,6 +98,12 @@ func (db *Database) UpdateUser(userID int, username, email, password, avatar str
 				(*db.Users)[i].Password = string(hash)
 			}
 			if avatar != "" {
+				if user.Avatar != "" {
+					err := deleteFile(user.Avatar)
+					if err != nil {
+						return errors.Wrap(err, "Error while updating user")
+					}
+				}
 				(*db.Users)[i].Avatar = avatar
 			}
 			return nil
