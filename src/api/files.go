@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const destinationFolder = "../static/"
+const destinationFolder = "../../static/"
 
 func getExtension(filename string) string {
 	splitted := strings.Split(filename, ".")
@@ -20,6 +20,14 @@ func getExtension(filename string) string {
 		return "." + splitted[len(splitted)-1]
 	}
 	return ""
+}
+
+func deleteFile(path string) error {
+	err := os.Remove(path)
+	if err != nil {
+		return errors.Wrap(err, "Error while deleting file")
+	}
+	return nil
 }
 
 func saveFile(file *multipart.FileHeader) (string, error) {
