@@ -17,6 +17,7 @@ type User struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Avatar   string `json:"-"`
 }
 
 type RegistrationResponse struct {
@@ -27,7 +28,6 @@ type UserRegistrationRequest struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	//TODO добавить аватар и в user
 }
 
 type UserLoginRequest struct {
@@ -36,8 +36,13 @@ type UserLoginRequest struct {
 }
 
 type GetUserByIdResponse struct {
-	Email    string `json:"email"`
-	Username string `json:"username"`
+	Email     string `json:"email"`
+	Username  string `json:"username"`
+	AvatarURL string `json:"avatarUrl"`
+}
+
+type GetUserByIdBody struct {
+	Response GetUserByIdResponse `json:"user"`
 }
 
 type PatchUserRequest struct {

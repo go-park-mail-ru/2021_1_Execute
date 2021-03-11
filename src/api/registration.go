@@ -12,7 +12,6 @@ func registration(c echo.Context) error {
 	if err := c.Bind(input); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-
 	newUser, err := db.CreateUser(input)
 	if err != nil {
 		return GetEchoError(err)

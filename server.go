@@ -4,7 +4,10 @@ import (
 	"2021_1_Execute/src/api"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
+
+var allowOrigins = []string{"http://127.0.0.1:3000", "http://localhost:3000", "http://localhost:1323", "http://89.208.199.114:3000"}
 
 func main() {
 	users := make([]api.User, 0)
@@ -21,6 +24,12 @@ func main() {
 			return next(cc)
 		}
 	})
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     allowOrigins,
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowCredentials: true,
+	}))
 
 	api.Router(e)
 	e.Logger.Fatal(e.Start(":1323"))

@@ -38,7 +38,7 @@ func DeleteSession(c echo.Context) error {
 
 	session, err := c.Cookie(CookieName)
 	if err != nil {
-		return &UnauthorizedError{err.Error()}
+		return UnauthorizedError
 	}
 
 	delete(*db.Sessions, session.Value)
