@@ -13,7 +13,6 @@ const CookieName = "trello_session"
 const CookieLifeTime = 12 * time.Hour
 
 func SetSession(c echo.Context, userID int) error {
-	cookie := new(http.Cookie)
 	db := c.(*Database)
 
 	sessionUUID, err := uuid.NewRandom()
@@ -24,12 +23,14 @@ func SetSession(c echo.Context, userID int) error {
 
 	(*db.Sessions)[sessionToken] = userID
 
-	cookie.HttpOnly = true
-	cookie.Name = CookieName
-	cookie.Value = sessionToken
-	cookie.Expires = time.Now().Add(CookieLifeTime)
-	cookie.Path = "/"
-	c.SetCookie(cookie)
+	cookie := http.Cookie{
+		HttpOnly: true,
+		Name:     CookieName,
+		Value:    sessionToken,
+		Path:     "/",
+		Expires:  time.Now().Add(CookieLifeTime),
+	}
+	c.SetCookie(&cookie)
 	return nil
 }
 
