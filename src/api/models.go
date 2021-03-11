@@ -41,6 +41,10 @@ type GetUserByIdResponse struct {
 	AvatarURL string `json:"avatarUrl"`
 }
 
+type GetUserByIdBody struct {
+	Response GetUserByIdResponse `json:"user"`
+}
+
 type PatchUserRequest struct {
 	NewEmail    string `json:"email,omitempty"`
 	NewUsername string `json:"username,omitempty"`

@@ -17,6 +17,12 @@ func createGetUserByIdResponse(user User) GetUserByIdResponse {
 	}
 }
 
+func createGetUserByIdBody(user User) GetUserByIdBody {
+	return GetUserByIdBody{
+		Response: createGetUserByIdResponse(user),
+	}
+}
+
 func GetCurrentUser(c echo.Context) error {
 	db := c.(*Database)
 
@@ -26,9 +32,7 @@ func GetCurrentUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
 	}
 
-	return c.JSON(http.StatusOK, struct {
-		User GetUserByIdResponse `json:"user"`
-	}{User: createGetUserByIdResponse(user)})
+	return c.JSON(http.StatusOK, createGetUserByIdBody(user))
 }
 
 func GetUserByID(c echo.Context) error {
