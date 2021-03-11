@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -27,7 +25,6 @@ func GetCurrentUser(c echo.Context) error {
 	db := c.(*Database)
 
 	user, ok := db.IsAuthorized(c)
-	log.Println(user, ok)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
 	}
@@ -36,7 +33,6 @@ func GetCurrentUser(c echo.Context) error {
 }
 
 func GetUserByID(c echo.Context) error {
-	fmt.Println(c.Param("id"))
 	userID, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
