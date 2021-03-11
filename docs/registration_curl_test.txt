@@ -1,0 +1,16 @@
+Обычная регистрация
+curl -X POST http://localhost:1323/api/users/ \
+-H 'Content-Type: application/json' \
+-d '{"email": "user@example.com","password": "stringc","username": "string"}'
+Некорректный email
+curl -X POST http://localhost:1323/api/users/ \
+-H 'Content-Type: application/json' \
+-d '{"email": "userexample.com","password": "stringc","username": "string"}'
+Короткий пароль
+curl -X POST http://localhost:1323/api/users/ \
+-H 'Content-Type: application/json' \
+-d '{"email": "user2@example.com","password": "strin","username": "string"}'
+
+curl -X POST http://localhost:1323/api/users/ \
+-H 'Content-Type: application/json' \
+-d '{"email": "user@example.com","password": "stringc","username": "string"}'
