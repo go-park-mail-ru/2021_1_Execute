@@ -5,29 +5,48 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 )
 
 const destinationFolder = "../static/"
 
-func saveFile(file *multipart.FileHeader) error {
+func getExtension(filename string) string {
+	splitted := strings.Split(filename, ".")
+	if len(splitted) > 1 {
+		return splitted[len(splitted)-1]
+	}
+	return ""
+}
+
+func saveFile(file *multipart.FileHeader) (string, error) {
 	src, err := file.Open()
 	if err != nil {
-		return err
+		return "", errors.Wrap(err, "Error while opening file")
 	}
 	defer src.Close()
 
-	dst, err := os.Create(destinationFolder + file.Filename)
+	uuid, err := uuid.NewRandom()
 	if err != nil {
-		return err
+		return "", errors.Wrap(err, "Error while create UUID")
+	}
+
+	newFilename := uuid.String()
+	newFilename += getExtension(file.Filename)
+
+	dst, err := os.Create(destinationFolder + newFilename)
+	if err != nil {
+		return "", errors.Wrap(err, "Error while creating file")
 	}
 	defer dst.Close()
 
 	if _, err = io.Copy(dst, src); err != nil {
-		return err
+		return "", errors.Wrap(err, "Error while saving file")
 	}
-	return nil
+	return newFilename, nil
 }
 
 func upload(c echo.Context) error {
@@ -44,12 +63,12 @@ func upload(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	err = saveFile(file)
+	filename, err := saveFile(file)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	err = db.UpdateUser(user.ID, "", "", "", destinationFolder+file.Filename)
+	err = db.UpdateUser(user.ID, "", "", "", destinationFolder+filename)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
