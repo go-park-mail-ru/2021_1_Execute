@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -27,7 +26,6 @@ func GetCurrentUser(c echo.Context) error {
 	db := c.(*Database)
 
 	user, ok := db.IsAuthorized(c)
-	log.Println(user, ok)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
 	}

@@ -8,16 +8,16 @@ import (
 
 func (db *Database) CreateUser(input *UserRegistrationRequest) (User, error) {
 	if !IsEmailValid(input.Email) {
-		return User{}, &BadRequestError{"Invalid email"}
+		return User{}, errors.Wrap(BadRequestError,"Invalid email")
 	}
 
 	if !IsPasswordValid((*input).Password) {
-		return User{}, &BadRequestError{"Invalid password"}
+		return User{}, errors.Wrap(BadRequestError,"Invalid password")
 	}
 
 	for _, user := range *db.Users {
 		if user.Email == input.Email {
-			return User{}, &ConflictError{"Email not unique"}
+			return User{}, errors.Wrap(ConflictError,"Email not unique")
 		}
 	}
 
@@ -75,11 +75,11 @@ func (db *Database) IsEmailUniq(userID int, email string) bool {
 func (db *Database) UpdateUser(userID int, username, email, password, avatar string) error {
 	switch {
 	case email != "" && !IsEmailValid(email):
-		return &BadRequestError{"Invalid email"}
+		return errors.Wrap(BadRequestError, "Invalid email")
 	case email != "" && !db.IsEmailUniq(userID, email):
-		return &ConflictError{"Non-uniq email"}
+		return errors.Wrap(ConflictError, "Non-uniq email")
 	case password != "" && !IsPasswordValid(password):
-		return &BadRequestError{"Invalid password"}
+		return errors.Wrap(BadRequestError, "Invalid password")
 	}
 
 	for i, user := range *db.Users {
@@ -110,7 +110,7 @@ func (db *Database) UpdateUser(userID int, username, email, password, avatar str
 		}
 	}
 
-	return &NotFoundError{"No such user"}
+	return errors.Wrap(NotFoundError, "No such user")
 }
 
 func (db *Database) DeleteUser(userID int) error {
