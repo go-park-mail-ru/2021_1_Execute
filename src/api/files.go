@@ -2,6 +2,7 @@ package api
 
 import (
 	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
 
@@ -9,6 +10,25 @@ import (
 )
 
 const destinationFolder = "../static/"
+
+func saveFile(file *multipart.FileHeader) error {
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	dst, err := os.Create(destinationFolder + file.Filename)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, src); err != nil {
+		return err
+	}
+	return nil
+}
 
 func upload(c echo.Context) error {
 
@@ -24,27 +44,12 @@ func upload(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	src, err := file.Open()
+	err = saveFile(file)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-
-	defer src.Close()
-
-	dst, err := os.Create(destinationFolder + file.Filename)
-
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-
-	defer dst.Close()
-
-	if _, err = io.Copy(dst, src); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	err = db.UpdateUser(user.ID, "", "", "", destinationFolder+file.Filename)
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
