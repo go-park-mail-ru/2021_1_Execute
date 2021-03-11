@@ -58,7 +58,6 @@ func saveFile(file *multipart.FileHeader) (string, error) {
 }
 
 func upload(c echo.Context) error {
-
 	db := c.(*Database)
 
 	user, ok := db.IsAuthorized(c)
@@ -85,7 +84,6 @@ func upload(c echo.Context) error {
 }
 
 func download(c echo.Context) error {
-
 	db := c.(*Database)
 
 	_, ok := db.IsAuthorized(c)
