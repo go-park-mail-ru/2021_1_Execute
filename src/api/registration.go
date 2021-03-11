@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -13,7 +12,6 @@ func registration(c echo.Context) error {
 	if err := c.Bind(input); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	fmt.Println(input)
 	newUser, err := db.CreateUser(input)
 	if err != nil {
 		return GetEchoError(err)

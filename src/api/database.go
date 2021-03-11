@@ -2,28 +2,27 @@ package api
 
 import (
 	"github.com/labstack/echo"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (db *Database) CreateUser(input *UserRegistrationRequest) (User, error) {
 	if !IsEmailValid(input.Email) {
-		return User{}, &BadRequestError{"Invalid email"}
+		return User{}, BadRequestError
 	}
 
 	if !IsPasswordValid((*input).Password) {
-		return User{}, &BadRequestError{"Invalid password"}
+		return User{}, BadRequestError
 	}
 
 	for _, user := range *db.Users {
 		if user.Email == input.Email {
-			return User{}, &ConflictError{"Email not unique"}
+			return User{}, ConflictError
 		}
 	}
 
 	passwordHashBytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 	if err != nil {
-		return User{}, errors.Wrap(err, "Error while hashing")
+		return User{}, InternalServerError
 	}
 
 	newUser := User{
@@ -75,11 +74,11 @@ func (db *Database) IsEmailUniq(userID int, email string) bool {
 func (db *Database) UpdateUser(userID int, username, email, password, avatar string) error {
 	switch {
 	case email != "" && !IsEmailValid(email):
-		return &BadRequestError{"Invalid email"}
+		return BadRequestError
 	case email != "" && !db.IsEmailUniq(userID, email):
-		return &ConflictError{"Non-uniq email"}
+		return ConflictError
 	case password != "" && !IsPasswordValid(password):
-		return &BadRequestError{"Invalid password"}
+		return BadRequestError
 	}
 
 	for i, user := range *db.Users {
@@ -93,7 +92,7 @@ func (db *Database) UpdateUser(userID int, username, email, password, avatar str
 			if password != "" {
 				hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 				if err != nil {
-					return errors.Wrap(err, "Error while hashing")
+					return InternalServerError
 				}
 				(*db.Users)[i].Password = string(hash)
 			}
@@ -101,7 +100,7 @@ func (db *Database) UpdateUser(userID int, username, email, password, avatar str
 				if user.Avatar != "" {
 					err := deleteFile(user.Avatar)
 					if err != nil {
-						return errors.Wrap(err, "Error while updating user")
+						return InternalServerError
 					}
 				}
 				(*db.Users)[i].Avatar = avatar
@@ -110,7 +109,7 @@ func (db *Database) UpdateUser(userID int, username, email, password, avatar str
 		}
 	}
 
-	return &NotFoundError{"No such user"}
+	return NotFoundError
 }
 
 func (db *Database) DeleteUser(userID int) error {
@@ -120,5 +119,5 @@ func (db *Database) DeleteUser(userID int) error {
 			return nil
 		}
 	}
-	return errors.New("No such user")
+	return NotFoundError
 }
