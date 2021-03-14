@@ -1,0 +1,1533 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Бэкенд для Trello</title>
+    <style type="text/css">
+      body {
+      	font-family: Trebuchet MS, sans-serif;
+      	font-size: 15px;
+      	color: #444;
+      	margin-right: 24px;
+      }
+      
+      h1	{
+      	font-size: 25px;
+      }
+      h2	{
+      	font-size: 20px;
+      }
+      h3	{
+      	font-size: 16px;
+      	font-weight: bold;
+      }
+      hr	{
+      	height: 1px;
+      	border: 0;
+      	color: #ddd;
+      	background-color: #ddd;
+      }
+      
+      .app-desc {
+        clear: both;
+        margin-left: 20px;
+      }
+      .param-name {
+        width: 100%;
+      }
+      .license-info {
+        margin-left: 20px;
+      }
+      
+      .license-url {
+        margin-left: 20px;
+      }
+      
+      .model {
+        margin: 0 0 0px 20px;
+      }
+      
+      .method {
+        margin-left: 20px;
+      }
+      
+      .method-notes	{
+      	margin: 10px 0 20px 0;
+      	font-size: 90%;
+      	color: #555;
+      }
+      
+      pre {
+        padding: 10px;
+        margin-bottom: 2px;
+      }
+      
+      .http-method {
+       text-transform: uppercase;
+      }
+      
+      pre.get {
+        background-color: #0f6ab4;
+      }
+      
+      pre.post {
+        background-color: #10a54a;
+      }
+      
+      pre.put {
+        background-color: #c5862b;
+      }
+      
+      pre.delete {
+        background-color: #a41e22;
+      }
+      
+      .huge	{
+      	color: #fff;
+      }
+      
+      pre.example {
+        background-color: #f3f3f3;
+        padding: 10px;
+        border: 1px solid #ddd;
+      }
+      
+      code {
+        white-space: pre;
+      }
+      
+      .nickname {
+        font-weight: bold;
+      }
+      
+      .method-path {
+        font-size: 1.5em;
+        background-color: #0f6ab4;
+      }
+      
+      .up {
+        float:right;
+      }
+      
+      .parameter {
+        width: 500px;
+      }
+      
+      .param {
+        width: 500px;
+        padding: 10px 0 0 20px;
+        font-weight: bold;
+      }
+      
+      .param-desc {
+        width: 700px;
+        padding: 0 0 0 20px;
+        color: #777;
+      }
+      
+      .param-type {
+        font-style: italic;
+      }
+      
+      .param-enum-header {
+      width: 700px;
+      padding: 0 0 0 60px;
+      color: #777;
+      font-weight: bold;
+      }
+      
+      .param-enum {
+      width: 700px;
+      padding: 0 0 0 80px;
+      color: #777;
+      font-style: italic;
+      }
+      
+      .field-label {
+        padding: 0;
+        margin: 0;
+        clear: both;
+      }
+      
+      .field-items	{
+      	padding: 0 0 15px 0;
+      	margin-bottom: 15px;
+      }
+      
+      .return-type {
+        clear: both;
+        padding-bottom: 10px;
+      }
+      
+      .param-header {
+        font-weight: bold;
+      }
+      
+      .method-tags {
+        text-align: right;
+      }
+      
+      .method-tag {
+        background: none repeat scroll 0% 0% #24A600;
+        border-radius: 3px;
+        padding: 2px 10px;
+        margin: 2px;
+        color: #FFF;
+        display: inline-block;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>Бэкенд для Trello</h1>
+    <div class="app-desc">More beautiful docs: 
+      <a href="https://app.swaggerhub.com/apis-docs/MKondakova/backend_trello/0.1.0">
+        https://app.swaggerhub.com/apis-docs/MKondakova/backend_trello/0.1.0</a></div>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Boards">Boards</a></h4>
+  <ul>
+  <li><a href="#apiBoardsGet"><code><span class="http-method">get</span> /api/boards</code></a></li>
+  <li><a href="#apiBoardsIdDelete"><code><span class="http-method">delete</span> /api/boards/{id}</code></a></li>
+  <li><a href="#apiBoardsIdGet"><code><span class="http-method">get</span> /api/boards/{id}</code></a></li>
+  <li><a href="#apiBoardsIdPatch"><code><span class="http-method">patch</span> /api/boards/{id}</code></a></li>
+  <li><a href="#apiBoardsPost"><code><span class="http-method">post</span> /api/boards</code></a></li>
+  </ul>
+  <h4><a href="#Rows">Rows</a></h4>
+  <ul>
+  <li><a href="#apiBoardsBIdRowsIdDelete"><code><span class="http-method">delete</span> /api/boards/{b_id}/rows/{id}</code></a></li>
+  <li><a href="#apiBoardsBIdRowsIdGet"><code><span class="http-method">get</span> /api/boards/{b_id}/rows/{id}</code></a></li>
+  <li><a href="#apiBoardsBIdRowsIdPatch"><code><span class="http-method">patch</span> /api/boards/{b_id}/rows/{id}</code></a></li>
+  <li><a href="#apiBoardsBIdRowsPost"><code><span class="http-method">post</span> /api/boards/{b_id}/rows</code></a></li>
+  </ul>
+  <h4><a href="#Tasks">Tasks</a></h4>
+  <ul>
+  <li><a href="#apiBoardsBIdRowsRIdTasksIdDelete"><code><span class="http-method">delete</span> /api/boards/{b_id}/rows/{r_id}/tasks/{id}</code></a></li>
+  <li><a href="#apiBoardsBIdRowsRIdTasksIdGet"><code><span class="http-method">get</span> /api/boards/{b_id}/rows/{r_id}/tasks/{id}</code></a></li>
+  <li><a href="#apiBoardsBIdRowsRIdTasksIdPatch"><code><span class="http-method">patch</span> /api/boards/{b_id}/rows/{r_id}/tasks/{id}</code></a></li>
+  <li><a href="#apiBoardsBIdRowsRIdTasksPost"><code><span class="http-method">post</span> /api/boards/{b_id}/rows/{r_id}/tasks</code></a></li>
+  </ul>
+  <h4><a href="#Users">Users</a></h4>
+  <ul>
+  <li><a href="#apiDownloadGet"><code><span class="http-method">get</span> /api/download</code></a></li>
+  <li><a href="#apiLoginPost"><code><span class="http-method">post</span> /api/login</code></a></li>
+  <li><a href="#apiLogoutDelete"><code><span class="http-method">delete</span> /api/logout</code></a></li>
+  <li><a href="#apiUploadPost"><code><span class="http-method">post</span> /api/upload</code></a></li>
+  <li><a href="#apiUsersDelete"><code><span class="http-method">delete</span> /api/users</code></a></li>
+  <li><a href="#apiUsersGet"><code><span class="http-method">get</span> /api/users</code></a></li>
+  <li><a href="#apiUsersIdGet"><code><span class="http-method">get</span> /api/users/{id}</code></a></li>
+  <li><a href="#apiUsersPatch"><code><span class="http-method">patch</span> /api/users</code></a></li>
+  <li><a href="#apiUsersPost"><code><span class="http-method">post</span> /api/users</code></a></li>
+  </ul>
+
+  <h1><a name="Boards">Boards</a></h1>
+  <div class="method"><a name="apiBoardsGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/boards</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsGet</span>)</div>
+    <div class="method-notes">Получение списка досок пользователя</div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetBoardsResponse">GetBoardsResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "boards" : [ {
+    "isStared" : true,
+    "name" : "name",
+    "description" : "description",
+    "id" : 0
+  }, {
+    "isStared" : true,
+    "name" : "name",
+    "description" : "description",
+    "id" : 0
+  } ]
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Доски успешно получены
+        <a href="#GetBoardsResponse">GetBoardsResponse</a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsIdDelete"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /api/boards/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsIdDelete</span>)</div>
+    <div class="method-notes">Удалeние доски</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Доска удалена
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Недостаточно прав
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsIdGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/boards/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsIdGet</span>)</div>
+    <div class="method-notes">Получение доски</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetBoardByIdResponse">GetBoardByIdResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "board" : {
+    "isStared" : true,
+    "access" : "Guest",
+    "name" : "name",
+    "description" : "description",
+    "isPrivate" : true,
+    "rows" : [ {
+      "id" : 6,
+      "position" : 1,
+      "row" : {
+        "name" : "name",
+        "tasks" : [ {
+          "name" : "name",
+          "id" : 5,
+          "position" : 5
+        }, {
+          "name" : "name",
+          "id" : 5,
+          "position" : 5
+        } ]
+      }
+    }, {
+      "id" : 6,
+      "position" : 1,
+      "row" : {
+        "name" : "name",
+        "tasks" : [ {
+          "name" : "name",
+          "id" : 5,
+          "position" : 5
+        }, {
+          "name" : "name",
+          "id" : 5,
+          "position" : 5
+        } ]
+      }
+    } ],
+    "users" : {
+      "owner" : {
+        "id" : 0,
+        "avatar" : "http://example.com/aeiou"
+      },
+      "members" : [ null, null ],
+      "admins" : [ null, null ]
+    }
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Доска успешно получена
+        <a href="#GetBoardByIdResponse">GetBoardByIdResponse</a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Доска не найдена
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsIdPatch"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="patch"><code class="huge"><span class="http-method">patch</span> /api/boards/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsIdPatch</span>)</div>
+    <div class="method-notes">Изменение доски</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#Board">Board</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Доска успешно изменена
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Недостаточно прав
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Доска не найдена
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/boards</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsPost</span>)</div>
+    <div class="method-notes">Создание доски</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#PostBoardsRequest">PostBoardsRequest</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PostResponses">PostResponses</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "id" : 0
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Доска успешно создана
+        <a href="#PostResponses">PostResponses</a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="Rows">Rows</a></h1>
+  <div class="method"><a name="apiBoardsBIdRowsIdDelete"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /api/boards/{b_id}/rows/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsBIdRowsIdDelete</span>)</div>
+    <div class="method-notes">Удаление столбца</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID столбца </div>      <div class="param">b_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Столбец успешно удален
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Столбец не найден
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsBIdRowsIdGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/boards/{b_id}/rows/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsBIdRowsIdGet</span>)</div>
+    <div class="method-notes">Получение содержимого столбца</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID столбца </div>      <div class="param">b_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetRowByIdResponse">GetRowByIdResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "row" : {
+    "name" : "name",
+    "tasks" : [ {
+      "name" : "name",
+      "id" : 5,
+      "position" : 5
+    }, {
+      "name" : "name",
+      "id" : 5,
+      "position" : 5
+    } ]
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Столбец получен
+        <a href="#GetRowByIdResponse">GetRowByIdResponse</a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Столбец не найден
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsBIdRowsIdPatch"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="patch"><code class="huge"><span class="http-method">patch</span> /api/boards/{b_id}/rows/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsBIdRowsIdPatch</span>)</div>
+    <div class="method-notes">Изменение столбца</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID столбца </div>      <div class="param">b_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Столбец успешно изменен
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Столбец не найден
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsBIdRowsPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/boards/{b_id}/rows</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsBIdRowsPost</span>)</div>
+    <div class="method-notes">Добавление столбца на доску</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">b_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#PostRowsRequest">PostRowsRequest</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PostResponses">PostResponses</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "id" : 0
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Столбец добавлен
+        <a href="#PostResponses">PostResponses</a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="Tasks">Tasks</a></h1>
+  <div class="method"><a name="apiBoardsBIdRowsRIdTasksIdDelete"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /api/boards/{b_id}/rows/{r_id}/tasks/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsBIdRowsRIdTasksIdDelete</span>)</div>
+    <div class="method-notes">Удаление задания</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">r_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID столбца </div>      <div class="param">b_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID задания </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Задание успешно удалено
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Задание не найдено
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsBIdRowsRIdTasksIdGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/boards/{b_id}/rows/{r_id}/tasks/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsBIdRowsRIdTasksIdGet</span>)</div>
+    <div class="method-notes">Получение задания</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">r_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID столбца </div>      <div class="param">b_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID задания </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetTaskByIdResponse">GetTaskByIdResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "task" : {
+    "name" : "name",
+    "description" : "description",
+    "users" : [ {
+      "id" : 0,
+      "avatar" : "http://example.com/aeiou"
+    }, {
+      "id" : 0,
+      "avatar" : "http://example.com/aeiou"
+    } ]
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Задание получено
+        <a href="#GetTaskByIdResponse">GetTaskByIdResponse</a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Задание не найдено
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsBIdRowsRIdTasksIdPatch"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="patch"><code class="huge"><span class="http-method">patch</span> /api/boards/{b_id}/rows/{r_id}/tasks/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsBIdRowsRIdTasksIdPatch</span>)</div>
+    <div class="method-notes">Изменение задания</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">r_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID столбца </div>      <div class="param">b_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID задания </div>    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#GetTaskByIdResponse">GetTaskByIdResponse</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Задание успешно изменено
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Задание не найдено
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiBoardsBIdRowsRIdTasksPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/boards/{b_id}/rows/{r_id}/tasks</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiBoardsBIdRowsRIdTasksPost</span>)</div>
+    <div class="method-notes">Добавление задания</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">r_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID столбца </div>      <div class="param">b_id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID доски </div>    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#PostTasksRequest">PostTasksRequest</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PostResponses">PostResponses</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "id" : 0
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Задание добавлено
+        <a href="#PostResponses">PostResponses</a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="Users">Users</a></h1>
+  <div class="method"><a name="apiDownloadGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/download</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiDownloadGet</span>)</div>
+    <div class="method-notes">Загрузка аватара</div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      byte[]
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>""</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>image/*</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Скачивание прошло успешно
+        <a href="#byte[]">byte[]</a>
+    <h4 class="field-label">404</h4>
+    Not found
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiLoginPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/login</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiLoginPost</span>)</div>
+    <div class="method-notes">Авторизация пользователя</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#LoginRequest">LoginRequest</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Авторизация прошла успешно
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Авторизация неуспешна
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiLogoutDelete"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /api/logout</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiLogoutDelete</span>)</div>
+    <div class="method-notes">Выход из сессии</div>
+
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Выход прошел успешно
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiUploadPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/upload</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiUploadPost</span>)</div>
+    <div class="method-notes">Добавление аватара</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>image/*</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#Object">Object</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Успешно отправлено
+        <a href="#"></a>
+    <h4 class="field-label">415</h4>
+    Неверный формат изображения
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiUsersDelete"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /api/users</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiUsersDelete</span>)</div>
+    <div class="method-notes">Удаление пользователя</div>
+
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Информация получена
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Недостаточно прав
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Пользователь не найден
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiUsersGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/users</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiUsersGet</span>)</div>
+    <div class="method-notes">Получение информации о текущем пользователе</div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetUserByIdResponse">GetUserByIdResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "user" : {
+    "avatar" : "http://example.com/aeiou",
+    "email" : "",
+    "username" : "username"
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Информация получена
+        <a href="#GetUserByIdResponse">GetUserByIdResponse</a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Пользователь не найден
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiUsersIdGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/users/{id}</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiUsersIdGet</span>)</div>
+    <div class="method-notes">Получение информации о пользователе</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; ID пользователя </div>    </div>  <!-- field-items -->
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetUserByIdResponse">GetUserByIdResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "user" : {
+    "avatar" : "http://example.com/aeiou",
+    "email" : "",
+    "username" : "username"
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Информация получена
+        <a href="#GetUserByIdResponse">GetUserByIdResponse</a>
+    <h4 class="field-label">401</h4>
+    Неавторизованный запрос
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Пользователь не найден
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiUsersPatch"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="patch"><code class="huge"><span class="http-method">patch</span> /api/users</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiUsersPatch</span>)</div>
+    <div class="method-notes">Изменение информации о текущем пользователе</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#PatchUserRequest">PatchUserRequest</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Информация получена
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Недостаточно прав
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Пользователь не найден
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiUsersPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/users</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">apiUsersPost</span>)</div>
+    <div class="method-notes">Регистрация нового пользователя</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#RegistrationRequest">RegistrationRequest</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+                </div>  <!-- field-items -->
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Пользователь успешно зарегистрирован
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Запрос сформирован неверно
+        <a href="#"></a>
+    <h4 class="field-label">409</h4>
+    Уже создан пользователь с таким email
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#AccessTypes"><code>AccessTypes</code></a></li>
+    <li><a href="#Board"><code>Board</code></a></li>
+    <li><a href="#BoardOutter"><code>BoardOutter</code></a></li>
+    <li><a href="#Board_rows"><code>Board_rows</code></a></li>
+    <li><a href="#Board_users"><code>Board_users</code></a></li>
+    <li><a href="#GetBoardByIdResponse"><code>GetBoardByIdResponse</code></a></li>
+    <li><a href="#GetBoardsResponse"><code>GetBoardsResponse</code></a></li>
+    <li><a href="#GetRowByIdResponse"><code>GetRowByIdResponse</code></a></li>
+    <li><a href="#GetTaskByIdResponse"><code>GetTaskByIdResponse</code></a></li>
+    <li><a href="#GetUserByIdResponse"><code>GetUserByIdResponse</code></a></li>
+    <li><a href="#GetUserByIdResponse_user"><code>GetUserByIdResponse_user</code></a></li>
+    <li><a href="#LoginRequest"><code>LoginRequest</code></a></li>
+    <li><a href="#PatchBoardRequest"><code>PatchBoardRequest</code></a></li>
+    <li><a href="#PatchUserRequest"><code>PatchUserRequest</code></a></li>
+    <li><a href="#PostBoardsRequest"><code>PostBoardsRequest</code></a></li>
+    <li><a href="#PostResponses"><code>PostResponses</code></a></li>
+    <li><a href="#PostRowsRequest"><code>PostRowsRequest</code></a></li>
+    <li><a href="#PostTasksRequest"><code>PostTasksRequest</code></a></li>
+    <li><a href="#RegistrationRequest"><code>RegistrationRequest</code></a></li>
+    <li><a href="#Row"><code>Row</code></a></li>
+    <li><a href="#Task"><code>Task</code></a></li>
+    <li><a href="#TaskOuter"><code>TaskOuter</code></a></li>
+    <li><a href="#UserOuter"><code>UserOuter</code></a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="AccessTypes"><code>AccessTypes</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Board"><code>Board</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">isPrivate (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">access (optional)</div><div class="param-desc"><span class="param-type"><a href="#AccessTypes">AccessTypes</a></span>  </div>
+<div class="param">users (optional)</div><div class="param-desc"><span class="param-type"><a href="#Board_users">Board_users</a></span>  </div>
+<div class="param">isStared (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">description (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">rows (optional)</div><div class="param-desc"><span class="param-type"><a href="#Board_rows">array[Board_rows]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BoardOutter"><code>BoardOutter</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">isStared (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">description (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Board_rows"><code>Board_rows</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">position (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">row (optional)</div><div class="param-desc"><span class="param-type"><a href="#Row">Row</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Board_users"><code>Board_users</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">owner (optional)</div><div class="param-desc"><span class="param-type"><a href="#UserOuter">UserOuter</a></span>  </div>
+<div class="param">admins (optional)</div><div class="param-desc"><span class="param-type"><a href="#UserOuter">array[UserOuter]</a></span>  </div>
+<div class="param">members (optional)</div><div class="param-desc"><span class="param-type"><a href="#UserOuter">array[UserOuter]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBoardByIdResponse"><code>GetBoardByIdResponse</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">board (optional)</div><div class="param-desc"><span class="param-type"><a href="#Board">Board</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBoardsResponse"><code>GetBoardsResponse</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">boards (optional)</div><div class="param-desc"><span class="param-type"><a href="#BoardOutter">array[BoardOutter]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetRowByIdResponse"><code>GetRowByIdResponse</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">row (optional)</div><div class="param-desc"><span class="param-type"><a href="#Row">Row</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetTaskByIdResponse"><code>GetTaskByIdResponse</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">task (optional)</div><div class="param-desc"><span class="param-type"><a href="#Task">Task</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetUserByIdResponse"><code>GetUserByIdResponse</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">user (optional)</div><div class="param-desc"><span class="param-type"><a href="#GetUserByIdResponse_user">GetUserByIdResponse_user</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetUserByIdResponse_user"><code>GetUserByIdResponse_user</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">username (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">email (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: email</div>
+<div class="param">avatar (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: uri</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="LoginRequest"><code>LoginRequest</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">email </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: email</div>
+<div class="param">password </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: password</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PatchBoardRequest"><code>PatchBoardRequest</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PatchUserRequest"><code>PatchUserRequest</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">email (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: email</div>
+<div class="param">password (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: password</div>
+<div class="param">username (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PostBoardsRequest"><code>PostBoardsRequest</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PostResponses"><code>PostResponses</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PostRowsRequest"><code>PostRowsRequest</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">position </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PostTasksRequest"><code>PostTasksRequest</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">position </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RegistrationRequest"><code>RegistrationRequest</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">email </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: email</div>
+<div class="param">password </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: password</div>
+<div class="param">username </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Row"><code>Row</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">tasks (optional)</div><div class="param-desc"><span class="param-type"><a href="#TaskOuter">array[TaskOuter]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Task"><code>Task</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">description (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">users (optional)</div><div class="param-desc"><span class="param-type"><a href="#UserOuter">array[UserOuter]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TaskOuter"><code>TaskOuter</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">position (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="UserOuter"><code>UserOuter</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">avatar (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: uri</div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>
