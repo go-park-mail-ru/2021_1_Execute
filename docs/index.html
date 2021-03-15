@@ -556,7 +556,6 @@
   }
   
   
-  00427D
   
   .sidenav > .active > a {
     position: relative;
@@ -693,7 +692,72 @@
   "type" : "string",
   "enum" : [ "Guest", "Member", "Admin", "Owner" ]
 };
+            defs["AllOfBoardBody_usersAdminsItems"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/UserOuter"
+  } ]
+};
+            defs["AllOfBoardBody_usersMembersItems"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/UserOuter"
+  } ]
+};
+            defs["AllOfBoardBody_usersOwner"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/UserOuter"
+  } ]
+};
+            defs["AllOfBoard_rowsRow"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Row"
+  } ]
+};
+            defs["AllOfGetBoardByIdResponseBoard"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Board"
+  } ]
+};
+            defs["AllOfGetBoardsResponseBoardsItems"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/BoardOutter"
+  } ]
+};
+            defs["AllOfGetRowByIdResponseRow"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Row"
+  } ]
+};
+            defs["AllOfGetTaskByIdResponseTask"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/Task"
+  } ]
+};
+            defs["AllOfRowTasksItems"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/TaskOuter"
+  } ]
+};
+            defs["AllOfTaskUsersItems"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/UserOuter"
+  } ]
+};
             defs["Board"] = {
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/BoardBody"
+  }, {
+    "type" : "object",
+    "properties" : {
+      "rows" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/Board_rows"
+        }
+      }
+    }
+  } ]
+};
+            defs["BoardBody"] = {
   "type" : "object",
   "properties" : {
     "isPrivate" : {
@@ -703,7 +767,7 @@
       "$ref" : "#/components/schemas/AccessTypes"
     },
     "users" : {
-      "$ref" : "#/components/schemas/Board_users"
+      "$ref" : "#/components/schemas/BoardBody_users"
     },
     "isStared" : {
       "type" : "boolean"
@@ -713,11 +777,31 @@
     },
     "description" : {
       "type" : "string"
+    }
+  }
+};
+            defs["BoardBody_users"] = {
+  "type" : "object",
+  "properties" : {
+    "owner" : {
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/UserOuter"
+      } ]
     },
-    "rows" : {
+    "admins" : {
       "type" : "array",
       "items" : {
-        "$ref" : "#/components/schemas/Board_rows"
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/UserOuter"
+        } ]
+      }
+    },
+    "members" : {
+      "type" : "array",
+      "items" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/UserOuter"
+        } ]
       }
     }
   }
@@ -727,6 +811,9 @@
   "properties" : {
     "id" : {
       "type" : "integer"
+    },
+    "access" : {
+      "$ref" : "#/components/schemas/AccessTypes"
     },
     "isStared" : {
       "type" : "boolean"
@@ -749,27 +836,9 @@
       "type" : "integer"
     },
     "row" : {
-      "$ref" : "#/components/schemas/Row"
-    }
-  }
-};
-            defs["Board_users"] = {
-  "type" : "object",
-  "properties" : {
-    "owner" : {
-      "$ref" : "#/components/schemas/UserOuter"
-    },
-    "admins" : {
-      "type" : "array",
-      "items" : {
-        "$ref" : "#/components/schemas/UserOuter"
-      }
-    },
-    "members" : {
-      "type" : "array",
-      "items" : {
-        "$ref" : "#/components/schemas/UserOuter"
-      }
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Row"
+      } ]
     }
   }
 };
@@ -777,7 +846,9 @@
   "type" : "object",
   "properties" : {
     "board" : {
-      "$ref" : "#/components/schemas/Board"
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Board"
+      } ]
     }
   }
 };
@@ -787,7 +858,9 @@
     "boards" : {
       "type" : "array",
       "items" : {
-        "$ref" : "#/components/schemas/BoardOutter"
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/BoardOutter"
+        } ]
       }
     }
   }
@@ -796,7 +869,9 @@
   "type" : "object",
   "properties" : {
     "row" : {
-      "$ref" : "#/components/schemas/Row"
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Row"
+      } ]
     }
   }
 };
@@ -804,7 +879,9 @@
   "type" : "object",
   "properties" : {
     "task" : {
-      "$ref" : "#/components/schemas/Task"
+      "allOf" : [ {
+        "$ref" : "#/components/schemas/Task"
+      } ]
     }
   }
 };
@@ -846,7 +923,66 @@
   }
 };
             defs["PatchBoardRequest"] = {
-  "$ref" : "#/components/schemas/Board"
+  "allOf" : [ {
+    "$ref" : "#/components/schemas/BoardBody"
+  }, {
+    "type" : "object",
+    "properties" : {
+      "move" : {
+        "$ref" : "#/components/schemas/PatchBoardRequest_move"
+      }
+    }
+  } ]
+};
+            defs["PatchBoardRequest_move"] = {
+  "type" : "object",
+  "properties" : {
+    "row_id" : {
+      "type" : "integer"
+    },
+    "new_position" : {
+      "type" : "integer"
+    }
+  }
+};
+            defs["PatchRowRequest"] = {
+  "type" : "object",
+  "properties" : {
+    "name" : {
+      "type" : "string"
+    },
+    "carry_over" : {
+      "$ref" : "#/components/schemas/PatchRowRequest_carry_over"
+    },
+    "move" : {
+      "$ref" : "#/components/schemas/PatchRowRequest_move"
+    }
+  }
+};
+            defs["PatchRowRequest_carry_over"] = {
+  "type" : "object",
+  "properties" : {
+    "from_row" : {
+      "type" : "integer"
+    },
+    "new_position" : {
+      "type" : "integer"
+    }
+  }
+};
+            defs["PatchRowRequest_move"] = {
+  "type" : "object",
+  "properties" : {
+    "card_id" : {
+      "type" : "integer"
+    },
+    "new_position" : {
+      "type" : "integer"
+    }
+  }
+};
+            defs["PatchTaskRequest"] = {
+  "$ref" : "#/components/schemas/Task"
 };
             defs["PatchUserRequest"] = {
   "properties" : {
@@ -882,6 +1018,9 @@
             defs["PostRowsRequest"] = {
   "required" : [ "name", "position" ],
   "properties" : {
+    "board_id" : {
+      "type" : "integer"
+    },
     "name" : {
       "type" : "string"
     },
@@ -893,6 +1032,9 @@
             defs["PostTasksRequest"] = {
   "required" : [ "name", "position" ],
   "properties" : {
+    "row_id" : {
+      "type" : "integer"
+    },
     "name" : {
       "type" : "string"
     },
@@ -926,7 +1068,9 @@
     "tasks" : {
       "type" : "array",
       "items" : {
-        "$ref" : "#/components/schemas/TaskOuter"
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/TaskOuter"
+        } ]
       }
     }
   }
@@ -943,7 +1087,9 @@
     "users" : {
       "type" : "array",
       "items" : {
-        "$ref" : "#/components/schemas/UserOuter"
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/UserOuter"
+        } ]
       }
     }
   }
@@ -1007,30 +1153,30 @@
                       <a href="#api-Boards-apiBoardsPost">apiBoardsPost</a>
                     </li>
                   <li class="nav-header" data-group="Rows"><a href="#api-Rows">API Methods - Rows</a></li>
-                    <li data-group="Rows" data-name="apiBoardsBIdRowsIdDelete" class="">
-                      <a href="#api-Rows-apiBoardsBIdRowsIdDelete">apiBoardsBIdRowsIdDelete</a>
+                    <li data-group="Rows" data-name="apiRowsIdDelete" class="">
+                      <a href="#api-Rows-apiRowsIdDelete">apiRowsIdDelete</a>
                     </li>
-                    <li data-group="Rows" data-name="apiBoardsBIdRowsIdGet" class="">
-                      <a href="#api-Rows-apiBoardsBIdRowsIdGet">apiBoardsBIdRowsIdGet</a>
+                    <li data-group="Rows" data-name="apiRowsIdGet" class="">
+                      <a href="#api-Rows-apiRowsIdGet">apiRowsIdGet</a>
                     </li>
-                    <li data-group="Rows" data-name="apiBoardsBIdRowsIdPatch" class="">
-                      <a href="#api-Rows-apiBoardsBIdRowsIdPatch">apiBoardsBIdRowsIdPatch</a>
+                    <li data-group="Rows" data-name="apiRowsIdPatch" class="">
+                      <a href="#api-Rows-apiRowsIdPatch">apiRowsIdPatch</a>
                     </li>
-                    <li data-group="Rows" data-name="apiBoardsBIdRowsPost" class="">
-                      <a href="#api-Rows-apiBoardsBIdRowsPost">apiBoardsBIdRowsPost</a>
+                    <li data-group="Rows" data-name="apiRowsPost" class="">
+                      <a href="#api-Rows-apiRowsPost">apiRowsPost</a>
                     </li>
                   <li class="nav-header" data-group="Tasks"><a href="#api-Tasks">API Methods - Tasks</a></li>
-                    <li data-group="Tasks" data-name="apiBoardsBIdRowsRIdTasksIdDelete" class="">
-                      <a href="#api-Tasks-apiBoardsBIdRowsRIdTasksIdDelete">apiBoardsBIdRowsRIdTasksIdDelete</a>
+                    <li data-group="Tasks" data-name="apiTasksIdDelete" class="">
+                      <a href="#api-Tasks-apiTasksIdDelete">apiTasksIdDelete</a>
                     </li>
-                    <li data-group="Tasks" data-name="apiBoardsBIdRowsRIdTasksIdGet" class="">
-                      <a href="#api-Tasks-apiBoardsBIdRowsRIdTasksIdGet">apiBoardsBIdRowsRIdTasksIdGet</a>
+                    <li data-group="Tasks" data-name="apiTasksIdGet" class="">
+                      <a href="#api-Tasks-apiTasksIdGet">apiTasksIdGet</a>
                     </li>
-                    <li data-group="Tasks" data-name="apiBoardsBIdRowsRIdTasksIdPatch" class="">
-                      <a href="#api-Tasks-apiBoardsBIdRowsRIdTasksIdPatch">apiBoardsBIdRowsRIdTasksIdPatch</a>
+                    <li data-group="Tasks" data-name="apiTasksIdPatch" class="">
+                      <a href="#api-Tasks-apiTasksIdPatch">apiTasksIdPatch</a>
                     </li>
-                    <li data-group="Tasks" data-name="apiBoardsBIdRowsRIdTasksPost" class="">
-                      <a href="#api-Tasks-apiBoardsBIdRowsRIdTasksPost">apiBoardsBIdRowsRIdTasksPost</a>
+                    <li data-group="Tasks" data-name="apiTasksPost" class="">
+                      <a href="#api-Tasks-apiTasksPost">apiTasksPost</a>
                     </li>
                   <li class="nav-header" data-group="Users"><a href="#api-Users">API Methods - Users</a></li>
                     <li data-group="Users" data-name="apiDownloadGet" class="">
@@ -1076,6 +1222,7 @@
               <div class="app-desc">Version: 0.1.0</div>
             <hr>
             <div><a href="https://app.swaggerhub.com/apis-docs/MKondakova/backend_trello/0.1.0">Более красивая схема</a></div>
+
           </div>
         </div>
         <div id="sections">
@@ -1996,7 +2143,7 @@ public class BoardsApiExample {
 
         BoardsApi apiInstance = new BoardsApi();
         Integer id = 56; // Integer | ID доски
-        Board body = ; // Board | 
+        PatchBoardRequest body = ; // PatchBoardRequest | 
         try {
             apiInstance.apiBoardsIdPatch(id, body);
         } catch (ApiException e) {
@@ -2015,7 +2162,7 @@ public class BoardsApiExample {
     public static void main(String[] args) {
         BoardsApi apiInstance = new BoardsApi();
         Integer id = 56; // Integer | ID доски
-        Board body = ; // Board | 
+        PatchBoardRequest body = ; // PatchBoardRequest | 
         try {
             apiInstance.apiBoardsIdPatch(id, body);
         } catch (ApiException e) {
@@ -2032,7 +2179,7 @@ public class BoardsApiExample {
                             <div class="tab-pane" id="examples-Boards-apiBoardsIdPatch-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
 Integer *id = 56; // ID доски
-Board *body = ; //  (optional)
+PatchBoardRequest *body = ; //  (optional)
 
 BoardsApi *apiInstance = [[BoardsApi alloc] init];
 
@@ -2054,7 +2201,7 @@ var defaultClient = Trello.ApiClient.instance;
 var api = new Trello.BoardsApi()
 var id = 56; // {{Integer}} ID доски
 var opts = { 
-  'body':  // {{Board}} 
+  'body':  // {{PatchBoardRequest}} 
 };
 var callback = function(error, data, response) {
   if (error) {
@@ -2087,7 +2234,7 @@ namespace Example
 
             var apiInstance = new BoardsApi();
             var id = 56;  // Integer | ID доски
-            var body = new Board(); // Board |  (optional) 
+            var body = new PatchBoardRequest(); // PatchBoardRequest |  (optional) 
 
             try
             {
@@ -2110,7 +2257,7 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Swagger\Client\ApiBoardsApi();
 $id = 56; // Integer | ID доски
-$body = ; // Board | 
+$body = ; // PatchBoardRequest | 
 
 try {
     $api_instance->apiBoardsIdPatch($id, $body);
@@ -2128,7 +2275,7 @@ use WWW::SwaggerClient::BoardsApi;
 
 my $api_instance = WWW::SwaggerClient::BoardsApi->new();
 my $id = 56; # Integer | ID доски
-my $body = WWW::SwaggerClient::Object::Board->new(); # Board | 
+my $body = WWW::SwaggerClient::Object::PatchBoardRequest->new(); # PatchBoardRequest | 
 
 eval { 
     $api_instance->apiBoardsIdPatch(id => $id, body => $body);
@@ -2149,7 +2296,7 @@ from pprint import pprint
 # create an instance of the API class
 api_instance = swagger_client.BoardsApi()
 id = 56 # Integer | ID доски
-body =  # Board |  (optional)
+body =  # PatchBoardRequest |  (optional)
 
 try: 
     api_instance.api_boards_id_patch(id, body=body)
@@ -2617,10 +2764,10 @@ except ApiException as e:
                   </section>
                 <section id="api-Rows">
                   <h1>Rows</h1>
-                    <div id="api-Rows-apiBoardsBIdRowsIdDelete">
-                      <article id="api-Rows-apiBoardsBIdRowsIdDelete-0" data-group="User" data-name="apiBoardsBIdRowsIdDelete" data-version="0">
+                    <div id="api-Rows-apiRowsIdDelete">
+                      <article id="api-Rows-apiRowsIdDelete-0" data-group="User" data-name="apiRowsIdDelete" data-version="0">
                         <div class="pull-left">
-                          <h1>apiBoardsBIdRowsIdDelete</h1>
+                          <h1>apiRowsIdDelete</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -2629,31 +2776,31 @@ except ApiException as e:
                         <p class="marked">Удаление столбца</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/api/boards/{b_id}/rows/{id}</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/api/rows/{id}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdDelete-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Rows-apiRowsIdDelete-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdDelete-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdDelete-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Rows-apiRowsIdDelete-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Rows-apiRowsIdDelete-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdDelete-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Rows-apiRowsIdDelete-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Rows-apiRowsIdDelete-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdDelete-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdDelete-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdDelete-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-curl">
+                          <div class="tab-pane active" id="examples-Rows-apiRowsIdDelete-0-curl">
                            <pre class="prettyprint"><code class="language-bsh">curl -X DELETE\
  -H "Authorization: Bearer [[accessToken]]"\
-"//api/boards/{b_id}/rows/{id}"</code></pre>
+"//api/rows/{id}"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-java">
+                          <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -2670,18 +2817,17 @@ public class RowsApiExample {
 
         RowsApi apiInstance = new RowsApi();
         Integer id = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         try {
-            apiInstance.apiBoardsBIdRowsIdDelete(id, bId);
+            apiInstance.apiRowsIdDelete(id);
         } catch (ApiException e) {
-            System.err.println("Exception when calling RowsApi#apiBoardsBIdRowsIdDelete");
+            System.err.println("Exception when calling RowsApi#apiRowsIdDelete");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-android">
+                          <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.RowsApi;
 
 public class RowsApiExample {
@@ -2689,29 +2835,26 @@ public class RowsApiExample {
     public static void main(String[] args) {
         RowsApi apiInstance = new RowsApi();
         Integer id = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         try {
-            apiInstance.apiBoardsBIdRowsIdDelete(id, bId);
+            apiInstance.apiRowsIdDelete(id);
         } catch (ApiException e) {
-            System.err.println("Exception when calling RowsApi#apiBoardsBIdRowsIdDelete");
+            System.err.println("Exception when calling RowsApi#apiRowsIdDelete");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-groovy">
+  <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-objc">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
 Integer *id = 56; // ID столбца
-Integer *bId = 56; // ID доски
 
 RowsApi *apiInstance = [[RowsApi alloc] init];
 
-[apiInstance apiBoardsBIdRowsIdDeleteWith:id
-    bId:bId
+[apiInstance apiRowsIdDeleteWith:id
               completionHandler: ^(NSError* error) {
                             if (error) {
                                 NSLog(@"Error: %@", error);
@@ -2720,14 +2863,13 @@ RowsApi *apiInstance = [[RowsApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-javascript">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
 var defaultClient = Trello.ApiClient.instance;
 
 
 var api = new Trello.RowsApi()
 var id = 56; // {{Integer}} ID столбца
-var bId = 56; // {{Integer}} ID доски
 
 var callback = function(error, data, response) {
   if (error) {
@@ -2736,14 +2878,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-api.apiBoardsBIdRowsIdDelete(id, bId, callback);
+api.apiRowsIdDelete(id, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-angular">
+                            <!--<div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-csharp">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -2752,7 +2894,7 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class apiBoardsBIdRowsIdDeleteExample
+    public class apiRowsIdDeleteExample
     {
         public void main()
         {
@@ -2760,15 +2902,14 @@ namespace Example
 
             var apiInstance = new RowsApi();
             var id = 56;  // Integer | ID столбца
-            var bId = 56;  // Integer | ID доски
 
             try
             {
-                apiInstance.apiBoardsBIdRowsIdDelete(id, bId);
+                apiInstance.apiRowsIdDelete(id);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling RowsApi.apiBoardsBIdRowsIdDelete: " + e.Message );
+                Debug.Print("Exception when calling RowsApi.apiRowsIdDelete: " + e.Message );
             }
         }
     }
@@ -2776,24 +2917,23 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-php">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiRowsApi();
 $id = 56; // Integer | ID столбца
-$bId = 56; // Integer | ID доски
 
 try {
-    $api_instance->apiBoardsBIdRowsIdDelete($id, $bId);
+    $api_instance->apiRowsIdDelete($id);
 } catch (Exception $e) {
-    echo 'Exception when calling RowsApi->apiBoardsBIdRowsIdDelete: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling RowsApi->apiRowsIdDelete: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-perl">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::RowsApi;
@@ -2801,17 +2941,16 @@ use WWW::SwaggerClient::RowsApi;
 
 my $api_instance = WWW::SwaggerClient::RowsApi->new();
 my $id = 56; # Integer | ID столбца
-my $bId = 56; # Integer | ID доски
 
 eval { 
-    $api_instance->apiBoardsBIdRowsIdDelete(id => $id, bId => $bId);
+    $api_instance->apiRowsIdDelete(id => $id);
 };
 if ($@) {
-    warn "Exception when calling RowsApi->apiBoardsBIdRowsIdDelete: $@\n";
+    warn "Exception when calling RowsApi->apiRowsIdDelete: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdDelete-0-python">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdDelete-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -2822,12 +2961,11 @@ from pprint import pprint
 # create an instance of the API class
 api_instance = swagger_client.RowsApi()
 id = 56 # Integer | ID столбца
-bId = 56 # Integer | ID доски
 
 try: 
-    api_instance.api_boards_b_id_rows_id_delete(id, bId)
+    api_instance.api_rows_id_delete(id)
 except ApiException as e:
-    print("Exception when calling RowsApi->apiBoardsBIdRowsIdDelete: %s\n" % e)</code></pre>
+    print("Exception when calling RowsApi->apiRowsIdDelete: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -2843,7 +2981,7 @@ except ApiException as e:
                                   <td>
                                   
                                   
-                                      <div id="d2e199_apiBoardsBIdRowsIdDelete_id">
+                                      <div id="d2e199_apiRowsIdDelete_id">
                                           <div class="json-schema-view">
                                               <div class="primitive">
                                                   <span class="type">
@@ -2852,28 +2990,6 @@ except ApiException as e:
                                   
                                                       <div class="inner description">
                                                           ID столбца
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                                  <tr><td style="width:150px;">b_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsIdDelete_bId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID доски
                                                       </div>
                                               </div>
                                                   <div class="inner required">
@@ -2917,10 +3033,10 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Rows-apiBoardsBIdRowsIdGet">
-                      <article id="api-Rows-apiBoardsBIdRowsIdGet-0" data-group="User" data-name="apiBoardsBIdRowsIdGet" data-version="0">
+                    <div id="api-Rows-apiRowsIdGet">
+                      <article id="api-Rows-apiRowsIdGet-0" data-group="User" data-name="apiRowsIdGet" data-version="0">
                         <div class="pull-left">
-                          <h1>apiBoardsBIdRowsIdGet</h1>
+                          <h1>apiRowsIdGet</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -2929,32 +3045,32 @@ except ApiException as e:
                         <p class="marked">Получение содержимого столбца</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/boards/{b_id}/rows/{id}</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/rows/{id}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdGet-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Rows-apiRowsIdGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Rows-apiRowsIdGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Rows-apiRowsIdGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Rows-apiRowsIdGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Rows-apiRowsIdGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdGet-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Rows-apiBoardsBIdRowsIdGet-0-curl">
+                          <div class="tab-pane active" id="examples-Rows-apiRowsIdGet-0-curl">
                            <pre class="prettyprint"><code class="language-bsh">curl -X GET\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
-"//api/boards/{b_id}/rows/{id}"</code></pre>
+"//api/rows/{id}"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-java">
+                          <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -2971,19 +3087,18 @@ public class RowsApiExample {
 
         RowsApi apiInstance = new RowsApi();
         Integer id = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         try {
-            GetRowByIdResponse result = apiInstance.apiBoardsBIdRowsIdGet(id, bId);
+            GetRowByIdResponse result = apiInstance.apiRowsIdGet(id);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling RowsApi#apiBoardsBIdRowsIdGet");
+            System.err.println("Exception when calling RowsApi#apiRowsIdGet");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-android">
+                          <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.RowsApi;
 
 public class RowsApiExample {
@@ -2991,30 +3106,27 @@ public class RowsApiExample {
     public static void main(String[] args) {
         RowsApi apiInstance = new RowsApi();
         Integer id = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         try {
-            GetRowByIdResponse result = apiInstance.apiBoardsBIdRowsIdGet(id, bId);
+            GetRowByIdResponse result = apiInstance.apiRowsIdGet(id);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling RowsApi#apiBoardsBIdRowsIdGet");
+            System.err.println("Exception when calling RowsApi#apiRowsIdGet");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-groovy">
+  <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-objc">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
 Integer *id = 56; // ID столбца
-Integer *bId = 56; // ID доски
 
 RowsApi *apiInstance = [[RowsApi alloc] init];
 
-[apiInstance apiBoardsBIdRowsIdGetWith:id
-    bId:bId
+[apiInstance apiRowsIdGetWith:id
               completionHandler: ^(GetRowByIdResponse output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -3026,14 +3138,13 @@ RowsApi *apiInstance = [[RowsApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-javascript">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
 var defaultClient = Trello.ApiClient.instance;
 
 
 var api = new Trello.RowsApi()
 var id = 56; // {{Integer}} ID столбца
-var bId = 56; // {{Integer}} ID доски
 
 var callback = function(error, data, response) {
   if (error) {
@@ -3042,14 +3153,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.apiBoardsBIdRowsIdGet(id, bId, callback);
+api.apiRowsIdGet(id, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-angular">
+                            <!--<div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-csharp">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -3058,7 +3169,7 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class apiBoardsBIdRowsIdGetExample
+    public class apiRowsIdGetExample
     {
         public void main()
         {
@@ -3066,16 +3177,15 @@ namespace Example
 
             var apiInstance = new RowsApi();
             var id = 56;  // Integer | ID столбца
-            var bId = 56;  // Integer | ID доски
 
             try
             {
-                GetRowByIdResponse result = apiInstance.apiBoardsBIdRowsIdGet(id, bId);
+                GetRowByIdResponse result = apiInstance.apiRowsIdGet(id);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling RowsApi.apiBoardsBIdRowsIdGet: " + e.Message );
+                Debug.Print("Exception when calling RowsApi.apiRowsIdGet: " + e.Message );
             }
         }
     }
@@ -3083,25 +3193,24 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-php">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiRowsApi();
 $id = 56; // Integer | ID столбца
-$bId = 56; // Integer | ID доски
 
 try {
-    $result = $api_instance->apiBoardsBIdRowsIdGet($id, $bId);
+    $result = $api_instance->apiRowsIdGet($id);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling RowsApi->apiBoardsBIdRowsIdGet: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling RowsApi->apiRowsIdGet: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-perl">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::RowsApi;
@@ -3109,18 +3218,17 @@ use WWW::SwaggerClient::RowsApi;
 
 my $api_instance = WWW::SwaggerClient::RowsApi->new();
 my $id = 56; # Integer | ID столбца
-my $bId = 56; # Integer | ID доски
 
 eval { 
-    my $result = $api_instance->apiBoardsBIdRowsIdGet(id => $id, bId => $bId);
+    my $result = $api_instance->apiRowsIdGet(id => $id);
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling RowsApi->apiBoardsBIdRowsIdGet: $@\n";
+    warn "Exception when calling RowsApi->apiRowsIdGet: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdGet-0-python">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdGet-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -3131,13 +3239,12 @@ from pprint import pprint
 # create an instance of the API class
 api_instance = swagger_client.RowsApi()
 id = 56 # Integer | ID столбца
-bId = 56 # Integer | ID доски
 
 try: 
-    api_response = api_instance.api_boards_b_id_rows_id_get(id, bId)
+    api_response = api_instance.api_rows_id_get(id)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling RowsApi->apiBoardsBIdRowsIdGet: %s\n" % e)</code></pre>
+    print("Exception when calling RowsApi->apiRowsIdGet: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -3153,7 +3260,7 @@ except ApiException as e:
                                   <td>
                                   
                                   
-                                      <div id="d2e199_apiBoardsBIdRowsIdGet_id">
+                                      <div id="d2e199_apiRowsIdGet_id">
                                           <div class="json-schema-view">
                                               <div class="primitive">
                                                   <span class="type">
@@ -3162,28 +3269,6 @@ except ApiException as e:
                                   
                                                       <div class="inner description">
                                                           ID столбца
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                                  <tr><td style="width:150px;">b_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsIdGet_bId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID доски
                                                       </div>
                                               </div>
                                                   <div class="inner required">
@@ -3204,14 +3289,14 @@ except ApiException as e:
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-apiBoardsBIdRowsIdGet-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-apiRowsIdGet-200-schema">Schema</a>
                                 </li>
 
                             </ul>
 
                             <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-apiBoardsBIdRowsIdGet-200-schema">
-                                  <div id='responses-apiBoardsBIdRowsIdGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                <div class="tab-pane active" id="responses-apiRowsIdGet-200-schema">
+                                  <div id='responses-apiRowsIdGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -3237,14 +3322,14 @@ except ApiException as e:
 
                                         //console.log(JSON.stringify(schema));
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-apiBoardsBIdRowsIdGet-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-apiBoardsBIdRowsIdGet-200-schema-200');
+                                        $('#responses-apiRowsIdGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-apiRowsIdGet-200-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-apiBoardsBIdRowsIdGet-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-apiRowsIdGet-200-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
 
@@ -3267,10 +3352,10 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Rows-apiBoardsBIdRowsIdPatch">
-                      <article id="api-Rows-apiBoardsBIdRowsIdPatch-0" data-group="User" data-name="apiBoardsBIdRowsIdPatch" data-version="0">
+                    <div id="api-Rows-apiRowsIdPatch">
+                      <article id="api-Rows-apiRowsIdPatch-0" data-group="User" data-name="apiRowsIdPatch" data-version="0">
                         <div class="pull-left">
-                          <h1>apiBoardsBIdRowsIdPatch</h1>
+                          <h1>apiRowsIdPatch</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -3279,31 +3364,32 @@ except ApiException as e:
                         <p class="marked">Изменение столбца</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="patch"><code><span class="pln">/api/boards/{b_id}/rows/{id}</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="patch"><code><span class="pln">/api/rows/{id}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsIdPatch-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Rows-apiRowsIdPatch-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdPatch-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdPatch-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Rows-apiRowsIdPatch-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Rows-apiRowsIdPatch-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdPatch-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Rows-apiRowsIdPatch-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Rows-apiRowsIdPatch-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdPatch-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdPatch-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsIdPatch-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-curl">
+                          <div class="tab-pane active" id="examples-Rows-apiRowsIdPatch-0-curl">
                            <pre class="prettyprint"><code class="language-bsh">curl -X PATCH\
  -H "Authorization: Bearer [[accessToken]]"\
-"//api/boards/{b_id}/rows/{id}"</code></pre>
+-H "Content-Type: application/json"\
+"//api/rows/{id}"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-java">
+                          <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -3320,18 +3406,18 @@ public class RowsApiExample {
 
         RowsApi apiInstance = new RowsApi();
         Integer id = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
+        PatchRowRequest body = ; // PatchRowRequest | 
         try {
-            apiInstance.apiBoardsBIdRowsIdPatch(id, bId);
+            apiInstance.apiRowsIdPatch(id, body);
         } catch (ApiException e) {
-            System.err.println("Exception when calling RowsApi#apiBoardsBIdRowsIdPatch");
+            System.err.println("Exception when calling RowsApi#apiRowsIdPatch");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-android">
+                          <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.RowsApi;
 
 public class RowsApiExample {
@@ -3339,29 +3425,29 @@ public class RowsApiExample {
     public static void main(String[] args) {
         RowsApi apiInstance = new RowsApi();
         Integer id = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
+        PatchRowRequest body = ; // PatchRowRequest | 
         try {
-            apiInstance.apiBoardsBIdRowsIdPatch(id, bId);
+            apiInstance.apiRowsIdPatch(id, body);
         } catch (ApiException e) {
-            System.err.println("Exception when calling RowsApi#apiBoardsBIdRowsIdPatch");
+            System.err.println("Exception when calling RowsApi#apiRowsIdPatch");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-groovy">
+  <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-objc">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
 Integer *id = 56; // ID столбца
-Integer *bId = 56; // ID доски
+PatchRowRequest *body = ; //  (optional)
 
 RowsApi *apiInstance = [[RowsApi alloc] init];
 
-[apiInstance apiBoardsBIdRowsIdPatchWith:id
-    bId:bId
+[apiInstance apiRowsIdPatchWith:id
+    body:body
               completionHandler: ^(NSError* error) {
                             if (error) {
                                 NSLog(@"Error: %@", error);
@@ -3370,15 +3456,16 @@ RowsApi *apiInstance = [[RowsApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-javascript">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
 var defaultClient = Trello.ApiClient.instance;
 
 
 var api = new Trello.RowsApi()
 var id = 56; // {{Integer}} ID столбца
-var bId = 56; // {{Integer}} ID доски
-
+var opts = { 
+  'body':  // {{PatchRowRequest}} 
+};
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -3386,14 +3473,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-api.apiBoardsBIdRowsIdPatch(id, bId, callback);
+api.apiRowsIdPatch(id, opts, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-angular">
+                            <!--<div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-csharp">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -3402,7 +3489,7 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class apiBoardsBIdRowsIdPatchExample
+    public class apiRowsIdPatchExample
     {
         public void main()
         {
@@ -3410,15 +3497,15 @@ namespace Example
 
             var apiInstance = new RowsApi();
             var id = 56;  // Integer | ID столбца
-            var bId = 56;  // Integer | ID доски
+            var body = new PatchRowRequest(); // PatchRowRequest |  (optional) 
 
             try
             {
-                apiInstance.apiBoardsBIdRowsIdPatch(id, bId);
+                apiInstance.apiRowsIdPatch(id, body);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling RowsApi.apiBoardsBIdRowsIdPatch: " + e.Message );
+                Debug.Print("Exception when calling RowsApi.apiRowsIdPatch: " + e.Message );
             }
         }
     }
@@ -3426,24 +3513,24 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-php">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiRowsApi();
 $id = 56; // Integer | ID столбца
-$bId = 56; // Integer | ID доски
+$body = ; // PatchRowRequest | 
 
 try {
-    $api_instance->apiBoardsBIdRowsIdPatch($id, $bId);
+    $api_instance->apiRowsIdPatch($id, $body);
 } catch (Exception $e) {
-    echo 'Exception when calling RowsApi->apiBoardsBIdRowsIdPatch: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling RowsApi->apiRowsIdPatch: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-perl">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::RowsApi;
@@ -3451,17 +3538,17 @@ use WWW::SwaggerClient::RowsApi;
 
 my $api_instance = WWW::SwaggerClient::RowsApi->new();
 my $id = 56; # Integer | ID столбца
-my $bId = 56; # Integer | ID доски
+my $body = WWW::SwaggerClient::Object::PatchRowRequest->new(); # PatchRowRequest | 
 
 eval { 
-    $api_instance->apiBoardsBIdRowsIdPatch(id => $id, bId => $bId);
+    $api_instance->apiRowsIdPatch(id => $id, body => $body);
 };
 if ($@) {
-    warn "Exception when calling RowsApi->apiBoardsBIdRowsIdPatch: $@\n";
+    warn "Exception when calling RowsApi->apiRowsIdPatch: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsIdPatch-0-python">
+                            <div class="tab-pane" id="examples-Rows-apiRowsIdPatch-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -3472,12 +3559,12 @@ from pprint import pprint
 # create an instance of the API class
 api_instance = swagger_client.RowsApi()
 id = 56 # Integer | ID столбца
-bId = 56 # Integer | ID доски
+body =  # PatchRowRequest |  (optional)
 
 try: 
-    api_instance.api_boards_b_id_rows_id_patch(id, bId)
+    api_instance.api_rows_id_patch(id, body=body)
 except ApiException as e:
-    print("Exception when calling RowsApi->apiBoardsBIdRowsIdPatch: %s\n" % e)</code></pre>
+    print("Exception when calling RowsApi->apiRowsIdPatch: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -3493,7 +3580,7 @@ except ApiException as e:
                                   <td>
                                   
                                   
-                                      <div id="d2e199_apiBoardsBIdRowsIdPatch_id">
+                                      <div id="d2e199_apiRowsIdPatch_id">
                                           <div class="json-schema-view">
                                               <div class="primitive">
                                                   <span class="type">
@@ -3511,31 +3598,51 @@ except ApiException as e:
                                       </div>
                                   </td>
                                   </tr>
-                                  <tr><td style="width:150px;">b_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsIdPatch_bId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID доски
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
                             </table>
 
 
+                            <div class="methodsubtabletitle">Body parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">body </td>
+                                <td>
+                                
+                                
+                                <script>
+                                $(document).ready(function() {
+                                  var schemaWrapper = {
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/PatchRowRequest"
+      }
+    }
+  }
+};
+                                  var schema = schemaWrapper.content["application/json"].schema;
+                                  if (schema.$ref != null) {
+                                    schema = defsParser.$refs.get(schema.$ref);
+                                  } else {
+                                    schemaWrapper.components = {};
+                                    schemaWrapper.components.schemas = Object.assign({}, defs);
+                                    $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                      console.log(err);
+                                    });
+                                  }
+                                
+                                  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+                                  var result = $('#d2e199_apiRowsIdPatch_body');
+                                  result.empty();
+                                  result.append(view.render());
+                                });
+                                </script>
+                                <div id="d2e199_apiRowsIdPatch_body"></div>
+                                </td>
+                                </tr>
+                            </table>
 
 
 
@@ -3575,10 +3682,10 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Rows-apiBoardsBIdRowsPost">
-                      <article id="api-Rows-apiBoardsBIdRowsPost-0" data-group="User" data-name="apiBoardsBIdRowsPost" data-version="0">
+                    <div id="api-Rows-apiRowsPost">
+                      <article id="api-Rows-apiRowsPost-0" data-group="User" data-name="apiRowsPost" data-version="0">
                         <div class="pull-left">
-                          <h1>apiBoardsBIdRowsPost</h1>
+                          <h1>apiRowsPost</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -3587,33 +3694,33 @@ except ApiException as e:
                         <p class="marked">Добавление столбца на доску</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/api/boards/{b_id}/rows</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/api/rows</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Rows-apiBoardsBIdRowsPost-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Rows-apiBoardsBIdRowsPost-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Rows-apiRowsPost-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsPost-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsPost-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Rows-apiRowsPost-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Rows-apiRowsPost-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsPost-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Rows-apiRowsPost-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Rows-apiRowsPost-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsPost-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsPost-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Rows-apiRowsPost-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Rows-apiBoardsBIdRowsPost-0-curl">
+                          <div class="tab-pane active" id="examples-Rows-apiRowsPost-0-curl">
                            <pre class="prettyprint"><code class="language-bsh">curl -X POST\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
 -H "Content-Type: application/json"\
-"//api/boards/{b_id}/rows"</code></pre>
+"//api/rows"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-java">
+                          <div class="tab-pane" id="examples-Rows-apiRowsPost-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -3629,51 +3736,47 @@ public class RowsApiExample {
 
 
         RowsApi apiInstance = new RowsApi();
-        Integer bId = 56; // Integer | ID доски
         PostRowsRequest body = ; // PostRowsRequest | 
         try {
-            PostResponses result = apiInstance.apiBoardsBIdRowsPost(bId, body);
+            PostResponses result = apiInstance.apiRowsPost(body);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling RowsApi#apiBoardsBIdRowsPost");
+            System.err.println("Exception when calling RowsApi#apiRowsPost");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-android">
+                          <div class="tab-pane" id="examples-Rows-apiRowsPost-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.RowsApi;
 
 public class RowsApiExample {
 
     public static void main(String[] args) {
         RowsApi apiInstance = new RowsApi();
-        Integer bId = 56; // Integer | ID доски
         PostRowsRequest body = ; // PostRowsRequest | 
         try {
-            PostResponses result = apiInstance.apiBoardsBIdRowsPost(bId, body);
+            PostResponses result = apiInstance.apiRowsPost(body);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling RowsApi#apiBoardsBIdRowsPost");
+            System.err.println("Exception when calling RowsApi#apiRowsPost");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-groovy">
+  <div class="tab-pane" id="examples-Rows-apiRowsPost-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-objc">
+                            <div class="tab-pane" id="examples-Rows-apiRowsPost-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-Integer *bId = 56; // ID доски
 PostRowsRequest *body = ; //  (optional)
 
 RowsApi *apiInstance = [[RowsApi alloc] init];
 
-[apiInstance apiBoardsBIdRowsPostWith:bId
-    body:body
+[apiInstance apiRowsPostWith:body
               completionHandler: ^(PostResponses output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -3685,13 +3788,12 @@ RowsApi *apiInstance = [[RowsApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-javascript">
+                            <div class="tab-pane" id="examples-Rows-apiRowsPost-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
 var defaultClient = Trello.ApiClient.instance;
 
 
 var api = new Trello.RowsApi()
-var bId = 56; // {{Integer}} ID доски
 var opts = { 
   'body':  // {{PostRowsRequest}} 
 };
@@ -3702,14 +3804,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.apiBoardsBIdRowsPost(bId, opts, callback);
+api.apiRowsPost(opts, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-angular">
+                            <!--<div class="tab-pane" id="examples-Rows-apiRowsPost-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-csharp">
+                            <div class="tab-pane" id="examples-Rows-apiRowsPost-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -3718,24 +3820,23 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class apiBoardsBIdRowsPostExample
+    public class apiRowsPostExample
     {
         public void main()
         {
 
 
             var apiInstance = new RowsApi();
-            var bId = 56;  // Integer | ID доски
             var body = new PostRowsRequest(); // PostRowsRequest |  (optional) 
 
             try
             {
-                PostResponses result = apiInstance.apiBoardsBIdRowsPost(bId, body);
+                PostResponses result = apiInstance.apiRowsPost(body);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling RowsApi.apiBoardsBIdRowsPost: " + e.Message );
+                Debug.Print("Exception when calling RowsApi.apiRowsPost: " + e.Message );
             }
         }
     }
@@ -3743,44 +3844,42 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-php">
+                            <div class="tab-pane" id="examples-Rows-apiRowsPost-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiRowsApi();
-$bId = 56; // Integer | ID доски
 $body = ; // PostRowsRequest | 
 
 try {
-    $result = $api_instance->apiBoardsBIdRowsPost($bId, $body);
+    $result = $api_instance->apiRowsPost($body);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling RowsApi->apiBoardsBIdRowsPost: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling RowsApi->apiRowsPost: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-perl">
+                            <div class="tab-pane" id="examples-Rows-apiRowsPost-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::RowsApi;
 
 
 my $api_instance = WWW::SwaggerClient::RowsApi->new();
-my $bId = 56; # Integer | ID доски
 my $body = WWW::SwaggerClient::Object::PostRowsRequest->new(); # PostRowsRequest | 
 
 eval { 
-    my $result = $api_instance->apiBoardsBIdRowsPost(bId => $bId, body => $body);
+    my $result = $api_instance->apiRowsPost(body => $body);
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling RowsApi->apiBoardsBIdRowsPost: $@\n";
+    warn "Exception when calling RowsApi->apiRowsPost: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Rows-apiBoardsBIdRowsPost-0-python">
+                            <div class="tab-pane" id="examples-Rows-apiRowsPost-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -3790,48 +3889,18 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.RowsApi()
-bId = 56 # Integer | ID доски
 body =  # PostRowsRequest |  (optional)
 
 try: 
-    api_response = api_instance.api_boards_b_id_rows_post(bId, body=body)
+    api_response = api_instance.api_rows_post(body=body)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling RowsApi->apiBoardsBIdRowsPost: %s\n" % e)</code></pre>
+    print("Exception when calling RowsApi->apiRowsPost: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
                           <h2>Parameters</h2>
 
-                            <div class="methodsubtabletitle">Path parameters</div>
-                            <table id="methodsubtable">
-                                <tr>
-                                  <th width="150px">Name</th>
-                                  <th>Description</th>
-                                </tr>
-                                  <tr><td style="width:150px;">b_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsPost_bId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID доски
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                            </table>
 
 
                             <div class="methodsubtabletitle">Body parameters</div>
@@ -3867,12 +3936,12 @@ except ApiException as e:
                                   }
                                 
                                   var view = new JSONSchemaView(schema,2,{isBodyParam: true});
-                                  var result = $('#d2e199_apiBoardsBIdRowsPost_body');
+                                  var result = $('#d2e199_apiRowsPost_body');
                                   result.empty();
                                   result.append(view.render());
                                 });
                                 </script>
-                                <div id="d2e199_apiBoardsBIdRowsPost_body"></div>
+                                <div id="d2e199_apiRowsPost_body"></div>
                                 </td>
                                 </tr>
                             </table>
@@ -3884,14 +3953,14 @@ except ApiException as e:
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-apiBoardsBIdRowsPost-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-apiRowsPost-200-schema">Schema</a>
                                 </li>
 
                             </ul>
 
                             <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-apiBoardsBIdRowsPost-200-schema">
-                                  <div id='responses-apiBoardsBIdRowsPost-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                <div class="tab-pane active" id="responses-apiRowsPost-200-schema">
+                                  <div id='responses-apiRowsPost-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -3917,14 +3986,14 @@ except ApiException as e:
 
                                         //console.log(JSON.stringify(schema));
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-apiBoardsBIdRowsPost-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-apiBoardsBIdRowsPost-200-schema-200');
+                                        $('#responses-apiRowsPost-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-apiRowsPost-200-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-apiBoardsBIdRowsPost-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-apiRowsPost-200-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
 
@@ -3950,10 +4019,10 @@ except ApiException as e:
                   </section>
                 <section id="api-Tasks">
                   <h1>Tasks</h1>
-                    <div id="api-Tasks-apiBoardsBIdRowsRIdTasksIdDelete">
-                      <article id="api-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0" data-group="User" data-name="apiBoardsBIdRowsRIdTasksIdDelete" data-version="0">
+                    <div id="api-Tasks-apiTasksIdDelete">
+                      <article id="api-Tasks-apiTasksIdDelete-0" data-group="User" data-name="apiTasksIdDelete" data-version="0">
                         <div class="pull-left">
-                          <h1>apiBoardsBIdRowsRIdTasksIdDelete</h1>
+                          <h1>apiTasksIdDelete</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -3962,31 +4031,31 @@ except ApiException as e:
                         <p class="marked">Удаление задания</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/api/boards/{b_id}/rows/{r_id}/tasks/{id}</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/api/tasks/{id}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Tasks-apiTasksIdDelete-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdDelete-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-curl">
+                          <div class="tab-pane active" id="examples-Tasks-apiTasksIdDelete-0-curl">
                            <pre class="prettyprint"><code class="language-bsh">curl -X DELETE\
  -H "Authorization: Bearer [[accessToken]]"\
-"//api/boards/{b_id}/rows/{r_id}/tasks/{id}"</code></pre>
+"//api/tasks/{id}"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-java">
+                          <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -4002,53 +4071,45 @@ public class TasksApiExample {
 
 
         TasksApi apiInstance = new TasksApi();
-        Integer rId = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         Integer id = 56; // Integer | ID задания
         try {
-            apiInstance.apiBoardsBIdRowsRIdTasksIdDelete(rId, bId, id);
+            apiInstance.apiTasksIdDelete(id);
         } catch (ApiException e) {
-            System.err.println("Exception when calling TasksApi#apiBoardsBIdRowsRIdTasksIdDelete");
+            System.err.println("Exception when calling TasksApi#apiTasksIdDelete");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-android">
+                          <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.TasksApi;
 
 public class TasksApiExample {
 
     public static void main(String[] args) {
         TasksApi apiInstance = new TasksApi();
-        Integer rId = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         Integer id = 56; // Integer | ID задания
         try {
-            apiInstance.apiBoardsBIdRowsRIdTasksIdDelete(rId, bId, id);
+            apiInstance.apiTasksIdDelete(id);
         } catch (ApiException e) {
-            System.err.println("Exception when calling TasksApi#apiBoardsBIdRowsRIdTasksIdDelete");
+            System.err.println("Exception when calling TasksApi#apiTasksIdDelete");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-groovy">
+  <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-objc">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-Integer *rId = 56; // ID столбца
-Integer *bId = 56; // ID доски
 Integer *id = 56; // ID задания
 
 TasksApi *apiInstance = [[TasksApi alloc] init];
 
-[apiInstance apiBoardsBIdRowsRIdTasksIdDeleteWith:rId
-    bId:bId
-    id:id
+[apiInstance apiTasksIdDeleteWith:id
               completionHandler: ^(NSError* error) {
                             if (error) {
                                 NSLog(@"Error: %@", error);
@@ -4057,14 +4118,12 @@ TasksApi *apiInstance = [[TasksApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-javascript">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
 var defaultClient = Trello.ApiClient.instance;
 
 
 var api = new Trello.TasksApi()
-var rId = 56; // {{Integer}} ID столбца
-var bId = 56; // {{Integer}} ID доски
 var id = 56; // {{Integer}} ID задания
 
 var callback = function(error, data, response) {
@@ -4074,14 +4133,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-api.apiBoardsBIdRowsRIdTasksIdDelete(rId, bId, id, callback);
+api.apiTasksIdDelete(id, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-angular">
+                            <!--<div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-csharp">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -4090,24 +4149,22 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class apiBoardsBIdRowsRIdTasksIdDeleteExample
+    public class apiTasksIdDeleteExample
     {
         public void main()
         {
 
 
             var apiInstance = new TasksApi();
-            var rId = 56;  // Integer | ID столбца
-            var bId = 56;  // Integer | ID доски
             var id = 56;  // Integer | ID задания
 
             try
             {
-                apiInstance.apiBoardsBIdRowsRIdTasksIdDelete(rId, bId, id);
+                apiInstance.apiTasksIdDelete(id);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling TasksApi.apiBoardsBIdRowsRIdTasksIdDelete: " + e.Message );
+                Debug.Print("Exception when calling TasksApi.apiTasksIdDelete: " + e.Message );
             }
         }
     }
@@ -4115,44 +4172,40 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-php">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiTasksApi();
-$rId = 56; // Integer | ID столбца
-$bId = 56; // Integer | ID доски
 $id = 56; // Integer | ID задания
 
 try {
-    $api_instance->apiBoardsBIdRowsRIdTasksIdDelete($rId, $bId, $id);
+    $api_instance->apiTasksIdDelete($id);
 } catch (Exception $e) {
-    echo 'Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdDelete: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling TasksApi->apiTasksIdDelete: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-perl">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::TasksApi;
 
 
 my $api_instance = WWW::SwaggerClient::TasksApi->new();
-my $rId = 56; # Integer | ID столбца
-my $bId = 56; # Integer | ID доски
 my $id = 56; # Integer | ID задания
 
 eval { 
-    $api_instance->apiBoardsBIdRowsRIdTasksIdDelete(rId => $rId, bId => $bId, id => $id);
+    $api_instance->apiTasksIdDelete(id => $id);
 };
 if ($@) {
-    warn "Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdDelete: $@\n";
+    warn "Exception when calling TasksApi->apiTasksIdDelete: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdDelete-0-python">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdDelete-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -4162,14 +4215,12 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.TasksApi()
-rId = 56 # Integer | ID столбца
-bId = 56 # Integer | ID доски
 id = 56 # Integer | ID задания
 
 try: 
-    api_instance.api_boards_b_id_rows_r_id_tasks_id_delete(rId, bId, id)
+    api_instance.api_tasks_id_delete(id)
 except ApiException as e:
-    print("Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdDelete: %s\n" % e)</code></pre>
+    print("Exception when calling TasksApi->apiTasksIdDelete: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -4181,55 +4232,11 @@ except ApiException as e:
                                   <th width="150px">Name</th>
                                   <th>Description</th>
                                 </tr>
-                                  <tr><td style="width:150px;">r_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdDelete_rId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID столбца
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                                  <tr><td style="width:150px;">b_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdDelete_bId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID доски
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
                                   <tr><td style="width:150px;">id*</td>
                                   <td>
                                   
                                   
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdDelete_id">
+                                      <div id="d2e199_apiTasksIdDelete_id">
                                           <div class="json-schema-view">
                                               <div class="primitive">
                                                   <span class="type">
@@ -4281,10 +4288,10 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Tasks-apiBoardsBIdRowsRIdTasksIdGet">
-                      <article id="api-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0" data-group="User" data-name="apiBoardsBIdRowsRIdTasksIdGet" data-version="0">
+                    <div id="api-Tasks-apiTasksIdGet">
+                      <article id="api-Tasks-apiTasksIdGet-0" data-group="User" data-name="apiTasksIdGet" data-version="0">
                         <div class="pull-left">
-                          <h1>apiBoardsBIdRowsRIdTasksIdGet</h1>
+                          <h1>apiTasksIdGet</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -4293,32 +4300,32 @@ except ApiException as e:
                         <p class="marked">Получение задания</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/boards/{b_id}/rows/{r_id}/tasks/{id}</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/tasks/{id}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Tasks-apiTasksIdGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tasks-apiTasksIdGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tasks-apiTasksIdGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tasks-apiTasksIdGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tasks-apiTasksIdGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdGet-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-curl">
+                          <div class="tab-pane active" id="examples-Tasks-apiTasksIdGet-0-curl">
                            <pre class="prettyprint"><code class="language-bsh">curl -X GET\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
-"//api/boards/{b_id}/rows/{r_id}/tasks/{id}"</code></pre>
+"//api/tasks/{id}"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-java">
+                          <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -4334,55 +4341,47 @@ public class TasksApiExample {
 
 
         TasksApi apiInstance = new TasksApi();
-        Integer rId = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         Integer id = 56; // Integer | ID задания
         try {
-            GetTaskByIdResponse result = apiInstance.apiBoardsBIdRowsRIdTasksIdGet(rId, bId, id);
+            GetTaskByIdResponse result = apiInstance.apiTasksIdGet(id);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling TasksApi#apiBoardsBIdRowsRIdTasksIdGet");
+            System.err.println("Exception when calling TasksApi#apiTasksIdGet");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-android">
+                          <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.TasksApi;
 
 public class TasksApiExample {
 
     public static void main(String[] args) {
         TasksApi apiInstance = new TasksApi();
-        Integer rId = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         Integer id = 56; // Integer | ID задания
         try {
-            GetTaskByIdResponse result = apiInstance.apiBoardsBIdRowsRIdTasksIdGet(rId, bId, id);
+            GetTaskByIdResponse result = apiInstance.apiTasksIdGet(id);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling TasksApi#apiBoardsBIdRowsRIdTasksIdGet");
+            System.err.println("Exception when calling TasksApi#apiTasksIdGet");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-groovy">
+  <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-objc">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-Integer *rId = 56; // ID столбца
-Integer *bId = 56; // ID доски
 Integer *id = 56; // ID задания
 
 TasksApi *apiInstance = [[TasksApi alloc] init];
 
-[apiInstance apiBoardsBIdRowsRIdTasksIdGetWith:rId
-    bId:bId
-    id:id
+[apiInstance apiTasksIdGetWith:id
               completionHandler: ^(GetTaskByIdResponse output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -4394,14 +4393,12 @@ TasksApi *apiInstance = [[TasksApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-javascript">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
 var defaultClient = Trello.ApiClient.instance;
 
 
 var api = new Trello.TasksApi()
-var rId = 56; // {{Integer}} ID столбца
-var bId = 56; // {{Integer}} ID доски
 var id = 56; // {{Integer}} ID задания
 
 var callback = function(error, data, response) {
@@ -4411,14 +4408,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.apiBoardsBIdRowsRIdTasksIdGet(rId, bId, id, callback);
+api.apiTasksIdGet(id, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-angular">
+                            <!--<div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-csharp">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -4427,25 +4424,23 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class apiBoardsBIdRowsRIdTasksIdGetExample
+    public class apiTasksIdGetExample
     {
         public void main()
         {
 
 
             var apiInstance = new TasksApi();
-            var rId = 56;  // Integer | ID столбца
-            var bId = 56;  // Integer | ID доски
             var id = 56;  // Integer | ID задания
 
             try
             {
-                GetTaskByIdResponse result = apiInstance.apiBoardsBIdRowsRIdTasksIdGet(rId, bId, id);
+                GetTaskByIdResponse result = apiInstance.apiTasksIdGet(id);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling TasksApi.apiBoardsBIdRowsRIdTasksIdGet: " + e.Message );
+                Debug.Print("Exception when calling TasksApi.apiTasksIdGet: " + e.Message );
             }
         }
     }
@@ -4453,46 +4448,42 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-php">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiTasksApi();
-$rId = 56; // Integer | ID столбца
-$bId = 56; // Integer | ID доски
 $id = 56; // Integer | ID задания
 
 try {
-    $result = $api_instance->apiBoardsBIdRowsRIdTasksIdGet($rId, $bId, $id);
+    $result = $api_instance->apiTasksIdGet($id);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdGet: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling TasksApi->apiTasksIdGet: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-perl">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::TasksApi;
 
 
 my $api_instance = WWW::SwaggerClient::TasksApi->new();
-my $rId = 56; # Integer | ID столбца
-my $bId = 56; # Integer | ID доски
 my $id = 56; # Integer | ID задания
 
 eval { 
-    my $result = $api_instance->apiBoardsBIdRowsRIdTasksIdGet(rId => $rId, bId => $bId, id => $id);
+    my $result = $api_instance->apiTasksIdGet(id => $id);
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdGet: $@\n";
+    warn "Exception when calling TasksApi->apiTasksIdGet: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdGet-0-python">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdGet-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -4502,15 +4493,13 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.TasksApi()
-rId = 56 # Integer | ID столбца
-bId = 56 # Integer | ID доски
 id = 56 # Integer | ID задания
 
 try: 
-    api_response = api_instance.api_boards_b_id_rows_r_id_tasks_id_get(rId, bId, id)
+    api_response = api_instance.api_tasks_id_get(id)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdGet: %s\n" % e)</code></pre>
+    print("Exception when calling TasksApi->apiTasksIdGet: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -4522,55 +4511,11 @@ except ApiException as e:
                                   <th width="150px">Name</th>
                                   <th>Description</th>
                                 </tr>
-                                  <tr><td style="width:150px;">r_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdGet_rId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID столбца
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                                  <tr><td style="width:150px;">b_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdGet_bId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID доски
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
                                   <tr><td style="width:150px;">id*</td>
                                   <td>
                                   
                                   
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdGet_id">
+                                      <div id="d2e199_apiTasksIdGet_id">
                                           <div class="json-schema-view">
                                               <div class="primitive">
                                                   <span class="type">
@@ -4599,14 +4544,14 @@ except ApiException as e:
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-apiBoardsBIdRowsRIdTasksIdGet-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-apiTasksIdGet-200-schema">Schema</a>
                                 </li>
 
                             </ul>
 
                             <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-apiBoardsBIdRowsRIdTasksIdGet-200-schema">
-                                  <div id='responses-apiBoardsBIdRowsRIdTasksIdGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                <div class="tab-pane active" id="responses-apiTasksIdGet-200-schema">
+                                  <div id='responses-apiTasksIdGet-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -4632,14 +4577,14 @@ except ApiException as e:
 
                                         //console.log(JSON.stringify(schema));
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-apiBoardsBIdRowsRIdTasksIdGet-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-apiBoardsBIdRowsRIdTasksIdGet-200-schema-200');
+                                        $('#responses-apiTasksIdGet-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-apiTasksIdGet-200-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-apiBoardsBIdRowsRIdTasksIdGet-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-apiTasksIdGet-200-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
 
@@ -4662,10 +4607,10 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Tasks-apiBoardsBIdRowsRIdTasksIdPatch">
-                      <article id="api-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0" data-group="User" data-name="apiBoardsBIdRowsRIdTasksIdPatch" data-version="0">
+                    <div id="api-Tasks-apiTasksIdPatch">
+                      <article id="api-Tasks-apiTasksIdPatch-0" data-group="User" data-name="apiTasksIdPatch" data-version="0">
                         <div class="pull-left">
-                          <h1>apiBoardsBIdRowsRIdTasksIdPatch</h1>
+                          <h1>apiTasksIdPatch</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -4674,32 +4619,32 @@ except ApiException as e:
                         <p class="marked">Изменение задания</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="patch"><code><span class="pln">/api/boards/{b_id}/rows/{r_id}/tasks/{id}</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="patch"><code><span class="pln">/api/tasks/{id}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Tasks-apiTasksIdPatch-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksIdPatch-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-curl">
+                          <div class="tab-pane active" id="examples-Tasks-apiTasksIdPatch-0-curl">
                            <pre class="prettyprint"><code class="language-bsh">curl -X PATCH\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Content-Type: application/json"\
-"//api/boards/{b_id}/rows/{r_id}/tasks/{id}"</code></pre>
+"//api/tasks/{id}"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-java">
+                          <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -4715,56 +4660,48 @@ public class TasksApiExample {
 
 
         TasksApi apiInstance = new TasksApi();
-        Integer rId = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         Integer id = 56; // Integer | ID задания
-        GetTaskByIdResponse body = ; // GetTaskByIdResponse | 
+        Task body = ; // Task | 
         try {
-            apiInstance.apiBoardsBIdRowsRIdTasksIdPatch(rId, bId, id, body);
+            apiInstance.apiTasksIdPatch(id, body);
         } catch (ApiException e) {
-            System.err.println("Exception when calling TasksApi#apiBoardsBIdRowsRIdTasksIdPatch");
+            System.err.println("Exception when calling TasksApi#apiTasksIdPatch");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-android">
+                          <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.TasksApi;
 
 public class TasksApiExample {
 
     public static void main(String[] args) {
         TasksApi apiInstance = new TasksApi();
-        Integer rId = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         Integer id = 56; // Integer | ID задания
-        GetTaskByIdResponse body = ; // GetTaskByIdResponse | 
+        Task body = ; // Task | 
         try {
-            apiInstance.apiBoardsBIdRowsRIdTasksIdPatch(rId, bId, id, body);
+            apiInstance.apiTasksIdPatch(id, body);
         } catch (ApiException e) {
-            System.err.println("Exception when calling TasksApi#apiBoardsBIdRowsRIdTasksIdPatch");
+            System.err.println("Exception when calling TasksApi#apiTasksIdPatch");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-groovy">
+  <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-objc">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-Integer *rId = 56; // ID столбца
-Integer *bId = 56; // ID доски
 Integer *id = 56; // ID задания
-GetTaskByIdResponse *body = ; //  (optional)
+Task *body = ; //  (optional)
 
 TasksApi *apiInstance = [[TasksApi alloc] init];
 
-[apiInstance apiBoardsBIdRowsRIdTasksIdPatchWith:rId
-    bId:bId
-    id:id
+[apiInstance apiTasksIdPatchWith:id
     body:body
               completionHandler: ^(NSError* error) {
                             if (error) {
@@ -4774,17 +4711,15 @@ TasksApi *apiInstance = [[TasksApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-javascript">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
 var defaultClient = Trello.ApiClient.instance;
 
 
 var api = new Trello.TasksApi()
-var rId = 56; // {{Integer}} ID столбца
-var bId = 56; // {{Integer}} ID доски
 var id = 56; // {{Integer}} ID задания
 var opts = { 
-  'body':  // {{GetTaskByIdResponse}} 
+  'body':  // {{Task}} 
 };
 var callback = function(error, data, response) {
   if (error) {
@@ -4793,14 +4728,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-api.apiBoardsBIdRowsRIdTasksIdPatch(rIdbIdid, opts, callback);
+api.apiTasksIdPatch(id, opts, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-angular">
+                            <!--<div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-csharp">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -4809,25 +4744,23 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class apiBoardsBIdRowsRIdTasksIdPatchExample
+    public class apiTasksIdPatchExample
     {
         public void main()
         {
 
 
             var apiInstance = new TasksApi();
-            var rId = 56;  // Integer | ID столбца
-            var bId = 56;  // Integer | ID доски
             var id = 56;  // Integer | ID задания
-            var body = new GetTaskByIdResponse(); // GetTaskByIdResponse |  (optional) 
+            var body = new Task(); // Task |  (optional) 
 
             try
             {
-                apiInstance.apiBoardsBIdRowsRIdTasksIdPatch(rId, bId, id, body);
+                apiInstance.apiTasksIdPatch(id, body);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling TasksApi.apiBoardsBIdRowsRIdTasksIdPatch: " + e.Message );
+                Debug.Print("Exception when calling TasksApi.apiTasksIdPatch: " + e.Message );
             }
         }
     }
@@ -4835,46 +4768,42 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-php">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiTasksApi();
-$rId = 56; // Integer | ID столбца
-$bId = 56; // Integer | ID доски
 $id = 56; // Integer | ID задания
-$body = ; // GetTaskByIdResponse | 
+$body = ; // Task | 
 
 try {
-    $api_instance->apiBoardsBIdRowsRIdTasksIdPatch($rId, $bId, $id, $body);
+    $api_instance->apiTasksIdPatch($id, $body);
 } catch (Exception $e) {
-    echo 'Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdPatch: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling TasksApi->apiTasksIdPatch: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-perl">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::TasksApi;
 
 
 my $api_instance = WWW::SwaggerClient::TasksApi->new();
-my $rId = 56; # Integer | ID столбца
-my $bId = 56; # Integer | ID доски
 my $id = 56; # Integer | ID задания
-my $body = WWW::SwaggerClient::Object::GetTaskByIdResponse->new(); # GetTaskByIdResponse | 
+my $body = WWW::SwaggerClient::Object::Task->new(); # Task | 
 
 eval { 
-    $api_instance->apiBoardsBIdRowsRIdTasksIdPatch(rId => $rId, bId => $bId, id => $id, body => $body);
+    $api_instance->apiTasksIdPatch(id => $id, body => $body);
 };
 if ($@) {
-    warn "Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdPatch: $@\n";
+    warn "Exception when calling TasksApi->apiTasksIdPatch: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksIdPatch-0-python">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksIdPatch-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -4884,15 +4813,13 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.TasksApi()
-rId = 56 # Integer | ID столбца
-bId = 56 # Integer | ID доски
 id = 56 # Integer | ID задания
-body =  # GetTaskByIdResponse |  (optional)
+body =  # Task |  (optional)
 
 try: 
-    api_instance.api_boards_b_id_rows_r_id_tasks_id_patch(rId, bId, id, body=body)
+    api_instance.api_tasks_id_patch(id, body=body)
 except ApiException as e:
-    print("Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksIdPatch: %s\n" % e)</code></pre>
+    print("Exception when calling TasksApi->apiTasksIdPatch: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
@@ -4904,55 +4831,11 @@ except ApiException as e:
                                   <th width="150px">Name</th>
                                   <th>Description</th>
                                 </tr>
-                                  <tr><td style="width:150px;">r_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdPatch_rId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID столбца
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                                  <tr><td style="width:150px;">b_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdPatch_bId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID доски
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
                                   <tr><td style="width:150px;">id*</td>
                                   <td>
                                   
                                   
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksIdPatch_id">
+                                      <div id="d2e199_apiTasksIdPatch_id">
                                           <div class="json-schema-view">
                                               <div class="primitive">
                                                   <span class="type">
@@ -4989,7 +4872,7 @@ except ApiException as e:
   "content" : {
     "application/json" : {
       "schema" : {
-        "$ref" : "#/components/schemas/GetTaskByIdResponse"
+        "$ref" : "#/components/schemas/PatchTaskRequest"
       }
     }
   }
@@ -5006,12 +4889,12 @@ except ApiException as e:
                                   }
                                 
                                   var view = new JSONSchemaView(schema,2,{isBodyParam: true});
-                                  var result = $('#d2e199_apiBoardsBIdRowsRIdTasksIdPatch_body');
+                                  var result = $('#d2e199_apiTasksIdPatch_body');
                                   result.empty();
                                   result.append(view.render());
                                 });
                                 </script>
-                                <div id="d2e199_apiBoardsBIdRowsRIdTasksIdPatch_body"></div>
+                                <div id="d2e199_apiTasksIdPatch_body"></div>
                                 </td>
                                 </tr>
                             </table>
@@ -5054,10 +4937,10 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Tasks-apiBoardsBIdRowsRIdTasksPost">
-                      <article id="api-Tasks-apiBoardsBIdRowsRIdTasksPost-0" data-group="User" data-name="apiBoardsBIdRowsRIdTasksPost" data-version="0">
+                    <div id="api-Tasks-apiTasksPost">
+                      <article id="api-Tasks-apiTasksPost-0" data-group="User" data-name="apiTasksPost" data-version="0">
                         <div class="pull-left">
-                          <h1>apiBoardsBIdRowsRIdTasksPost</h1>
+                          <h1>apiTasksPost</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -5066,33 +4949,33 @@ except ApiException as e:
                         <p class="marked">Добавление задания</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/api/boards/{b_id}/rows/{r_id}/tasks</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/api/tasks</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-python">Python</a></li>
+                          <li class="active"><a href="#examples-Tasks-apiTasksPost-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksPost-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksPost-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Tasks-apiTasksPost-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Tasks-apiTasksPost-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksPost-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Tasks-apiTasksPost-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Tasks-apiTasksPost-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksPost-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksPost-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Tasks-apiTasksPost-0-python">Python</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-curl">
+                          <div class="tab-pane active" id="examples-Tasks-apiTasksPost-0-curl">
                            <pre class="prettyprint"><code class="language-bsh">curl -X POST\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
 -H "Content-Type: application/json"\
-"//api/boards/{b_id}/rows/{r_id}/tasks"</code></pre>
+"//api/tasks"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-java">
+                          <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
 import io.swagger.client.auth.*;
 import io.swagger.client.model.*;
@@ -5108,55 +4991,47 @@ public class TasksApiExample {
 
 
         TasksApi apiInstance = new TasksApi();
-        Integer rId = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         PostTasksRequest body = ; // PostTasksRequest | 
         try {
-            PostResponses result = apiInstance.apiBoardsBIdRowsRIdTasksPost(rId, bId, body);
+            PostResponses result = apiInstance.apiTasksPost(body);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling TasksApi#apiBoardsBIdRowsRIdTasksPost");
+            System.err.println("Exception when calling TasksApi#apiTasksPost");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-android">
+                          <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-android">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.TasksApi;
 
 public class TasksApiExample {
 
     public static void main(String[] args) {
         TasksApi apiInstance = new TasksApi();
-        Integer rId = 56; // Integer | ID столбца
-        Integer bId = 56; // Integer | ID доски
         PostTasksRequest body = ; // PostTasksRequest | 
         try {
-            PostResponses result = apiInstance.apiBoardsBIdRowsRIdTasksPost(rId, bId, body);
+            PostResponses result = apiInstance.apiTasksPost(body);
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling TasksApi#apiBoardsBIdRowsRIdTasksPost");
+            System.err.println("Exception when calling TasksApi#apiTasksPost");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-groovy">
+  <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-objc">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-Integer *rId = 56; // ID столбца
-Integer *bId = 56; // ID доски
 PostTasksRequest *body = ; //  (optional)
 
 TasksApi *apiInstance = [[TasksApi alloc] init];
 
-[apiInstance apiBoardsBIdRowsRIdTasksPostWith:rId
-    bId:bId
-    body:body
+[apiInstance apiTasksPostWith:body
               completionHandler: ^(PostResponses output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -5168,14 +5043,12 @@ TasksApi *apiInstance = [[TasksApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-javascript">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
 var defaultClient = Trello.ApiClient.instance;
 
 
 var api = new Trello.TasksApi()
-var rId = 56; // {{Integer}} ID столбца
-var bId = 56; // {{Integer}} ID доски
 var opts = { 
   'body':  // {{PostTasksRequest}} 
 };
@@ -5186,14 +5059,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.apiBoardsBIdRowsRIdTasksPost(rIdbId, opts, callback);
+api.apiTasksPost(opts, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-angular">
+                            <!--<div class="tab-pane" id="examples-Tasks-apiTasksPost-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-csharp">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using IO.Swagger.Api;
@@ -5202,25 +5075,23 @@ using IO.Swagger.Model;
 
 namespace Example
 {
-    public class apiBoardsBIdRowsRIdTasksPostExample
+    public class apiTasksPostExample
     {
         public void main()
         {
 
 
             var apiInstance = new TasksApi();
-            var rId = 56;  // Integer | ID столбца
-            var bId = 56;  // Integer | ID доски
             var body = new PostTasksRequest(); // PostTasksRequest |  (optional) 
 
             try
             {
-                PostResponses result = apiInstance.apiBoardsBIdRowsRIdTasksPost(rId, bId, body);
+                PostResponses result = apiInstance.apiTasksPost(body);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
             {
-                Debug.Print("Exception when calling TasksApi.apiBoardsBIdRowsRIdTasksPost: " + e.Message );
+                Debug.Print("Exception when calling TasksApi.apiTasksPost: " + e.Message );
             }
         }
     }
@@ -5228,46 +5099,42 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-php">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiTasksApi();
-$rId = 56; // Integer | ID столбца
-$bId = 56; // Integer | ID доски
 $body = ; // PostTasksRequest | 
 
 try {
-    $result = $api_instance->apiBoardsBIdRowsRIdTasksPost($rId, $bId, $body);
+    $result = $api_instance->apiTasksPost($body);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksPost: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling TasksApi->apiTasksPost: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-perl">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::TasksApi;
 
 
 my $api_instance = WWW::SwaggerClient::TasksApi->new();
-my $rId = 56; # Integer | ID столбца
-my $bId = 56; # Integer | ID доски
 my $body = WWW::SwaggerClient::Object::PostTasksRequest->new(); # PostTasksRequest | 
 
 eval { 
-    my $result = $api_instance->apiBoardsBIdRowsRIdTasksPost(rId => $rId, bId => $bId, body => $body);
+    my $result = $api_instance->apiTasksPost(body => $body);
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksPost: $@\n";
+    warn "Exception when calling TasksApi->apiTasksPost: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Tasks-apiBoardsBIdRowsRIdTasksPost-0-python">
+                            <div class="tab-pane" id="examples-Tasks-apiTasksPost-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import swagger_client
@@ -5277,71 +5144,18 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.TasksApi()
-rId = 56 # Integer | ID столбца
-bId = 56 # Integer | ID доски
 body =  # PostTasksRequest |  (optional)
 
 try: 
-    api_response = api_instance.api_boards_b_id_rows_r_id_tasks_post(rId, bId, body=body)
+    api_response = api_instance.api_tasks_post(body=body)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling TasksApi->apiBoardsBIdRowsRIdTasksPost: %s\n" % e)</code></pre>
+    print("Exception when calling TasksApi->apiTasksPost: %s\n" % e)</code></pre>
                             </div>
                           </div>
 
                           <h2>Parameters</h2>
 
-                            <div class="methodsubtabletitle">Path parameters</div>
-                            <table id="methodsubtable">
-                                <tr>
-                                  <th width="150px">Name</th>
-                                  <th>Description</th>
-                                </tr>
-                                  <tr><td style="width:150px;">r_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksPost_rId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID столбца
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                                  <tr><td style="width:150px;">b_id*</td>
-                                  <td>
-                                  
-                                  
-                                      <div id="d2e199_apiBoardsBIdRowsRIdTasksPost_bId">
-                                          <div class="json-schema-view">
-                                              <div class="primitive">
-                                                  <span class="type">
-                                                      Integer
-                                                  </span>
-                                  
-                                                      <div class="inner description">
-                                                          ID доски
-                                                      </div>
-                                              </div>
-                                                  <div class="inner required">
-                                                      Required
-                                                  </div>
-                                          </div>
-                                      </div>
-                                  </td>
-                                  </tr>
-                            </table>
 
 
                             <div class="methodsubtabletitle">Body parameters</div>
@@ -5377,12 +5191,12 @@ except ApiException as e:
                                   }
                                 
                                   var view = new JSONSchemaView(schema,2,{isBodyParam: true});
-                                  var result = $('#d2e199_apiBoardsBIdRowsRIdTasksPost_body');
+                                  var result = $('#d2e199_apiTasksPost_body');
                                   result.empty();
                                   result.append(view.render());
                                 });
                                 </script>
-                                <div id="d2e199_apiBoardsBIdRowsRIdTasksPost_body"></div>
+                                <div id="d2e199_apiTasksPost_body"></div>
                                 </td>
                                 </tr>
                             </table>
@@ -5394,14 +5208,14 @@ except ApiException as e:
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-apiBoardsBIdRowsRIdTasksPost-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-apiTasksPost-200-schema">Schema</a>
                                 </li>
 
                             </ul>
 
                             <div class="tab-content" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-apiBoardsBIdRowsRIdTasksPost-200-schema">
-                                  <div id='responses-apiBoardsBIdRowsRIdTasksPost-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                <div class="tab-pane active" id="responses-apiTasksPost-200-schema">
+                                  <div id='responses-apiTasksPost-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -5427,14 +5241,14 @@ except ApiException as e:
 
                                         //console.log(JSON.stringify(schema));
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-apiBoardsBIdRowsRIdTasksPost-200-schema-data').val(stringify(schema));
-                                        var result = $('#responses-apiBoardsBIdRowsRIdTasksPost-200-schema-200');
+                                        $('#responses-apiTasksPost-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-apiTasksPost-200-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-apiBoardsBIdRowsRIdTasksPost-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-apiTasksPost-200-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
 
