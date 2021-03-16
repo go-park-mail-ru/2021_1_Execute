@@ -14,4 +14,5 @@ func Router(e *echo.Echo) {
 	e.DELETE("/api/users/:id", DeleteUserByID)
 	e.POST("/api/upload/", upload)
 	e.GET("/static/:filename", download)
+	e.File("/api/", "docs/index.html")
 }

@@ -8,6 +8,37 @@ tags:
   - name: Rows
   - name: Tasks
 paths:
+  /api/upload:
+    post:
+      tags:
+        - Users
+      description: Добавление аватара
+      requestBody:
+        content:      
+            image/*:    
+             schema: 
+               type: string
+               format: binary
+      responses:
+        200:
+          description: Успешно отправлено
+        415:
+          description: Неверный формат изображения
+  /api/download:
+    get:
+      tags:
+        - Users
+      description: Загрузка аватара
+      responses:
+        200:
+          description: Скачивание прошло успешно
+          content:      
+            image/*:    
+              schema: 
+                type: string
+                format: binary
+        404:
+          description: Not found
   /api/login:
     post:
       tags:
@@ -21,7 +52,6 @@ paths:
       responses:
         200:
           description: Авторизация прошла успешно
-
         400:
           description: Запрос сформирован неверно
         403:
@@ -53,6 +83,50 @@ paths:
           description: Запрос сформирован неверно
         409:
           description: Уже создан пользователь с таким email
+    get:
+      tags:
+        - Users
+      description: Получение информации о текущем пользователе
+      responses:
+        200:
+          description: Информация получена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserByIdResponse"
+        401:
+          description: Неавторизованный запрос
+        404:
+          description: Пользователь не найден
+    patch:
+      tags:
+        - Users
+      description: Изменение информации о текущем пользователе
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchUserRequest"
+      responses:
+        200:
+          description: Информация получена
+        403:
+          description: Недостаточно прав
+        404:
+          description: Пользователь не найден
+        400:
+          description: Запрос сформирован неверно
+    delete:
+      tags:
+        - Users
+      description: Удаление пользователя
+      responses:
+        200:
+          description: Информация получена
+        404:
+          description: Пользователь не найден
+        403:
+          description: Недостаточно прав
   /api/users/{id}:
     parameters:
       - name: id
@@ -76,30 +150,6 @@ paths:
           description: Неавторизованный запрос
         404:
           description: Пользователь не найден
-    patch:
-      tags:
-        - Users
-      description: Изменение информации о пользователе
-      responses:
-        200:
-          description: Информация получена
-        403:
-          description: Недостаточно прав
-        404:
-          description: Пользователь не найден
-        400:
-          description: Запрос сформирован неверно
-    delete:
-      tags:
-        - Users
-      description: Удаление пользователя
-      responses:
-        200:
-          description: Информация получена
-        404:
-          description: Пользователь не найден
-        403:
-          description: Недостаточно прав
           
   /api/boards:
     get:
@@ -162,6 +212,11 @@ paths:
       tags:
         - Boards
       description: Изменение доски
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchBoardRequest"
       responses:
         200:
           description: Доска успешно изменена
@@ -171,6 +226,8 @@ paths:
           description: Доска не найдена
         400:
           description: Запрос сформирован неверно
+        403:
+          description: Недостаточно прав
     delete:
       tags:
         - Boards
@@ -182,14 +239,7 @@ paths:
           description: Неавторизованный запрос
         403:
           description: Недостаточно прав
-  /api/boards/{b_id}/rows:
-    parameters:
-      - name: b_id
-        description: ID доски
-        in: path
-        required: true
-        schema:
-          type: integer
+  /api/rows:
     post:
       tags:
         - Rows
@@ -210,16 +260,10 @@ paths:
           description: Неавторизованный запрос
         400:
           description: Запрос сформирован неверно
-  /api/boards/{b_id}/rows/{id}:
+  /api/rows/{id}:
     parameters:
       - name: id
         description: ID столбца
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: b_id
-        description: ID доски
         in: path
         required: true
         schema:
@@ -243,6 +287,11 @@ paths:
       tags:
         - Rows
       description: Изменение столбца
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchRowRequest"
       responses:
         200:
           description: Столбец успешно изменен
@@ -263,20 +312,7 @@ paths:
           description: Неавторизованный запрос
         404:
           description: Столбец не найден
-  /api/boards/{b_id}/rows/{r_id}/tasks:
-    parameters:
-      - name: r_id
-        description: ID столбца
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: b_id
-        description: ID доски
-        in: path
-        required: true
-        schema:
-          type: integer
+  /api/tasks:
     post:
       tags:
         - Tasks
@@ -297,20 +333,8 @@ paths:
           description: Неавторизованный запрос
         400:
           description: Запрос сформирован неверно
-  /api/boards/{b_id}/rows/{r_id}/tasks/{id}:
+  /api/tasks/{id}:
     parameters:
-      - name: r_id
-        description: ID столбца
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: b_id
-        description: ID доски
-        in: path
-        required: true
-        schema:
-          type: integer
       - name: id
         description: ID задания
         in: path
@@ -336,6 +360,11 @@ paths:
       tags:
         - Tasks
       description: Изменение задания
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchTaskRequest"
       responses:
         200:
           description: Задание успешно изменено
@@ -379,13 +408,21 @@ components:
           format: password
         username:
           type: string
-        avatar:
-          type: string
-          format: binary
       required:
         - email
         - password
         - username
+    PatchUserRequest:
+      properties:
+        email:
+          type: string
+          format: email
+        password: 
+          type: string
+          format: password
+        username:
+          type: string
+
     PostBoardsRequest:
       properties:
         name:
@@ -394,16 +431,26 @@ components:
         - name
     PostRowsRequest:
       properties:
+        board_id:
+          type: integer
         name:
           type: string
+        position:
+          type: integer
       required:
         - name
+        - position
     PostTasksRequest:
       properties:
+        row_id:
+          type: integer
         name:
           type: string
+        position:
+          type: integer
       required:
         - name
+        - position
     GetUserByIdResponse:
       type: object
       properties:
@@ -415,49 +462,126 @@ components:
             email:
               type: string
               format: email
+            avatar:
+              type: string
+              format: uri
     GetBoardsResponse:
       type: object
       properties:
         boards:
           type: array
           items:
-            $ref: "#/components/schemas/BoardOutter"
+            allOf:
+              - $ref: "#/components/schemas/BoardOutter"
     GetBoardByIdResponse:
       type: object
       properties:
         board:
-          $ref: "#/components/schemas/Board"
+          allOf:
+            - $ref: "#/components/schemas/Board"
     GetRowByIdResponse:
       type: object
       properties:
         row:
-          $ref: "#/components/schemas/Row"
+          allOf:
+            - $ref: "#/components/schemas/Row"
     GetTaskByIdResponse:
       type: object
       properties:
         task:
-          $ref: "#/components/schemas/Task"
+          allOf:
+            - $ref: "#/components/schemas/Task"
     PostResponses:
       type: object
       properties:
         id:
           type: integer
     
-
-    Board:
+    PatchBoardRequest:
+      allOf:
+        - $ref: "#/components/schemas/BoardBody"
+        - type: object
+          properties:
+            move:
+              type: object
+              properties:
+                row_id:
+                  type: integer
+                new_position:
+                  type: integer
+    PatchTaskRequest:
+      $ref: "#/components/schemas/Task"
+    PatchRowRequest:
       type: object
       properties:
         name:
           type: string
-        rows:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-              row:
-                $ref: "#/components/schemas/Row"
+        #перенос таски с другого столбца
+        carry_over:
+          type: object
+          properties:
+            #id исходного столбца 
+            from_row:
+              type: integer
+            new_position:
+              type: integer
+        #перенос таски внутри столбца
+        move:
+          type: object
+          properties:
+            card_id:
+              type: integer
+            new_position:
+              type: integer
+        
+      
+
+    Board:
+      allOf:
+        - $ref: "#/components/schemas/BoardBody" 
+        - type: object
+          properties:
+            rows:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  position:
+                    type: integer
+                  row:
+                    allOf:
+                      - $ref: "#/components/schemas/Row"
+    BoardBody:
+      type: object
+      properties:
+        isPrivate:
+          type: boolean
+        access:
+          $ref: "#/components/schemas/AccessTypes"
+        users:
+          type: object
+          properties:
+            owner:
+              allOf:
+                - $ref: "#/components/schemas/UserOuter"
+            admins:
+              type: array
+              items:
+                allOf:
+                  - $ref: "#/components/schemas/UserOuter"
+            members:
+              type: array
+              items:
+                allOf:
+                  - $ref: "#/components/schemas/UserOuter"
+        isStared:
+          type: boolean
+        name:
+          type: string
+        description:
+          type: string        
     Row:
       type: object
       properties:
@@ -466,14 +590,21 @@ components:
         tasks:
           type: array
           items:
-            $ref: "#/components/schemas/TaskOutter"
+            allOf:
+              - $ref: "#/components/schemas/TaskOuter"
     BoardOutter:
       type: object
       properties:
-        name:
-          type: string
         id:
           type: integer
+        access:
+          $ref: "#/components/schemas/AccessTypes"
+        isStared:
+          type: boolean
+        name:
+          type: string
+        description:
+          type: string
     Task:
       type: object
       properties:
@@ -481,13 +612,31 @@ components:
           type: string
         description:
           type: string
-    TaskOutter:
+        users:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/components/schemas/UserOuter"
+    TaskOuter:
       type: object
       properties:
         name:
           type: string
         id:
           type: integer
+        position:
+          type: integer
+    AccessTypes:
+      type: string
+      enum: [Guest, Member, Admin, Owner]
+    UserOuter:
+      type: object
+      properties:
+        id:
+          type: integer
+        avatar:
+          type: string
+          format: uri
 
     
 
@@ -497,6 +646,3 @@ components:
       scheme: bearer
 security:
   - bearerAuth: []
-
-  
-  
