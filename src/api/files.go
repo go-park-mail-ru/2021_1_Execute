@@ -70,6 +70,10 @@ func upload(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	if !strings.HasPrefix(file.Header.Get("Content-Type"), "image") {
+		return echo.NewHTTPError(http.StatusUnsupportedMediaType, "Invalid media type")
+	}
+
 	filename, err := saveFile(file)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
