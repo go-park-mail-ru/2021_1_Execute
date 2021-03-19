@@ -12,8 +12,8 @@ import (
 var allowOrigins = []string{"http://127.0.0.1:3000", "http://localhost:3000", "http://localhost:1323", "http://89.208.199.114:3000"}
 
 func main() {
-	clintPort := flag.Int("-clint-port", 3000, "")
-	serverPort := flag.Int("-server-port", 1323, "")
+	clintPort := flag.Int("clint-port", 3000, "")
+	serverPort := flag.Int("server-port", 1323, "")
 	flag.Parse()
 	allowOrigins = append(allowOrigins, fmt.Sprint("http://89.208.199.114:", *clintPort))
 	fmt.Println(allowOrigins)
