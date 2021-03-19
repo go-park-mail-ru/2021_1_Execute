@@ -2,6 +2,8 @@ package main
 
 import (
 	"2021_1_Execute/src/api"
+	"flag"
+	"fmt"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -10,6 +12,11 @@ import (
 var allowOrigins = []string{"http://127.0.0.1:3000", "http://localhost:3000", "http://localhost:1323", "http://89.208.199.114:3000"}
 
 func main() {
+	port := flag.Int("port", 3000, "")
+	flag.Parse()
+	allowOrigins = append(allowOrigins, fmt.Sprint("http://89.208.199.114:", *port))
+	fmt.Println(allowOrigins)
+
 	users := make([]api.User, 0)
 	sessions := make(api.Sessions, 0)
 	e := echo.New()
