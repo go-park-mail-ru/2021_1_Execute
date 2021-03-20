@@ -47,3 +47,15 @@ func DeleteSession(c echo.Context) error {
 	c.SetCookie(session)
 	return nil
 }
+
+func IsAuthorized(c echo.Context) error {
+	db := c.(*Database)
+
+	_, ok := db.IsAuthorized(c)
+
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
+	}
+
+	return c.NoContent(http.StatusOK)
+}
