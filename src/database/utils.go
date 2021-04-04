@@ -1,8 +1,16 @@
 package postgreRepo
 
-import "github.com/pkg/errors"
+import (
+	"2021_1_Execute/src/api"
+
+	"github.com/pkg/errors"
+)
 
 func (repo *PostgreRepo) IsEmailUniq(userID int, email string) (bool, error) {
+	if !api.IsEmailValid(email) {
+		return false, api.BadRequestError
+	}
+
 	user, err := repo.getUserByEmail(email)
 
 	if err != nil {
