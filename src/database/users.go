@@ -106,8 +106,14 @@ func (repo *PostgreRepo) UpdateUser(userID int, username, email, password, avata
 	switch {
 	case email != "" && !api.IsEmailValid(email):
 		return api.BadRequestError
-	case email != "" && !repo.IsEmailUniq(userID, email):
-		return api.ConflictError
+	case email != "":
+		ok, err := repo.IsEmailUniq(userID, email)
+		if err != nil {
+			return errors.Wrap(err, "Error while updating user")
+		}
+		if !ok {
+			return api.ConflictError
+		}
 	case password != "" && !api.IsPasswordValid(password):
 		return api.BadRequestError
 	}
