@@ -1,4 +1,4 @@
-package postgresRepo
+package postgreRepo
 
 import (
 	"2021_1_Execute/src/api"
@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (repo *PostgresRepo) getUserByEmail(email string) (api.User, error) {
+func (repo *PostgreRepo) getUserByEmail(email string) (api.User, error) {
 	conn, err := repo.GetConnection()
 	if err != nil {
 		return api.User{}, err
@@ -41,7 +41,7 @@ func (repo *PostgresRepo) getUserByEmail(email string) (api.User, error) {
 	return result, nil
 }
 
-func (repo *PostgresRepo) insertUser(user api.User) error {
+func (repo *PostgreRepo) insertUser(user api.User) error {
 	conn, err := repo.GetConnection()
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func (repo *PostgresRepo) insertUser(user api.User) error {
 	return nil
 }
 
-func (repo *PostgresRepo) CreateUser(input *api.UserRegistrationRequest) (api.User, error) {
+func (repo *PostgreRepo) CreateUser(input *api.UserRegistrationRequest) (api.User, error) {
 	//TODO: add validation of username and path to avatar
 
 	if !api.IsEmailValid(input.Email) {
@@ -102,7 +102,7 @@ func (repo *PostgresRepo) CreateUser(input *api.UserRegistrationRequest) (api.Us
 	return user, nil
 }
 
-func (repo *PostgresRepo) UpdateUser(userID int, username, email, password, avatar string) error {
+func (repo *PostgreRepo) UpdateUser(userID int, username, email, password, avatar string) error {
 	switch {
 	case email != "" && !api.IsEmailValid(email):
 		return api.BadRequestError

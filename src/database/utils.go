@@ -1,5 +1,5 @@
-package postgresRepo
+package postgreRepo
 
-func (repo *PostgresRepo) IsEmailUniq(userID int, email string) bool {
+func (repo *PostgreRepo) IsEmailUniq(userID int, email string) bool {
 	return true
 }

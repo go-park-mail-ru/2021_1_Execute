@@ -1,11 +1,11 @@
-package postgresRepo
+package postgreRepo
 
 import (
 	"github.com/jackc/pgx"
 	"github.com/pkg/errors"
 )
 
-type PostgresRepo struct {
+type PostgreRepo struct {
 	Host           string
 	Port           uint16
 	DatabaseName   string
@@ -14,7 +14,7 @@ type PostgresRepo struct {
 	pool           *pgx.ConnPool
 }
 
-func (repo *PostgresRepo) ConfigConnection(host, dbName, user, passw string, port uint16, maxConnections int) error {
+func (repo *PostgreRepo) ConfigConnection(host, dbName, user, passw string, port uint16, maxConnections int) error {
 	repo.Host = host
 	repo.DatabaseName = dbName
 	repo.User = user
@@ -38,7 +38,7 @@ func (repo *PostgresRepo) ConfigConnection(host, dbName, user, passw string, por
 	return nil
 }
 
-func (repo *PostgresRepo) GetConnection() (*pgx.Conn, error) {
+func (repo *PostgreRepo) GetConnection() (*pgx.Conn, error) {
 	conn, err := repo.pool.Acquire()
 	if err != nil {
 		return nil, errors.Wrap(err, "Error while creating Conn")
@@ -46,7 +46,7 @@ func (repo *PostgresRepo) GetConnection() (*pgx.Conn, error) {
 	return conn, nil
 }
 
-func (repo *PostgresRepo) CloseConnection() {
+func (repo *PostgreRepo) CloseConnection() {
 	repo.pool.Close()
 }
 
