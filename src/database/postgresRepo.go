@@ -2,6 +2,7 @@ package postgresRepo
 
 import (
 	"github.com/jackc/pgx"
+	"github.com/pkg/errors"
 )
 
 type PostgresRepo struct {
@@ -31,7 +32,7 @@ func (repo *PostgresRepo) ConfigConnection(host, dbName, user, passw string, por
 	}
 	pool, err := pgx.NewConnPool(poolConfig)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Error while creating ConnPool")
 	}
 	repo.pool = pool
 	return nil
@@ -40,27 +41,13 @@ func (repo *PostgresRepo) ConfigConnection(host, dbName, user, passw string, por
 func (repo *PostgresRepo) GetConnection() (*pgx.Conn, error) {
 	conn, err := repo.pool.Acquire()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Error while creating Conn")
 	}
 	return conn, nil
 }
 
 func (repo *PostgresRepo) CloseConnection() {
 	repo.pool.Close()
-}
-
-func (repo *PostgresRepo) RunQuery(sql string) (*pgx.Rows, error) {
-	conn, err := repo.GetConnection()
-	if err != nil {
-		return nil, err
-	}
-	//defer conn.Close()
-	rows, err := conn.Query(sql)
-	if err != nil {
-		return nil, err
-	}
-	//fmt.Println(rows)
-	return rows, nil
 }
 
 // func main() {
@@ -70,42 +57,13 @@ func (repo *PostgresRepo) RunQuery(sql string) (*pgx.Rows, error) {
 // 		log.Println(err)
 // 	}
 // 	defer repo.CloseConnection()
-// 	// poolConfig := pgx.ConnPoolConfig{
-// 	// 	ConnConfig: pgx.ConnConfig{
-// 	// 		Host:     "localhost",
-// 	// 		Port:     5432,
-// 	// 		Database: "testdb",
-// 	// 		User:     "test",
-// 	// 		Password: "test",
-// 	// 	},
-// 	// 	MaxConnections: 10,
-// 	// }
-
-// 	// pool, err := pgx.NewConnPool(poolConfig)
-// 	// if err != nil {
-// 	// 	log.Println(err)
-// 	// }
-// 	// defer pool.Close()
-
-// 	// conn, err := pool.Acquire()
-// 	// if err != nil {
-// 	// 	log.Println(err)
-// 	// }
-// 	// defer conn.Close()
-// 	for i := 0; i < 11; i++ {
-// 		fmt.Println("Hi")
-// 		rows, err := repo.RunQuery("select * from boards")
-// 		if err != nil {
-// 			log.Println(err)
-// 		}
-// 		defer rows.Close()
-// 		fmt.Println(rows)
-// 		for rows.Next() {
-// 			answ, err := rows.Values()
-// 			if err != nil {
-// 				log.Println(err)
-// 			}
-// 			fmt.Println(answ)
-// 		}
+// 	user := &api.UserRegistrationRequest{
+// 		Email:    "ggwp@",
+// 		Username: "ggwpomg",
+// 		Password: "123456",
 // 	}
+
+// 	usr, err := repo.CreateUser(user)
+
+// 	fmt.Println("OUT:\n\t", usr, "\n\t", err)
 // }
