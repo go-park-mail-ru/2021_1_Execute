@@ -9,6 +9,10 @@ import (
 )
 
 func (repo *PostgreRepo) getUserByEmailOrID(typeOfSelecting string, param interface{}) (api.User, error) {
+	if typeOfSelecting == "email" && !api.IsEmailValid(param.(string)) {
+		return api.User{}, api.BadRequestError
+	}
+
 	conn, err := repo.GetConnection()
 	if err != nil {
 		return api.User{}, err
@@ -19,9 +23,9 @@ func (repo *PostgreRepo) getUserByEmailOrID(typeOfSelecting string, param interf
 
 	switch typeOfSelecting {
 	case "email":
-		rows, err = conn.Query("select id, email, username, hashed_password, path_to_avatar from users where email = $1", param.(string))
+		rows, err = conn.Query("select id, email, username, hashed_password, path_to_avatar from users where email = $1::text", param.(string))
 	case "ID":
-		rows, err = conn.Query("select id, email, username, hashed_password, path_to_avatar from users where id = $1", param.(int))
+		rows, err = conn.Query("select id, email, username, hashed_password, path_to_avatar from users where id = $1::int", param.(int))
 	default:
 		return api.User{}, errors.New("Invalid get request")
 	}
@@ -34,19 +38,9 @@ func (repo *PostgreRepo) getUserByEmailOrID(typeOfSelecting string, param interf
 	var result api.User
 
 	for rows.Next() {
-		user, err := rows.Values()
+		err := rows.Scan(&result.ID, &result.Email, &result.Username, &result.Password, &result.Avatar)
 		if err != nil {
 			return api.User{}, errors.Wrap(err, "Error while reading getUserByEmailOrID")
-		}
-
-		if len(user) == 5 {
-			result = api.User{
-				ID:       int(user[0].(int32)),
-				Email:    user[1].(string),
-				Username: user[2].(string),
-				Password: user[3].(string),
-				Avatar:   user[4].(string),
-			}
 		}
 	}
 	return result, nil
@@ -59,7 +53,7 @@ func (repo *PostgreRepo) insertUser(user api.User) error {
 	}
 	defer conn.Close()
 
-	_, err = conn.Query("insert into users (email, username, hashed_password, path_to_avatar) values ($1, $2, $3, $4)",
+	_, err = conn.Query("insert into users (email, username, hashed_password, path_to_avatar) values ($1::text, $2::text, $3::text, $4::text)",
 		user.Email,
 		user.Username,
 		user.Password,
@@ -110,6 +104,12 @@ func (repo *PostgreRepo) CreateUser(input *api.UserRegistrationRequest) (api.Use
 		return api.User{}, errors.Wrap(err, "Error while inserting user in CreateUser")
 	}
 
+	user.ID, err = repo.getIdByEmail(user.Email)
+
+	if err != nil {
+		return api.User{}, errors.Wrap(err, "Error while getting ID")
+	}
+
 	return user, nil
 }
 
@@ -119,11 +119,25 @@ func (repo *PostgreRepo) updateUserQuery(user api.User) error {
 		return err
 	}
 	defer conn.Close()
+
+	_, err = conn.Query("update users set email = $1::text, username = $2::text, hashed_password = $3::text, path_to_avatar = $4::text where id = $5::int",
+		user.Email,
+		user.Username,
+		user.Password,
+		user.Avatar,
+		user.ID,
+	)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to update user")
+	}
+
 	return nil
 }
 
 func (repo *PostgreRepo) UpdateUser(userID int, username, email, password, avatar string) error {
 	switch {
+	//TODO: validation of username and path to avatar
 	case email != "" && !api.IsEmailValid(email):
 		return api.BadRequestError
 	case email != "":

@@ -23,3 +23,32 @@ func (repo *PostgreRepo) IsEmailUniq(userID int, email string) (bool, error) {
 
 	return true, nil
 }
+
+func (repo *PostgreRepo) getIdByEmail(email string) (int, error) {
+	if !api.IsEmailValid(email) {
+		return -1, api.BadRequestError
+	}
+
+	conn, err := repo.GetConnection()
+	if err != nil {
+		return -1, err
+	}
+	defer conn.Close()
+
+	rows, err := conn.Query("select id from users where email = $1::text", email)
+
+	if err != nil {
+		return -1, err
+	}
+
+	var id int = -1
+
+	for rows.Next() {
+		err = rows.Scan(&id)
+		if err != nil {
+			return -1, err
+		}
+	}
+
+	return id, nil
+}
