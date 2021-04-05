@@ -11,7 +11,7 @@ func (repo *PostgreRepo) IsEmailUniq(userID int, email string) (bool, error) {
 		return false, api.BadRequestError
 	}
 
-	user, err := repo.getUserByEmail(email)
+	user, err := repo.getUserByEmailOrID("email", email)
 
 	if err != nil {
 		return false, errors.Wrap(err, "Error while checking uniq email")

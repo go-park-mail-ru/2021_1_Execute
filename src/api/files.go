@@ -22,7 +22,7 @@ func getExtension(filename string) string {
 	return ""
 }
 
-func deleteFile(path string) error {
+func DeleteFile(path string) error {
 	err := os.Remove(path)
 	if err != nil {
 		return errors.Wrap(err, "Error while deleting file")

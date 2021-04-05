@@ -98,7 +98,7 @@ func (db *Database) UpdateUser(userID int, username, email, password, avatar str
 			}
 			if avatar != "" {
 				if user.Avatar != "" {
-					err := deleteFile(user.Avatar)
+					err := DeleteFile(user.Avatar)
 					if err != nil {
 						return InternalServerError
 					}
