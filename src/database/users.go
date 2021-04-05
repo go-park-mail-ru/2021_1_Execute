@@ -13,19 +13,14 @@ func (repo *PostgreRepo) getUserByEmailOrID(typeOfSelecting string, param interf
 		return api.User{}, api.BadRequestError
 	}
 
-	conn, err := repo.GetConnection()
-	if err != nil {
-		return api.User{}, err
-	}
-	defer conn.Close()
-
 	var rows *pgx.Rows
+	var err error
 
 	switch typeOfSelecting {
 	case "email":
-		rows, err = conn.Query("select id, email, username, hashed_password, path_to_avatar from users where email = $1::text", param.(string))
+		rows, err = repo.pool.Query("select id, email, username, hashed_password, path_to_avatar from users where email = $1::text", param.(string))
 	case "ID":
-		rows, err = conn.Query("select id, email, username, hashed_password, path_to_avatar from users where id = $1::int", param.(int))
+		rows, err = repo.pool.Query("select id, email, username, hashed_password, path_to_avatar from users where id = $1::int", param.(int))
 	default:
 		return api.User{}, errors.New("Invalid get request")
 	}
@@ -47,13 +42,7 @@ func (repo *PostgreRepo) getUserByEmailOrID(typeOfSelecting string, param interf
 }
 
 func (repo *PostgreRepo) insertUser(user api.User) error {
-	conn, err := repo.GetConnection()
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	_, err = conn.Query("insert into users (email, username, hashed_password, path_to_avatar) values ($1::text, $2::text, $3::text, $4::text)",
+	rows, err := repo.pool.Query("insert into users (email, username, hashed_password, path_to_avatar) values ($1::text, $2::text, $3::text, $4::text)",
 		user.Email,
 		user.Username,
 		user.Password,
@@ -63,49 +52,52 @@ func (repo *PostgreRepo) insertUser(user api.User) error {
 	if err != nil {
 		return errors.Wrap(err, "Error while query insertUser")
 	}
+	rows.Close()
 
 	return nil
 }
 
+func createUserInsertObject(input *api.UserRegistrationRequest) (api.User, error) {
+	passwordHashBytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
+	if err != nil {
+		return api.User{}, errors.Wrap(err, "Unable to insert user")
+	}
+
+	return api.User{
+		Email:    input.Email,
+		Username: input.Username,
+		Password: string(passwordHashBytes),
+	}, nil
+}
+
 func (repo *PostgreRepo) CreateUser(input *api.UserRegistrationRequest) (api.User, error) {
 	//TODO: add validation of username and path to avatar
-
 	if !api.IsEmailValid(input.Email) {
 		return api.User{}, api.BadRequestError
 	}
-
 	if !api.IsPasswordValid((*input).Password) {
 		return api.User{}, api.BadRequestError
 	}
 
-	existingUser, err := repo.getUserByEmailOrID("email", input.Email)
-
+	uniq, err := repo.IsEmailUniq(input.Email)
 	if err != nil {
-		return api.User{}, errors.Wrap(err, "Error while getUserByEmail in CreateUser")
+		return api.User{}, errors.Wrap(err, "Unable to check uniqueness")
 	}
-	if existingUser.Email != "" {
+	if !uniq {
 		return api.User{}, api.ConflictError
 	}
 
-	passwordHashBytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
+	user, err := createUserInsertObject(input)
 	if err != nil {
-		return api.User{}, api.InternalServerError
-	}
-
-	user := api.User{
-		Email:    input.Email,
-		Username: input.Username,
-		Password: string(passwordHashBytes),
+		return api.User{}, errors.Wrap(err, "Unable to create user")
 	}
 
 	err = repo.insertUser(user)
-
 	if err != nil {
 		return api.User{}, errors.Wrap(err, "Error while inserting user in CreateUser")
 	}
 
 	user.ID, err = repo.getIdByEmail(user.Email)
-
 	if err != nil {
 		return api.User{}, errors.Wrap(err, "Error while getting ID")
 	}
@@ -114,13 +106,7 @@ func (repo *PostgreRepo) CreateUser(input *api.UserRegistrationRequest) (api.Use
 }
 
 func (repo *PostgreRepo) updateUserQuery(user api.User) error {
-	conn, err := repo.GetConnection()
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	_, err = conn.Query("update users set email = $1::text, username = $2::text, hashed_password = $3::text, path_to_avatar = $4::text where id = $5::int",
+	rows, err := repo.pool.Query("update users set email = $1::text, username = $2::text, hashed_password = $3::text, path_to_avatar = $4::text where id = $5::int",
 		user.Email,
 		user.Username,
 		user.Password,
@@ -131,8 +117,50 @@ func (repo *PostgreRepo) updateUserQuery(user api.User) error {
 	if err != nil {
 		return errors.Wrap(err, "Unable to update user")
 	}
+	rows.Close()
 
 	return nil
+}
+
+func createUserUpdateObject(outdatedUser, newUser api.User) (api.User, error) {
+	var result api.User
+
+	result.ID = outdatedUser.ID
+	if newUser.Username != "" {
+		result.Username = newUser.Username
+	} else {
+		result.Username = outdatedUser.Username
+	}
+
+	if newUser.Email != "" {
+		result.Email = newUser.Email
+	} else {
+		result.Email = outdatedUser.Email
+	}
+
+	if newUser.Password != "" {
+		hash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.MinCost)
+		if err != nil {
+			return api.User{}, err
+		}
+		result.Password = string(hash)
+	} else {
+		result.Password = outdatedUser.Password
+	}
+
+	if newUser.Avatar != "" {
+		if outdatedUser.Avatar != "" {
+			err := api.DeleteFile(outdatedUser.Avatar)
+			if err != nil {
+				return api.User{}, err
+			}
+		}
+		result.Avatar = newUser.Avatar
+	} else {
+		result.Avatar = outdatedUser.Avatar
+	}
+
+	return result, nil
 }
 
 func (repo *PostgreRepo) UpdateUser(userID int, username, email, password, avatar string) error {
@@ -141,7 +169,7 @@ func (repo *PostgreRepo) UpdateUser(userID int, username, email, password, avata
 	case email != "" && !api.IsEmailValid(email):
 		return api.BadRequestError
 	case email != "":
-		ok, err := repo.IsEmailUniq(userID, email)
+		ok, err := repo.IsEmailUniq(email)
 		if err != nil {
 			return errors.Wrap(err, "Error while updating user")
 		}
@@ -152,57 +180,47 @@ func (repo *PostgreRepo) UpdateUser(userID int, username, email, password, avata
 		return api.BadRequestError
 	}
 
-	userForUpdating, err := repo.getUserByEmailOrID("ID", userID)
+	outdatedUser, err := repo.getUserByEmailOrID("ID", userID)
 	if err != nil {
 		return errors.Wrap(err, "Error while updating user")
 	}
-	if userForUpdating.Email == "" {
+	if outdatedUser.Email == "" {
 		return api.NotFoundError
 	}
 
-	var user api.User
-
-	user.ID = userID
-
-	if username != "" {
-		user.Username = username
-	} else {
-		user.Username = userForUpdating.Username
+	newUser, err := createUserUpdateObject(outdatedUser, api.User{
+		Username: username,
+		Email:    email,
+		Password: password,
+		Avatar:   avatar,
+	})
+	if err != nil {
+		return errors.Wrap(err, "Unable to update user")
 	}
 
-	if email != "" {
-		user.Email = email
-	} else {
-		user.Email = userForUpdating.Email
-	}
-
-	if password != "" {
-		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
-		if err != nil {
-			return api.InternalServerError
-		}
-		user.Password = string(hash)
-	} else {
-		user.Password = userForUpdating.Password
-	}
-
-	if avatar != "" {
-		if userForUpdating.Avatar != "" {
-			err := api.DeleteFile(userForUpdating.Avatar)
-			if err != nil {
-				return api.InternalServerError
-			}
-		}
-		user.Avatar = avatar
-	} else {
-		user.Avatar = userForUpdating.Avatar
-	}
-
-	err = repo.updateUserQuery(user)
-
+	err = repo.updateUserQuery(newUser)
 	if err != nil {
 		return errors.Wrap(err, "Error while updating user")
 	}
+
+	return nil
+}
+
+func (repo *PostgreRepo) DeleteUser(userID int) error {
+	//TODO: id validation
+	user, err := repo.getUserByEmailOrID("ID", userID)
+	if err != nil {
+		return errors.Wrap(err, "Unable to get user")
+	}
+	if user.Email == "" {
+		return api.NotFoundError
+	}
+
+	rows, err := repo.pool.Query("delete from users where id = $1::int", userID)
+	if err != nil {
+		return errors.Wrap(err, "Unable to delete user")
+	}
+	rows.Close()
 
 	return nil
 }
