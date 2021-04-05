@@ -38,32 +38,6 @@ func (repo *PostgreRepo) ConfigConnection(host, dbName, user, passw string, port
 	return nil
 }
 
-func (repo *PostgreRepo) GetConnection() (*pgx.Conn, error) {
-	conn, err := repo.pool.Acquire()
-	if err != nil {
-		return nil, errors.Wrap(err, "Error while creating Conn")
-	}
-	return conn, nil
-}
-
 func (repo *PostgreRepo) CloseConnection() {
 	repo.pool.Close()
 }
-
-// func main() {
-// 	var repo PostgresRepo
-// 	err := repo.ConfigConnection("localhost", "testdb", "test", "test", 5432, 10)
-// 	if err != nil {
-// 		log.Println(err)
-// 	}
-// 	defer repo.CloseConnection()
-// 	user := &api.UserRegistrationRequest{
-// 		Email:    "ggwp@",
-// 		Username: "ggwpomg",
-// 		Password: "123456",
-// 	}
-
-// 	usr, err := repo.CreateUser(user)
-
-// 	fmt.Println("OUT:\n\t", usr, "\n\t", err)
-// }
