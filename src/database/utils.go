@@ -87,3 +87,19 @@ func (repo *PostgreRepo) IsAuthorized(session string) (api.User, bool, error) {
 
 	return user, true, nil
 }
+
+func (repo *PostgreRepo) checkInformation(username, email, password, avatar string) bool {
+	switch {
+	//TODO: validation of username and path to avatar
+	case email != "" && !api.IsEmailValid(email):
+		return false
+	case email != "":
+		uniq, err := repo.IsEmailUniq(email)
+		if err != nil || !uniq {
+			return false
+		}
+	case password != "" && !api.IsPasswordValid(password):
+		return false
+	}
+	return true
+}

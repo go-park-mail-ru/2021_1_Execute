@@ -71,20 +71,8 @@ func createUserInsertObject(input *api.UserRegistrationRequest) (api.User, error
 }
 
 func (repo *PostgreRepo) CreateUser(input *api.UserRegistrationRequest) (api.User, error) {
-	//TODO: add validation of username and path to avatar
-	if !api.IsEmailValid(input.Email) {
+	if !repo.checkInformation(input.Username, input.Email, input.Password, "") {
 		return api.User{}, api.BadRequestError
-	}
-	if !api.IsPasswordValid((*input).Password) {
-		return api.User{}, api.BadRequestError
-	}
-
-	uniq, err := repo.IsEmailUniq(input.Email)
-	if err != nil {
-		return api.User{}, errors.Wrap(err, "Unable to check uniqueness")
-	}
-	if !uniq {
-		return api.User{}, api.ConflictError
 	}
 
 	user, err := createUserInsertObject(input)
@@ -164,19 +152,7 @@ func createUserUpdateObject(outdatedUser, newUser api.User) (api.User, error) {
 }
 
 func (repo *PostgreRepo) UpdateUser(userID int, username, email, password, avatar string) error {
-	switch {
-	//TODO: validation of username and path to avatar
-	case email != "" && !api.IsEmailValid(email):
-		return api.BadRequestError
-	case email != "":
-		ok, err := repo.IsEmailUniq(email)
-		if err != nil {
-			return errors.Wrap(err, "Error while updating user")
-		}
-		if !ok {
-			return api.ConflictError
-		}
-	case password != "" && !api.IsPasswordValid(password):
+	if !repo.checkInformation(username, email, password, avatar) {
 		return api.BadRequestError
 	}
 
