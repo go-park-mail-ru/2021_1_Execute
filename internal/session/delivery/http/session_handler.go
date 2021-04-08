@@ -1,6 +1,8 @@
 package http
 
 import (
+	"2021_1_Execute/internal/domain"
+	"context"
 	"net/http"
 	"time"
 
@@ -9,22 +11,35 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Sessions map[string]int
-
 const CookieName = "trello_session"
 const CookieLifeTime = 12 * time.Hour
 
-func SetSession(c echo.Context, userID int) error {
-	db := c.(*Database)
+type sessionHandler struct {
+	sessionRepo domain.SessionsRepository
+}
+
+type SessionHandler interface {
+	SetSession(c echo.Context, userID int) error
+}
+
+func NewSessionHandler(e *echo.Context, repo domain.SessionsRepository) SessionHandler {
+	return &sessionHandler{
+		sessionRepo: repo,
+	}
+}
+
+func (handler *sessionHandler) SetSession(c echo.Context, userID int) error {
 
 	sessionUUID, err := uuid.NewRandom()
 	if err != nil {
-		return errors.Wrap(err, "Error while create UUID")
+		return errors.Wrap(domain.InternalServerError, "Error while create UUID")
 	}
 	sessionToken := sessionUUID.String()
-
-	(*db.Sessions)[sessionToken] = userID
-
+	ctx := context.Background()
+	err = handler.sessionRepo.SetSession(ctx, userID, sessionToken)
+	if err != nil {
+		return err
+	}
 	cookie := http.Cookie{
 		HttpOnly: true,
 		Name:     CookieName,
@@ -36,8 +51,7 @@ func SetSession(c echo.Context, userID int) error {
 	return nil
 }
 
-func DeleteSession(c echo.Context) error {
-	db := c.(*Database)
+func (handler *sessionHandler) DeleteSession(c echo.Context) error {
 
 	session, err := c.Cookie(CookieName)
 	if err != nil {
@@ -50,8 +64,7 @@ func DeleteSession(c echo.Context) error {
 	return nil
 }
 
-func IsAuthorized(c echo.Context) error {
-	db := c.(*Database)
+func (handler *sessionHandler) IsAuthorized(c echo.Context) (domain.User, error) {
 
 	_, ok := db.IsAuthorized(c)
 

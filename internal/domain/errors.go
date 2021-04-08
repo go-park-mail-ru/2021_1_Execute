@@ -21,6 +21,7 @@ var (
 	BadRequestError     = ServerError{"Incorrect data"}
 	NotFoundError       = ServerError{"Not found"}
 	InternalServerError = ServerError{"We are not responsible for this"}
+	ForbiddenError      = ServerError{"Forbidden"}
 )
 
 func GetEchoError(err error) error {
@@ -37,6 +38,8 @@ func GetEchoError(err error) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	case errors.Is(err, NotFoundError):
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
+	case errors.Is(err, ForbiddenError):
+		return echo.NewHTTPError(http.StatusForbidden, err.Error())
 	default:
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

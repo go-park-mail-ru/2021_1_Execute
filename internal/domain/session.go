@@ -4,17 +4,10 @@ import (
 	"context"
 )
 
-type UUID string
-type Sessions map[UUID]int
+type Sessions map[string]int
 
 type SessionsRepository interface {
-	IsAuthorized(ctx context.Context, uuid UUID) (User, error)
-	SetSession(ctx context.Context, userID int) (error, UUID)
-	DeleteSession(ctx context.Context, uuid UUID) error
-}
-
-type SessionsUsecase interface {
-	IsAuthorized(ctx context.Context, uuid UUID) (User, error)
-	SetSession(ctx context.Context, userID int) (UUID, error)
-	DeleteSession(ctx context.Context, uuid UUID) error
+	IsAuthorized(ctx context.Context, uuid string) (bool, int, error)
+	SetSession(ctx context.Context, userID int, uuid string) error
+	DeleteSession(ctx context.Context, uuid string) error
 }
