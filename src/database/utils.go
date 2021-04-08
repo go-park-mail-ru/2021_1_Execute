@@ -57,37 +57,6 @@ func (repo *PostgreRepo) IsCredentialsCorrect(input *api.UserLoginRequest) (api.
 	return api.User{}, false, nil
 }
 
-func (repo *PostgreRepo) IsAuthorized(session string) (api.User, bool, error) {
-	//TODO: validation of session
-
-	rows, err := repo.pool.Query("select user_id from sessions where session_token = $1::text", session)
-	if err != nil {
-		return api.User{}, false, errors.Wrap(err, "Unable to query authorization request")
-	}
-
-	var userID int = -1
-
-	for rows.Next() {
-		err = rows.Scan(&userID)
-		if err != nil {
-			return api.User{}, false, errors.Wrap(err, "Unable to get user_id")
-		}
-	}
-
-	rows.Close()
-
-	if userID == -1 {
-		return api.User{}, false, nil
-	}
-
-	user, err := repo.getUserByEmailOrID("ID", userID)
-	if err != nil {
-		return api.User{}, false, errors.Wrap(err, "Unable to get user")
-	}
-
-	return user, true, nil
-}
-
 func (repo *PostgreRepo) checkInformation(username, email, password, avatar string) bool {
 	switch {
 	//TODO: validation of username and path to avatar
