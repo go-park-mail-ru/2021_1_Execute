@@ -1,4 +1,4 @@
-package tests
+package usecase_test
 
 import (
 	"2021_1_Execute/src/api"

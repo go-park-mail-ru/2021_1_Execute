@@ -1,10 +1,15 @@
-package api
+package http
 
-import (
-	"net/http"
 
-	"github.com/labstack/echo"
-)
+type RegistrationResponse struct {
+	ID int `json:"id"`
+}
+
+type UserRegistrationRequest struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
 
 func registration(c echo.Context) error {
 	db := c.(*Database)

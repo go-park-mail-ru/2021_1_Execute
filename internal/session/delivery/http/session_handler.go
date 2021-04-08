@@ -1,4 +1,4 @@
-package api
+package http
 
 import (
 	"net/http"
@@ -8,6 +8,8 @@ import (
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
+
+type Sessions map[string]int
 
 const CookieName = "trello_session"
 const CookieLifeTime = 12 * time.Hour

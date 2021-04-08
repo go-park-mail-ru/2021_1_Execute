@@ -1,4 +1,4 @@
-package api
+package http
 
 import (
 	"net/http"
@@ -7,6 +7,33 @@ import (
 	"github.com/labstack/echo"
 )
 
+type GetUserByIdResponse struct {
+	Email     string `json:"email"`
+	Username  string `json:"username"`
+	AvatarURL string `json:"avatarUrl"`
+}
+
+type GetUserByIdBody struct {
+	Response GetUserByIdResponse `json:"user"`
+}
+
+type PatchUserRequest struct {
+	NewEmail    string `json:"email,omitempty"`
+	NewUsername string `json:"username,omitempty"`
+	NewPassword string `json:"password,omitempty"`
+}
+
+/*
+func NewUserHandler(e *echo.Echo, us domain.ArticleUsecase) {
+	handler := &ArticleHandler{
+		AUsecase: us,
+	}
+	e.GET("/articles", handler.FetchArticle)
+	e.POST("/articles", handler.Store)
+	e.GET("/articles/:id", handler.GetByID)
+	e.DELETE("/articles/:id", handler.Delete)
+}
+*/
 func createGetUserByIdResponse(user User) GetUserByIdResponse {
 	return GetUserByIdResponse{
 		Email:     user.Email,

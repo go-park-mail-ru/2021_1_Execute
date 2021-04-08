@@ -1,14 +1,16 @@
-package api
+package http
 
-import (
-	"net/http"
+type UserLoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
 
-	"github.com/labstack/echo"
-)
+
 
 func CreateLoginResponse(user User) RegistrationResponse {
 	return RegistrationResponse{ID: user.ID}
 }
+
 
 func login(c echo.Context) error {
 	db := c.(*Database)
