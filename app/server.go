@@ -1,14 +1,21 @@
 package main
 
 import (
-	//FilesHttpDelivery "2021_1_Execute/internal/files/delivery/http"
-	//"2021_1_Execute/internal/files"
-	//SessionsHttpDelivery "2021_1_Execute/internal/session/delivery"
+	"2021_1_Execute/internal/files"
+	FilesHttpDelivery "2021_1_Execute/internal/files/delivery/http"
+	SessionsDelivery "2021_1_Execute/internal/session/delivery"
+	"2021_1_Execute/internal/session/repository/postgreSessionsRepository"
+	"io/ioutil"
+	"log"
 
-	//UserHttpDelivery "2021_1_Execute/internal/users/delivery/http"
+	UserHttpDelivery "2021_1_Execute/internal/users/delivery/http"
+	"2021_1_Execute/internal/users/repository/postgreUserRepository"
+	"2021_1_Execute/internal/users/usecase"
+	"context"
 	"flag"
 	"fmt"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -22,7 +29,27 @@ func main() {
 	allowOrigins = append(allowOrigins, fmt.Sprint("http://89.208.199.114:", *clientPort))
 	fmt.Println(allowOrigins)
 
-	//todo настроить подключение к бд dbConn := ...
+	DBUri := "postgresql://postgres:123456@localhost:5432/trello"
+	config, err := pgxpool.ParseConfig(DBUri)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx := context.Background()
+
+	pool, err := pgxpool.ConnectConfig(ctx, config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer pool.Close()
+
+	initFile, err := ioutil.ReadFile("database/trello.sql")
+	if err != nil {
+		log.Fatal(err)
+	}
+	initComands := string(initFile)
+
+	_, err = pool.Exec(ctx, initComands)
 
 	e := echo.New()
 
@@ -34,14 +61,16 @@ func main() {
 
 	Router(e)
 
-	//todo инициализировать userRepo и sessionsRepo
+	fileUtil := files.NewFileUtil()
 
-	//userUC := usecase.NewUserUsecase()
-	//fileUtil := files.NewFileUtil()
+	sessionRepo := postgreSessionsRepository.NewPostgreSessionsRepository(pool)
+	sessionHandler := SessionsDelivery.NewSessionHandler(sessionRepo)
 
-	//UserHttpDelivery.NewUserHandler(e,)
-	//SessionsHttpDelivery.NewSessionHandler(e,)
-	//FilesHttpDelivery.NewFilesHandler(e,)
+	userRepo := postgreUserRepository.NewPostgreUserRepository(pool, fileUtil)
+	userUC := usecase.NewUserUsecase(userRepo)
+
+	UserHttpDelivery.NewUserHandler(e, userUC, sessionHandler)
+	FilesHttpDelivery.NewFilesHandler(e, userUC, fileUtil, sessionHandler)
 	e.Logger.Fatal(e.Start(fmt.Sprint(":", *serverPort)))
 }
 

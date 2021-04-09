@@ -14,7 +14,7 @@ var Ls string = "dfs"
 
 type UserLoginRequest struct {
 	Email    string `json:"email" valid:"email"`
-	Password string `json:"password" valid:"password"`
+	Password string `json:"password" ` // todo valid:"password"
 }
 
 type EntranceResponse struct {
@@ -23,8 +23,8 @@ type EntranceResponse struct {
 
 type UserRegistrationRequest struct {
 	Email    string `json:"email" valid:"email"`
-	Username string `json:"username" valid:"username"`
-	Password string `json:"password" valid:"password"`
+	Username string `json:"username" ` //todo valid:"username"
+	Password string `json:"password" ` // todovalid:"password"
 }
 
 func LoginRequestToUser(input *UserLoginRequest) domain.User {
@@ -38,6 +38,7 @@ func RegistrationRequestToUser(input *UserRegistrationRequest) domain.User {
 	return domain.User{
 		Email:    input.Email,
 		Password: input.Password,
+		Username: input.Username,
 	}
 }
 

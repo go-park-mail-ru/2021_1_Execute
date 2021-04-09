@@ -18,7 +18,7 @@ type sessionHandler struct {
 	sessionRepo domain.SessionsRepository
 }
 
-func NewSessionHandler(e *echo.Context, repo domain.SessionsRepository) domain.SessionHandler {
+func NewSessionHandler(repo domain.SessionsRepository) domain.SessionHandler {
 	return &sessionHandler{
 		sessionRepo: repo,
 	}

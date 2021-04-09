@@ -23,8 +23,8 @@ type GetUserByIdBody struct {
 
 type PatchUserRequest struct {
 	NewEmail    string `json:"email,omitempty" valid:"email"`
-	NewUsername string `json:"username,omitempty" valid:"username"`
-	NewPassword string `json:"password,omitempty" valid:"password"`
+	NewUsername string `json:"username,omitempty" `
+	NewPassword string `json:"password,omitempty" `
 }
 
 type UserHandler struct {

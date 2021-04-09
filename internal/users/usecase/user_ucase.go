@@ -73,7 +73,7 @@ func (uc *userUsecase) DeleteUser(ctx context.Context, changerID int, userID int
 }
 
 func (uc *userUsecase) GetUserByID(ctx context.Context, userID int) (domain.User, error) {
-	user, err := uc.GetUserByID(ctx, userID)
+	user, err := uc.userRepo.GetUserByID(ctx, userID)
 	return user, err
 }
 
