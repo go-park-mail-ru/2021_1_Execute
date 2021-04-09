@@ -2,7 +2,6 @@ package postgreUserRepository
 
 import (
 	"2021_1_Execute/internal/domain"
-	"2021_1_Execute/internal/files"
 	"context"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -11,11 +10,15 @@ import (
 )
 
 type PostgreUserRepository struct {
-	Pool *pgxpool.Pool
+	Pool     *pgxpool.Pool
+	FileUtil domain.FileUtil
 }
 
-func NewPostgreUserRepository(pool *pgxpool.Pool) domain.UserRepository {
-	return &PostgreUserRepository{Pool: pool}
+func NewPostgreUserRepository(pool *pgxpool.Pool, fileUtil domain.FileUtil) domain.UserRepository {
+	return &PostgreUserRepository{
+		Pool:     pool,
+		FileUtil: fileUtil,
+	}
 }
 
 func (repo *PostgreUserRepository) AddUser(ctx context.Context, user domain.User) (int, error) {
@@ -46,7 +49,7 @@ func (repo *PostgreUserRepository) UpdateUser(ctx context.Context, user domain.U
 		return domain.NotFoundError
 	}
 
-	newUser, err := createUserUpdateObject(outdatedUser, domain.User{
+	newUser, err := repo.createUserUpdateObject(outdatedUser, domain.User{
 		ID:       user.ID,
 		Username: user.Username,
 		Email:    user.Email,
@@ -187,7 +190,7 @@ func (repo *PostgreUserRepository) updateUserQuery(ctx context.Context, user dom
 	return nil
 }
 
-func createUserUpdateObject(outdatedUser, newUser domain.User) (domain.User, error) {
+func (repo *PostgreUserRepository) createUserUpdateObject(outdatedUser, newUser domain.User) (domain.User, error) {
 	var result domain.User
 
 	result.ID = outdatedUser.ID
@@ -215,7 +218,7 @@ func createUserUpdateObject(outdatedUser, newUser domain.User) (domain.User, err
 
 	if newUser.Avatar != "" {
 		if outdatedUser.Avatar != "" {
-			err := files.DeleteFile(outdatedUser.Avatar)
+			err := repo.FileUtil.DeleteFile(outdatedUser.Avatar)
 			if err != nil {
 				return domain.User{}, err
 			}
