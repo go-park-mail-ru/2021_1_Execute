@@ -17,7 +17,7 @@ const localDestinationFolder = "../static/"
 type fileUtil struct {
 }
 
-func GetNewFileUtil() domain.FileUtil {
+func NewFileUtil() domain.FileUtil {
 	return &fileUtil{}
 }
 

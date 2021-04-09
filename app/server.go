@@ -1,6 +1,11 @@
 package main
 
 import (
+	//FilesHttpDelivery "2021_1_Execute/internal/files/delivery/http"
+	//"2021_1_Execute/internal/files"
+	//SessionsHttpDelivery "2021_1_Execute/internal/session/delivery"
+
+	//UserHttpDelivery "2021_1_Execute/internal/users/delivery/http"
 	"flag"
 	"fmt"
 
@@ -17,20 +22,9 @@ func main() {
 	allowOrigins = append(allowOrigins, fmt.Sprint("http://89.208.199.114:", *clientPort))
 	fmt.Println(allowOrigins)
 
-	users := make([]api.User, 0)
-	sessions := make(api.Sessions, 0)
+	//todo настроить подключение к бд dbConn := ...
+
 	e := echo.New()
-	//This middleware should be registered before any other middleware.
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			cc := &api.Database{
-				Context:  c,
-				Users:    &users,
-				Sessions: &sessions,
-			}
-			return next(cc)
-		}
-	})
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     allowOrigins,
@@ -38,11 +32,19 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	api.Router(e)
+	Router(e)
+
+	//todo инициализировать userRepo и sessionsRepo
+
+	//userUC := usecase.NewUserUsecase()
+	//fileUtil := files.NewFileUtil()
+
+	//UserHttpDelivery.NewUserHandler(e,)
+	//SessionsHttpDelivery.NewSessionHandler(e,)
+	//FilesHttpDelivery.NewFilesHandler(e,)
 	e.Logger.Fatal(e.Start(fmt.Sprint(":", *serverPort)))
 }
 
 func Router(e *echo.Echo) {
-	e.GET("/api/authorized/", IsAuthorized)
 	e.File("/api/", "docs/index.html")
 }

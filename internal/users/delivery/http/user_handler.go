@@ -44,6 +44,7 @@ func NewUserHandler(e *echo.Echo, userUsecase domain.UserUsecase, sessionsHandle
 	e.POST("/api/login/", handler.Login)
 	e.POST("/api/users/", handler.Registration)
 	e.DELETE("/api/logout/", handler.Logout)
+	e.GET("/api/authorized/", handler.IsAuthorized)
 }
 func createGetUserByIdBody(user domain.User) GetUserByIdResponse {
 	return GetUserByIdResponse{
@@ -66,6 +67,14 @@ func createUserFromPatchRequest(input *PatchUserRequest) domain.User {
 		Password: input.NewPassword,
 		Avatar:   "",
 	}
+}
+
+func (handler *UserHandler) IsAuthorized(c echo.Context) error {
+	_, err := handler.sessionHD.IsAuthorized(c)
+	if err != nil {
+		return domain.GetEchoError(err)
+	}
+	return c.NoContent(http.StatusOK)
 }
 
 func (handler *UserHandler) GetCurrentUser(c echo.Context) error {

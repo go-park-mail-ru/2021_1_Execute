@@ -1,4 +1,4 @@
-package http
+package delivery
 
 import (
 	"2021_1_Execute/internal/domain"
