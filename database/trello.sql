@@ -1,6 +1,6 @@
 create table if not exists USERS (
   id serial primary key,
-  email text,
+  email text unique,
   username text,
   hashed_password text,
   path_to_avatar text
@@ -73,8 +73,8 @@ create table if not exists Tasks_Users (
 );
 
 create table if not exists Sessions (
-  session_token text not null,
-  user_id integer not null,
+  session_token text not null unique,
+  user_id integer not null default,
 
   foreign key (user_id) references USERS (id) on delete cascade
 );
