@@ -1,7 +1,6 @@
 package main
 
 import (
-	"2021_1_Execute/src/api"
 	"flag"
 	"fmt"
 
@@ -41,29 +40,9 @@ func main() {
 
 	api.Router(e)
 	e.Logger.Fatal(e.Start(fmt.Sprint(":", *serverPort)))
-<<<<<<< HEAD
 }
 
-//fixme вынести в соотв delivery
 func Router(e *echo.Echo) {
-	e.POST("/api/login/", login)
-	e.DELETE("/api/logout/", logout)
-	e.POST("/api/users/", registration)
-	e.POST("/api/upload/", upload)
-	e.GET("/static/:filename", download)
-	e.GET("/api/authorized/", IsAuthorized)
-	e.File("/api/", "docs/index.html")
-=======
->>>>>>> 42e922c... Пробрасываю порт сервера
-}
-
-//fixme вынести в соотв delivery
-func Router(e *echo.Echo) {
-	e.POST("/api/login/", login)
-	e.DELETE("/api/logout/", logout)
-	e.POST("/api/users/", registration)
-	e.POST("/api/upload/", upload)
-	e.GET("/static/:filename", download)
 	e.GET("/api/authorized/", IsAuthorized)
 	e.File("/api/", "docs/index.html")
 }

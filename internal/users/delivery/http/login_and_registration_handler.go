@@ -1,14 +1,20 @@
 package http
 
 import (
+	"2021_1_Execute/internal/domain"
+	"context"
 	"net/http"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 )
 
+var Ls string = "dfs"
+
 type UserLoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" valid:"email"`
+	Password string `json:"password" valid:"password"`
 }
 
 type EntranceResponse struct {
@@ -16,51 +22,78 @@ type EntranceResponse struct {
 }
 
 type UserRegistrationRequest struct {
-	Email    string `json:"email"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Email    string `json:"email" valid:"email"`
+	Username string `json:"username" valid:"username"`
+	Password string `json:"password" valid:"password"`
 }
 
-func login(c echo.Context) error {
-	db := c.(*Database)
+func LoginRequestToUser(input *UserLoginRequest) domain.User {
+	return domain.User{
+		Email:    input.Email,
+		Password: input.Password,
+	}
+}
 
+func RegistrationRequestToUser(input *UserRegistrationRequest) domain.User {
+	return domain.User{
+		Email:    input.Email,
+		Password: input.Password,
+	}
+}
+
+func (handler *UserHandler) Login(c echo.Context) error {
 	input := new(UserLoginRequest)
 	if err := c.Bind(input); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
 	}
 
-	user, isCorrect := db.IsCredentialsCorrect(input)
-	if isCorrect {
-		err := SetSession(c, user.ID)
-		if err != nil {
-			return GetEchoError(err)
-		}
-		return c.JSON(http.StatusOK, CreateLoginResponse(user))
+	_, err := govalidator.ValidateStruct(input)
+	if err != nil {
+		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
 	}
-	return echo.NewHTTPError(http.StatusForbidden, "Wrong pair: password, email")
+
+	ctx := context.Background()
+	userID, err := handler.userUC.Authentication(ctx, LoginRequestToUser(input))
+	if err != nil {
+		return domain.GetEchoError(err)
+	}
+
+	err = handler.sessionHD.SetSession(c, userID)
+	if err != nil {
+		return domain.GetEchoError(err)
+	}
+
+	return c.JSON(http.StatusOK, &EntranceResponse{ID: userID})
 }
 
-func registration(c echo.Context) error {
-	db := c.(*Database)
+func (handler *UserHandler) Registration(c echo.Context) error {
 	input := new(UserRegistrationRequest)
 	if err := c.Bind(input); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
-	newUser, err := db.CreateUser(input)
-	if err != nil {
-		return GetEchoError(err)
+		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
 	}
 
-	err = SetSession(c, newUser.ID)
+	_, err := govalidator.ValidateStruct(input)
 	if err != nil {
-		return GetEchoError(err)
+		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
 	}
-	return c.JSON(http.StatusOK, CreateLoginResponse(newUser))
-}
-func logout(c echo.Context) error {
-	err := DeleteSession(c)
+
+	ctx := context.Background()
+	userID, err := handler.userUC.Registration(ctx, RegistrationRequestToUser(input))
 	if err != nil {
-		return GetEchoError(err)
+		return domain.GetEchoError(err)
+	}
+
+	err = handler.sessionHD.SetSession(c, userID)
+	if err != nil {
+		return domain.GetEchoError(err)
+	}
+	return c.JSON(http.StatusOK, &EntranceResponse{ID: userID})
+}
+
+func (handler *UserHandler) Logout(c echo.Context) error {
+	err := handler.sessionHD.DeleteSession(c)
+	if err != nil {
+		return domain.GetEchoError(err)
 	}
 
 	return c.NoContent(http.StatusOK)

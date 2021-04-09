@@ -18,11 +18,7 @@ type sessionHandler struct {
 	sessionRepo domain.SessionsRepository
 }
 
-type SessionHandler interface {
-	SetSession(c echo.Context, userID int) error
-}
-
-func NewSessionHandler(e *echo.Context, repo domain.SessionsRepository) SessionHandler {
+func NewSessionHandler(e *echo.Context, repo domain.SessionsRepository) domain.SessionHandler {
 	return &sessionHandler{
 		sessionRepo: repo,
 	}
@@ -55,22 +51,35 @@ func (handler *sessionHandler) DeleteSession(c echo.Context) error {
 
 	session, err := c.Cookie(CookieName)
 	if err != nil {
-		return UnauthorizedError
+		return domain.UnauthorizedError
 	}
 
-	delete(*db.Sessions, session.Value)
+	ctx := context.Background()
+	err = handler.sessionRepo.DeleteSession(ctx, session.Value)
+
+	if err != nil {
+		return err
+	}
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	c.SetCookie(session)
 	return nil
 }
 
-func (handler *sessionHandler) IsAuthorized(c echo.Context) (domain.User, error) {
+func (handler *sessionHandler) IsAuthorized(c echo.Context) (int, error) {
+	session, err := c.Cookie(CookieName)
+	if err != nil {
+		return 0, domain.UnauthorizedError
+	}
+	ctx := context.Background()
+	isAuth, userID, err := handler.sessionRepo.IsAuthorized(ctx, session.Value)
 
-	_, ok := db.IsAuthorized(c)
-
-	if !ok {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
+	if err != nil {
+		return 0, err
 	}
 
-	return c.NoContent(http.StatusOK)
+	if !isAuth {
+		return 0, domain.UnauthorizedError
+	}
+
+	return userID, nil
 }

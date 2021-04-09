@@ -16,12 +16,13 @@ func (e ServerError) Error() string {
 }
 
 var (
-	UnauthorizedError   = ServerError{"Unauthorized Error"}
-	ConflictError       = ServerError{"Something not unique"}
-	BadRequestError     = ServerError{"Incorrect data"}
-	NotFoundError       = ServerError{"Not found"}
-	InternalServerError = ServerError{"We are not responsible for this"}
-	ForbiddenError      = ServerError{"Forbidden"}
+	UnauthorizedError    = ServerError{"Unauthorized Error"}
+	ConflictError        = ServerError{"Something not unique"}
+	BadRequestError      = ServerError{"Incorrect data"}
+	NotFoundError        = ServerError{"Not found"}
+	InternalServerError  = ServerError{"We are not responsible for this"}
+	ForbiddenError       = ServerError{"Forbidden"}
+	UnsupportedMediaType = ServerError{"Invalid media type"}
 )
 
 func GetEchoError(err error) error {
@@ -40,6 +41,8 @@ func GetEchoError(err error) error {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	case errors.Is(err, ForbiddenError):
 		return echo.NewHTTPError(http.StatusForbidden, err.Error())
+	case errors.Is(err, UnsupportedMediaType):
+		return echo.NewHTTPError(http.StatusUnsupportedMediaType, err.Error())
 	default:
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

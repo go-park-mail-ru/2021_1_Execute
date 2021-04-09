@@ -1,14 +1,18 @@
 package http
 
 import (
+	"2021_1_Execute/internal/domain"
+	"context"
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 )
 
 type GetUserByIdResponse struct {
-	Email     string `json:"email"`
+	Email     string `json:"email" `
 	Username  string `json:"username"`
 	AvatarURL string `json:"avatarUrl"`
 }
@@ -18,23 +22,30 @@ type GetUserByIdBody struct {
 }
 
 type PatchUserRequest struct {
-	NewEmail    string `json:"email,omitempty"`
-	NewUsername string `json:"username,omitempty"`
-	NewPassword string `json:"password,omitempty"`
+	NewEmail    string `json:"email,omitempty" valid:"email"`
+	NewUsername string `json:"username,omitempty" valid:"username"`
+	NewPassword string `json:"password,omitempty" valid:"password"`
 }
 
-/*
-func NewUserHandler(e *echo.Echo, us domain.ArticleUsecase) {
-	handler := &ArticleHandler{
-		AUsecase: us,
-	}
-	e.GET("/articles", handler.FetchArticle)
-	e.POST("/articles", handler.Store)
-	e.GET("/articles/:id", handler.GetByID)
-	e.DELETE("/articles/:id", handler.Delete)
+type UserHandler struct {
+	userUC    domain.UserUsecase
+	sessionHD domain.SessionHandler
 }
-*/
-func createGetUserByIdResponse(user User) GetUserByIdResponse {
+
+func NewUserHandler(e *echo.Echo, userUsecase domain.UserUsecase, sessionsHandler domain.SessionHandler) {
+	handler := &UserHandler{
+		userUC:    userUsecase,
+		sessionHD: sessionsHandler,
+	}
+	e.GET("/api/users/", handler.GetCurrentUser)
+	e.GET("/api/users/:id", handler.GetUserByID)
+	e.PATCH("/api/users/", handler.PatchUser)
+	e.DELETE("/api/users/:id", handler.DeleteUserByID)
+	e.POST("/api/login/", handler.Login)
+	e.POST("/api/users/", handler.Registration)
+	e.DELETE("/api/logout/", handler.Logout)
+}
+func createGetUserByIdBody(user domain.User) GetUserByIdResponse {
 	return GetUserByIdResponse{
 		Email:     user.Email,
 		Username:  user.Username,
@@ -42,99 +53,91 @@ func createGetUserByIdResponse(user User) GetUserByIdResponse {
 	}
 }
 
-func createGetUserByIdBody(user User) GetUserByIdBody {
+func createGetUserByIdResponse(user domain.User) GetUserByIdBody {
 	return GetUserByIdBody{
-		Response: createGetUserByIdResponse(user),
+		Response: createGetUserByIdBody(user),
 	}
 }
 
-func GetCurrentUser(c echo.Context) error {
-	db := c.(*Database)
-
-	user, ok := db.IsAuthorized(c)
-	if !ok {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
+func createUserFromPatchRequest(input *PatchUserRequest) domain.User {
+	return domain.User{
+		Email:    input.NewEmail,
+		Username: input.NewUsername,
+		Password: input.NewPassword,
+		Avatar:   "",
 	}
-
-	return c.JSON(http.StatusOK, createGetUserByIdBody(user))
 }
 
-func GetUserByID(c echo.Context) error {
-	userID, err := strconv.Atoi(c.Param("id"))
-
+func (handler *UserHandler) GetCurrentUser(c echo.Context) error {
+	userId, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return domain.GetEchoError(err)
 	}
 
-	db := c.(*Database)
-
-	user, ok := db.IsAuthorized(c)
-
-	if !ok {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized request")
-	}
-
-	if userID != user.ID {
-		return echo.NewHTTPError(http.StatusNotFound, "User not found")
-	}
-
-	return c.JSON(http.StatusOK, struct {
-		User GetUserByIdResponse `json:"user"`
-	}{User: createGetUserByIdResponse(user)})
+	ctx := context.Background()
+	user, err := handler.userUC.GetUserByID(ctx, userId)
+	return c.JSON(http.StatusOK, createGetUserByIdResponse(user))
 }
 
-func PatchUser(c echo.Context) error {
+func (handler *UserHandler) GetUserByID(c echo.Context) error {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return domain.GetEchoError(errors.Wrap(domain.ForbiddenError, "ID should be int"))
+	}
+
+	_, err = handler.sessionHD.IsAuthorized(c)
+	if err != nil {
+		return domain.GetEchoError(err)
+	}
+
+	ctx := context.Background()
+	user, err := handler.userUC.GetUserByID(ctx, userID)
+	return c.JSON(http.StatusOK, createGetUserByIdResponse(user))
+}
+
+func (handler *UserHandler) PatchUser(c echo.Context) error {
 	input := new(PatchUserRequest)
 	if err := c.Bind(input); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
 	}
 
-	db := c.(*Database)
-
-	user, ok := db.IsAuthorized(c)
-	if !ok {
-		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
+	_, err := govalidator.ValidateStruct(input)
+	if err != nil {
+		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
 	}
 
-	err := db.UpdateUser(user.ID, input.NewUsername, input.NewEmail, input.NewPassword, "")
+	userID, err := handler.sessionHD.IsAuthorized(c)
+	if err != nil {
+		return domain.GetEchoError(err)
+	}
+
+	ctx := context.Background()
+	user := createUserFromPatchRequest(input)
+	user.ID = userID
+	err = handler.userUC.UpdateUser(ctx, userID, user)
 
 	if err != nil {
-		return GetEchoError(err)
+		return domain.GetEchoError(err)
 	}
 
 	return c.NoContent(http.StatusOK)
 }
 
-func DeleteUserByID(c echo.Context) error {
+func (handler *UserHandler) DeleteUserByID(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("id"))
-
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return domain.GetEchoError(errors.Wrap(domain.ForbiddenError, "ID should be int"))
 	}
 
-	db := c.(*Database)
-
-	user, ok := db.IsAuthorized(c)
-
-	if !ok {
-		return echo.NewHTTPError(http.StatusForbidden, "Invalid access rights")
-	}
-
-	if userID != user.ID {
-		return echo.NewHTTPError(http.StatusNotFound, "User not found")
-	}
-
-	err = db.DeleteUser(userID)
-
+	currentUserID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return domain.GetEchoError(err)
 	}
 
-	err = DeleteSession(c)
-
+	ctx := context.Background()
+	err = handler.userUC.DeleteUser(ctx, currentUserID, userID)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return domain.GetEchoError(err)
 	}
-
 	return c.NoContent(http.StatusOK)
 }

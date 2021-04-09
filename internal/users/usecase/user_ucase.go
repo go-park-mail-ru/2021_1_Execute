@@ -38,14 +38,22 @@ func (uc *userUsecase) Registration(ctx context.Context, user domain.User) (int,
 	return userId, nil
 }
 
-func (uc *userUsecase) UpdateUser(ctx context.Context, changerID int,
-	changedUser domain.User, isPasswordChanged bool) error {
+func (uc *userUsecase) UpdateAvatar(ctx context.Context, userID int, path string) error {
+	changedUser := domain.User{
+		ID:     userID,
+		Avatar: path,
+	}
+	err := uc.userRepo.UpdateUser(ctx, changedUser)
+	return err
+}
+
+func (uc *userUsecase) UpdateUser(ctx context.Context, changerID int, changedUser domain.User) error {
 	var err error
 	if changerID != changedUser.ID {
 		return errors.Wrap(domain.ForbiddenError, "Not enough rights")
 	}
 
-	if isPasswordChanged {
+	if len(changedUser.Password) > 0 {
 		changedUser, err = setPassword(changedUser)
 		if err != nil {
 			return err
