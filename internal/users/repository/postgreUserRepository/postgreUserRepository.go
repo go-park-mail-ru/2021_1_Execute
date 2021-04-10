@@ -24,18 +24,12 @@ func NewPostgreUserRepository(pool *pgxpool.Pool, fileUtil domain.FileUtil) doma
 func (repo *PostgreUserRepository) AddUser(ctx context.Context, user domain.User) (int, error) {
 	err := repo.insertUser(ctx, user)
 	if err != nil {
-		if errors.Is(err, domain.DBConflictError) {
-			return -1, err
-		}
 		return -1, errors.Wrap(err, "Error while inserting user")
 	}
 
-	user.ID, err = repo.getIdByEmail(ctx, user.Email)
+	user.ID, err = repo.getIDByEmail(ctx, user.Email)
 	if err != nil {
-		if errors.Is(err, domain.DBNotFoundError) {
-			return -1, err
-		}
-		return -1, errors.Wrap(err, "Error while getting ID")
+		return -1, errors.Wrap(err, "Error while getting id")
 	}
 
 	return user.ID, nil
@@ -44,7 +38,7 @@ func (repo *PostgreUserRepository) AddUser(ctx context.Context, user domain.User
 func (repo *PostgreUserRepository) UpdateUser(ctx context.Context, user domain.User) error {
 	outdatedUser, err := repo.GetUserByID(ctx, user.ID)
 	if err != nil {
-		return errors.Wrap(err, "Error while updating user")
+		return errors.Wrap(err, "Unable to get outdated user")
 	}
 	if outdatedUser.Email == "" {
 		return domain.DBNotFoundError
@@ -52,14 +46,11 @@ func (repo *PostgreUserRepository) UpdateUser(ctx context.Context, user domain.U
 
 	newUser, err := repo.createUserUpdateObject(outdatedUser, user)
 	if err != nil {
-		return errors.Wrap(err, "Unable to update user")
+		return errors.Wrap(err, "Unable to create user update object")
 	}
 
 	err = repo.updateUserQuery(ctx, newUser)
 	if err != nil {
-		if errors.Is(err, domain.DBConflictError) {
-			return err
-		}
 		return errors.Wrap(err, "Error while updating user")
 	}
 
@@ -69,7 +60,7 @@ func (repo *PostgreUserRepository) UpdateUser(ctx context.Context, user domain.U
 func (repo *PostgreUserRepository) DeleteUser(ctx context.Context, userID int) error {
 	user, err := repo.GetUserByID(ctx, userID)
 	if err != nil {
-		return errors.Wrap(err, "Unable to get user")
+		return errors.Wrap(err, "Unable to get user by id")
 	}
 	if user.Email == "" {
 		return domain.DBNotFoundError
@@ -149,7 +140,7 @@ func (repo *PostgreUserRepository) insertUser(ctx context.Context, user domain.U
 	return nil
 }
 
-func (repo *PostgreUserRepository) getIdByEmail(ctx context.Context, email string) (int, error) {
+func (repo *PostgreUserRepository) getIDByEmail(ctx context.Context, email string) (int, error) {
 	rows, err := repo.Pool.Query(ctx, "select id from users where email = $1::text", email)
 	if err != nil {
 		return -1, err
@@ -161,7 +152,7 @@ func (repo *PostgreUserRepository) getIdByEmail(ctx context.Context, email strin
 	for rows.Next() {
 		err = rows.Scan(&id)
 		if err != nil {
-			return -1, err
+			return -1, errors.Wrap(err, "Unable to get user_id by email")
 		}
 	}
 
@@ -182,7 +173,7 @@ func (repo *PostgreUserRepository) updateUserQuery(ctx context.Context, user dom
 	)
 
 	if err != nil {
-		return errors.Wrap(err, "Unable to update user")
+		return errors.Wrap(err, "Error while query updateUser")
 	}
 	rows.Close()
 	if err != nil {
@@ -226,7 +217,7 @@ func (repo *PostgreUserRepository) createUserUpdateObject(outdatedUser, newUser 
 		if outdatedUser.Avatar != "" {
 			err := repo.FileUtil.DeleteFile(outdatedUser.Avatar)
 			if err != nil {
-				return domain.User{}, err
+				return domain.User{}, errors.Wrap(err, "Unable to delete outdated avatar")
 			}
 		}
 		result.Avatar = newUser.Avatar
