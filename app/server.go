@@ -43,7 +43,7 @@ func main() {
 	}
 	defer pool.Close()
 
-	initFile, err := ioutil.ReadFile("database/trello.sql")
+	initFile, err := ioutil.ReadFile("../database/trello.sql")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -10,11 +10,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-var Ls string = "dfs"
-
 type UserLoginRequest struct {
 	Email    string `json:"email" valid:"email"`
-	Password string `json:"password" ` // todo valid:"password"
+	Password string `json:"password" valid:"password" `
 }
 
 type EntranceResponse struct {
@@ -23,8 +21,8 @@ type EntranceResponse struct {
 
 type UserRegistrationRequest struct {
 	Email    string `json:"email" valid:"email"`
-	Username string `json:"username" ` //todo valid:"username"
-	Password string `json:"password" ` // todovalid:"password"
+	Username string `json:"username" valid:"username"`
+	Password string `json:"password" valid:"password" `
 }
 
 func LoginRequestToUser(input *UserLoginRequest) domain.User {
