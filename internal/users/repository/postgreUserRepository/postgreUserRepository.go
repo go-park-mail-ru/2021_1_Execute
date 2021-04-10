@@ -6,7 +6,6 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type PostgreUserRepository struct {
@@ -22,12 +21,7 @@ func NewPostgreUserRepository(pool *pgxpool.Pool, fileUtil domain.FileUtil) doma
 }
 
 func (repo *PostgreUserRepository) AddUser(ctx context.Context, user domain.User) (int, error) {
-	user, err := createUserInsertObject(user)
-	if err != nil {
-		return -1, errors.Wrap(err, "Unable to add user")
-	}
-
-	err = repo.insertUser(ctx, user)
+	err := repo.insertUser(ctx, user)
 	if err != nil {
 		return -1, errors.Wrap(err, "Error while inserting user")
 	}
@@ -49,13 +43,7 @@ func (repo *PostgreUserRepository) UpdateUser(ctx context.Context, user domain.U
 		return domain.NotFoundError
 	}
 
-	newUser, err := repo.createUserUpdateObject(outdatedUser, domain.User{
-		ID:       user.ID,
-		Username: user.Username,
-		Email:    user.Email,
-		Password: user.Password,
-		Avatar:   user.Avatar,
-	})
+	newUser, err := repo.createUserUpdateObject(outdatedUser, user)
 	if err != nil {
 		return errors.Wrap(err, "Unable to update user")
 	}
@@ -131,27 +119,12 @@ func (repo *PostgreUserRepository) insertUser(ctx context.Context, user domain.U
 		user.Password,
 		user.Avatar,
 	)
-
 	if err != nil {
 		return errors.Wrap(err, "Error while query insertUser")
 	}
 	rows.Close()
 
 	return nil
-}
-
-func createUserInsertObject(input domain.User) (domain.User, error) {
-	passwordHashBytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
-	if err != nil {
-		return domain.User{}, errors.Wrap(err, "Unable to hash password")
-	}
-
-	return domain.User{
-		Email:    input.Email,
-		Username: input.Username,
-		Password: string(passwordHashBytes),
-		Avatar:   input.Avatar,
-	}, nil
 }
 
 func (repo *PostgreUserRepository) getIdByEmail(ctx context.Context, email string) (int, error) {
@@ -207,11 +180,7 @@ func (repo *PostgreUserRepository) createUserUpdateObject(outdatedUser, newUser 
 	}
 
 	if newUser.Password != "" {
-		hash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.MinCost)
-		if err != nil {
-			return domain.User{}, err
-		}
-		result.Password = string(hash)
+		result.Password = newUser.Password
 	} else {
 		result.Password = outdatedUser.Password
 	}
