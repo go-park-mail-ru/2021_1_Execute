@@ -43,23 +43,23 @@ func RegistrationRequestToUser(input *UserRegistrationRequest) domain.User {
 func (handler *UserHandler) Login(c echo.Context) error {
 	input := new(UserLoginRequest)
 	if err := c.Bind(input); err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
+		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
 	_, err := govalidator.ValidateStruct(input)
 	if err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
+		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
 	ctx := context.Background()
 	userID, err := handler.userUC.Authentication(ctx, LoginRequestToUser(input))
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	err = handler.sessionHD.SetSession(c, userID)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	return c.JSON(http.StatusOK, &EntranceResponse{ID: userID})
@@ -68,23 +68,23 @@ func (handler *UserHandler) Login(c echo.Context) error {
 func (handler *UserHandler) Registration(c echo.Context) error {
 	input := new(UserRegistrationRequest)
 	if err := c.Bind(input); err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
+		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
 	_, err := govalidator.ValidateStruct(input)
 	if err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
+		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
 	ctx := context.Background()
 	userID, err := handler.userUC.Registration(ctx, RegistrationRequestToUser(input))
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	err = handler.sessionHD.SetSession(c, userID)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 	return c.JSON(http.StatusOK, &EntranceResponse{ID: userID})
 }
@@ -92,7 +92,7 @@ func (handler *UserHandler) Registration(c echo.Context) error {
 func (handler *UserHandler) Logout(c echo.Context) error {
 	err := handler.sessionHD.DeleteSession(c)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusOK)

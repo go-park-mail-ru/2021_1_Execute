@@ -31,34 +31,34 @@ func (handler *FilesHandler) AddAvatar(c echo.Context) error {
 
 	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.InternalServerError, err.Error()))
+		return errors.Wrap(domain.InternalServerError, err.Error())
 	}
 
 	if !strings.HasPrefix(fileHeader.Header.Get("Content-Type"), "image") {
-		return domain.GetEchoError(domain.UnsupportedMediaType)
+		return domain.UnsupportedMediaType
 	}
 
 	file, err := fileHeader.Open()
 	defer file.Close()
 	if err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.InternalServerError, err.Error()))
+		return errors.Wrap(domain.InternalServerError, err.Error())
 	}
 	extension := handler.fileUT.GetExtension(fileHeader.Filename)
 	filename, err := handler.fileUT.SaveFile(file, extension)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 	path := handler.fileUT.GetDestinationFolder() + filename
 
 	ctx := context.Background()
 	err = handler.userUC.UpdateAvatar(ctx, userID, path)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -67,7 +67,7 @@ func (handler *FilesHandler) AddAvatar(c echo.Context) error {
 func (handler *FilesHandler) Download(c echo.Context) error {
 	_, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	filename := c.Param("filename")

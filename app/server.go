@@ -1,6 +1,7 @@
 package main
 
 import (
+	"2021_1_Execute/internal/domain"
 	"2021_1_Execute/internal/files"
 	FilesHttpDelivery "2021_1_Execute/internal/files/delivery/http"
 	SessionsDelivery "2021_1_Execute/internal/session/delivery"
@@ -43,7 +44,7 @@ func main() {
 	}
 	defer pool.Close()
 
-	initFile, err := ioutil.ReadFile("../database/trello.sql")
+	initFile, err := ioutil.ReadFile("database/trello.sql")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,6 +53,10 @@ func main() {
 	_, err = pool.Exec(ctx, initComands)
 
 	e := echo.New()
+	e.HTTPErrorHandler = func(err error, c echo.Context) {
+		err = domain.GetEchoError(err)
+		e.DefaultHTTPErrorHandler(err, c)
+	}
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     allowOrigins,
