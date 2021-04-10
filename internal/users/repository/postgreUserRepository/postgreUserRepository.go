@@ -123,6 +123,10 @@ func (repo *PostgreUserRepository) insertUser(ctx context.Context, user domain.U
 		return errors.Wrap(err, "Error while query insertUser")
 	}
 	rows.Close()
+	err = rows.Err()
+	if err != nil {
+		return errors.Wrap(err, "postgreSQL error")
+	}
 
 	return nil
 }
@@ -159,6 +163,10 @@ func (repo *PostgreUserRepository) updateUserQuery(ctx context.Context, user dom
 		return errors.Wrap(err, "Unable to update user")
 	}
 	rows.Close()
+	err = rows.Err()
+	if err != nil {
+		return errors.Wrap(err, "postgreSQL error")
+	}
 
 	return nil
 }
