@@ -45,7 +45,6 @@ func (repo *PostgreSessionsRepository) SetSession(ctx context.Context, userID in
 	fmt.Println("hi")
 	rows, err := repo.Pool.Query(ctx, "insert into sessions (session_token, user_id) values ($1::text, $2::int)", uuid, userID)
 	if err != nil {
-		fmt.Println(err)
 		return errors.Wrap(err, "Unable to set session")
 	}
 	rows.Close()

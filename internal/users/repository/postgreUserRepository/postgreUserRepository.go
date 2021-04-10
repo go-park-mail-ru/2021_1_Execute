@@ -3,6 +3,7 @@ package postgreUserRepository
 import (
 	"2021_1_Execute/internal/domain"
 	"context"
+	"regexp"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
@@ -23,6 +24,9 @@ func NewPostgreUserRepository(pool *pgxpool.Pool, fileUtil domain.FileUtil) doma
 func (repo *PostgreUserRepository) AddUser(ctx context.Context, user domain.User) (int, error) {
 	err := repo.insertUser(ctx, user)
 	if err != nil {
+		if errors.Is(err, domain.DBConflictError) {
+			return -1, err
+		}
 		return -1, errors.Wrap(err, "Error while inserting user")
 	}
 
@@ -40,7 +44,7 @@ func (repo *PostgreUserRepository) UpdateUser(ctx context.Context, user domain.U
 		return errors.Wrap(err, "Error while updating user")
 	}
 	if outdatedUser.Email == "" {
-		return domain.NotFoundError
+		return domain.ServerNotFoundError
 	}
 
 	newUser, err := repo.createUserUpdateObject(outdatedUser, user)
@@ -50,6 +54,9 @@ func (repo *PostgreUserRepository) UpdateUser(ctx context.Context, user domain.U
 
 	err = repo.updateUserQuery(ctx, newUser)
 	if err != nil {
+		if errors.Is(err, domain.DBConflictError) {
+			return err
+		}
 		return errors.Wrap(err, "Error while updating user")
 	}
 
@@ -62,7 +69,7 @@ func (repo *PostgreUserRepository) DeleteUser(ctx context.Context, userID int) e
 		return errors.Wrap(err, "Unable to get user")
 	}
 	if user.Email == "" {
-		return domain.NotFoundError
+		return domain.ServerNotFoundError
 	}
 
 	rows, err := repo.Pool.Query(ctx, "delete from users where id = $1::int", user.ID)
@@ -125,7 +132,15 @@ func (repo *PostgreUserRepository) insertUser(ctx context.Context, user domain.U
 	rows.Close()
 	err = rows.Err()
 	if err != nil {
-		return errors.Wrap(err, "postgreSQL error")
+		re, reErr := regexp.MatchString(`duplicate key value violates unique constraint`, err.Error())
+		switch {
+		case reErr != nil:
+			return errors.Wrap(reErr, "Invalid regexp")
+		case re:
+			return domain.DBConflictError
+		default:
+			return errors.Wrap(err, "postgreSQL error")
+		}
 	}
 
 	return nil
@@ -163,9 +178,16 @@ func (repo *PostgreUserRepository) updateUserQuery(ctx context.Context, user dom
 		return errors.Wrap(err, "Unable to update user")
 	}
 	rows.Close()
-	err = rows.Err()
 	if err != nil {
-		return errors.Wrap(err, "postgreSQL error")
+		re, reErr := regexp.MatchString(`duplicate key value violates unique constraint`, err.Error())
+		switch {
+		case reErr != nil:
+			return errors.Wrap(reErr, "Invalid regexp")
+		case re:
+			return domain.DBConflictError
+		default:
+			return errors.Wrap(err, "postgreSQL error")
+		}
 	}
 
 	return nil
