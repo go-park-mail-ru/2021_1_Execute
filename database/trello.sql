@@ -74,7 +74,7 @@ create table if not exists Tasks_Users (
 
 create table if not exists Sessions (
   session_token text not null unique,
-  user_id integer not null default,
+  user_id integer not null,
 
   foreign key (user_id) references USERS (id) on delete cascade
 );
