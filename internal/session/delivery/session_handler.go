@@ -34,7 +34,7 @@ func (handler *sessionHandler) SetSession(c echo.Context, userID int) error {
 	ctx := context.Background()
 	err = handler.sessionRepo.SetSession(ctx, userID, sessionToken)
 	if err != nil {
-		return err
+		return domain.DBErrorToServerError(err)
 	}
 	cookie := http.Cookie{
 		HttpOnly: true,

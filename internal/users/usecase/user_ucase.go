@@ -33,7 +33,7 @@ func (uc *userUsecase) Registration(ctx context.Context, user domain.User) (int,
 	user, err := setPassword(user)
 	userId, err := uc.userRepo.AddUser(ctx, user)
 	if err != nil {
-		return 0, err
+		return 0, domain.DBErrorToServerError(err)
 	}
 	return userId, nil
 }
@@ -44,7 +44,7 @@ func (uc *userUsecase) UpdateAvatar(ctx context.Context, userID int, path string
 		Avatar: path,
 	}
 	err := uc.userRepo.UpdateUser(ctx, changedUser)
-	return err
+	return domain.DBErrorToServerError(err)
 }
 
 func (uc *userUsecase) UpdateUser(ctx context.Context, changerID int, changedUser domain.User) error {
@@ -60,7 +60,7 @@ func (uc *userUsecase) UpdateUser(ctx context.Context, changerID int, changedUse
 		}
 	}
 	err = uc.userRepo.UpdateUser(ctx, changedUser)
-	return err
+	return domain.DBErrorToServerError(err)
 
 }
 
@@ -69,18 +69,19 @@ func (uc *userUsecase) DeleteUser(ctx context.Context, changerID int, userID int
 		return errors.Wrap(domain.ForbiddenError, "Not enough rights")
 	}
 	err := uc.userRepo.DeleteUser(ctx, userID)
-	return err
+
+	return domain.DBErrorToServerError(err)
 }
 
 func (uc *userUsecase) GetUserByID(ctx context.Context, userID int) (domain.User, error) {
 	user, err := uc.userRepo.GetUserByID(ctx, userID)
-	return user, err
+	return user, domain.DBErrorToServerError(err)
 }
 
 func (uc *userUsecase) Authentication(ctx context.Context, user domain.User) (int, error) {
 	userFromBD, err := uc.userRepo.GetUserByEmail(ctx, user.Email)
 	if err != nil {
-		return 0, err
+		return 0, domain.DBErrorToServerError(err)
 	}
 	if bcrypt.CompareHashAndPassword([]byte(userFromBD.Password), []byte(user.Password)) == nil {
 
