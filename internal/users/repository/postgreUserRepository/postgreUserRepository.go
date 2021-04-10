@@ -32,6 +32,9 @@ func (repo *PostgreUserRepository) AddUser(ctx context.Context, user domain.User
 
 	user.ID, err = repo.getIdByEmail(ctx, user.Email)
 	if err != nil {
+		if errors.Is(err, domain.DBNotFoundError) {
+			return -1, err
+		}
 		return -1, errors.Wrap(err, "Error while getting ID")
 	}
 
@@ -44,7 +47,7 @@ func (repo *PostgreUserRepository) UpdateUser(ctx context.Context, user domain.U
 		return errors.Wrap(err, "Error while updating user")
 	}
 	if outdatedUser.Email == "" {
-		return domain.ServerNotFoundError
+		return domain.DBNotFoundError
 	}
 
 	newUser, err := repo.createUserUpdateObject(outdatedUser, user)
@@ -69,7 +72,7 @@ func (repo *PostgreUserRepository) DeleteUser(ctx context.Context, userID int) e
 		return errors.Wrap(err, "Unable to get user")
 	}
 	if user.Email == "" {
-		return domain.ServerNotFoundError
+		return domain.DBNotFoundError
 	}
 
 	rows, err := repo.Pool.Query(ctx, "delete from users where id = $1::int", user.ID)
@@ -160,6 +163,10 @@ func (repo *PostgreUserRepository) getIdByEmail(ctx context.Context, email strin
 		if err != nil {
 			return -1, err
 		}
+	}
+
+	if id == -1 {
+		return -1, domain.DBNotFoundError
 	}
 
 	return id, nil
