@@ -122,3 +122,25 @@ func (repo *PostgreBoardRepository) DeleteBoard(ctx context.Context, boardID int
 
 	return nil
 }
+
+func (repo *PostgreBoardRepository) GetBoardsOwners(ctx context.Context, boardID int) ([]int, error) {
+	rows, err := repo.Pool.Query(ctx, "select user_id from owners where board_id = $1::int", boardID)
+	if err != nil {
+		return []int{}, errors.Wrap(err, "Unable to get owners")
+	}
+
+	var owners []int
+
+	for rows.Next() {
+		var owner int
+		err = rows.Scan(&owner)
+		if err != nil {
+			return []int{}, errors.Wrap(err, "Unable to read owner")
+		}
+		owners = append(owners, owner)
+	}
+
+	rows.Close()
+
+	return owners, nil
+}
