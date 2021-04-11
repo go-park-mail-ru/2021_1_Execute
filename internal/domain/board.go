@@ -16,6 +16,7 @@ type Row struct {
 type Task struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
+	Position    int    `json:"position"`
 	Description string `json:"description"`
 }
 
@@ -27,39 +28,33 @@ type FullBoardInfo struct {
 	Rows        []FullRowInfo `json:"rows"`
 }
 type FullRowInfo struct {
-	ID       int              `json:"id"`
-	Name     string           `json:"name"`
-	Position int              `json:"position"`
-	Tasks    []OutterTaskInfo `json:"tasks"`
-}
-
-type OutterTaskInfo struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
 	Position int    `json:"position"`
+	Tasks    []Task `json:"tasks"`
 }
 
 type BoardUsecase interface {
-	AddBoard(ctx context.Context, board Board, userID int) (int, error)
-	AddRow(ctx context.Context, row Row, boardID int) (int, error)
-	AddTask(ctx context.Context, task Task, rowID int) (int, error)
+	AddBoard(ctx context.Context, board Board, userID int) (int, error) // [x]
+	AddRow(ctx context.Context, row Row, boardID int) (int, error)      //[ ]
+	AddTask(ctx context.Context, task Task, rowID int) (int, error)     //[ ]
 
-	UpdateBoard(ctx context.Context, board Board) error
-	UpdateRow(ctx context.Context, row Row) error
-	UpdateTask(ctx context.Context, task Task) error
+	UpdateBoard(ctx context.Context, board Board) error //[ ]
+	UpdateRow(ctx context.Context, row Row) error       //[ ]
+	UpdateTask(ctx context.Context, task Task) error    //[ ]
 
-	MoveRow(ctx context.Context, boardID int, rowID int, newPosition int) error
-	MoveTask(ctx context.Context, cardID int, newPosition int) error
-	CarryOverTask(ctx context.Context, cardID int, newPosition int) error
+	MoveRow(ctx context.Context, boardID int, rowID int, newPosition int) error //[ ]
+	MoveTask(ctx context.Context, cardID int, newPosition int) error            //[ ]
+	CarryOverTask(ctx context.Context, cardID int, newPosition int) error       //[ ]
 
-	DeleteBoard(ctx context.Context, boardID int) error
-	DeleteRow(ctx context.Context, rowID int) error
-	DeleteTask(ctx context.Context, taskID int) error
+	DeleteBoard(ctx context.Context, boardID int) error //[ ]
+	DeleteRow(ctx context.Context, rowID int) error     //[ ]
+	DeleteTask(ctx context.Context, taskID int) error   //[ ]
 
-	GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (FullBoardInfo, error)
-	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)
-	GetTask(ctx context.Context, taskID int) (Task, error)
-	GetRow(ctx context.Context, rowID int) (Row, error)
+	GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (FullBoardInfo, error) //[x]
+	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)                           //[x]
+	GetTask(ctx context.Context, taskID int) (Task, error)                                     //[ ]
+	GetRow(ctx context.Context, rowID int) (Row, error)                                        //[ ]
 }
 
 type BoardRepository interface {
@@ -82,4 +77,5 @@ type BoardRepository interface {
 	GetTask(ctx context.Context, taskID int) (Task, error)
 	GetRow(ctx context.Context, rowID int) (Row, error)
 	GetBoard(ctx context.Context, boardID int) (Board, error)
+	GetBoardsOwner(ctx context.Context, boardID int) (int, error)
 }

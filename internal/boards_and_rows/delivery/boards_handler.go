@@ -24,10 +24,6 @@ func NewBoardsHandler(e *echo.Echo, boardUC domain.BoardUsecase, sessionHD domai
 	e.DELETE("api/boards/:id", handler.DeleteBoardByID)
 }
 
-func (handler *BoardsHandler) PostBoard(c echo.Context) error {
-	return nil //todo
-}
-
 func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
 	return nil //todo
 }
