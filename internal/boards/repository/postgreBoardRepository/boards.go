@@ -123,7 +123,7 @@ func (repo *PostgreBoardRepository) DeleteBoard(ctx context.Context, boardID int
 	return nil
 }
 
-func (repo *PostgreBoardRepository) GetBoardsOwners(ctx context.Context, boardID int) ([]int, error) {
+func (repo *PostgreBoardRepository) GetBoardOwners(ctx context.Context, boardID int) ([]int, error) {
 	rows, err := repo.Pool.Query(ctx, "select user_id from owners where board_id = $1::int", boardID)
 	if err != nil {
 		return []int{}, errors.Wrap(err, "Unable to get owners")
