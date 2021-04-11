@@ -7,21 +7,22 @@ create table if not exists USERS (
 );
 
 create table if not exists BOARDS (
-  id integer not null primary key,
+  id serial primary key,
   name text,
   description text
 );
 
 create table if not exists ROWS (
-  id integer not null primary key,
+  id serial primary key,
   name text,
   position integer
 );
 
 create table if not exists TASKS (
-  id integer not null primary key,
+  id serial primary key,
   name text,
-  description text
+  description text,
+  check (name != '')
 );
 
 create table if not exists Owners (
