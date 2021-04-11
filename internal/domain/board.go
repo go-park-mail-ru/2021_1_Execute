@@ -40,7 +40,7 @@ type OutterTaskInfo struct {
 }
 
 type BoardUsecase interface {
-	AddBoard(ctx context.Context, board Board) (int, error)
+	AddBoard(ctx context.Context, board Board, userID int) (int, error)
 	AddRow(ctx context.Context, row Row, boardID int) (int, error)
 	AddTask(ctx context.Context, task Task, rowID int) (int, error)
 
