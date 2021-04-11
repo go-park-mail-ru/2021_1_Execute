@@ -78,13 +78,13 @@ func (handler *UserHandler) IsAuthorized(c echo.Context) error {
 }
 
 func (handler *UserHandler) GetCurrentUser(c echo.Context) error {
-	userId, err := handler.sessionHD.IsAuthorized(c)
+	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
 		return domain.GetEchoError(err)
 	}
 
 	ctx := context.Background()
-	user, err := handler.userUC.GetUserByID(ctx, userId)
+	user, err := handler.userUC.GetUserByID(ctx, userID)
 	return c.JSON(http.StatusOK, createGetUserByIdResponse(user))
 }
 

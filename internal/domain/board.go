@@ -56,7 +56,7 @@ type BoardUsecase interface {
 	DeleteRow(ctx context.Context, rowID int) error
 	DeleteTask(ctx context.Context, taskID int) error
 
-	GetFullBoardInfo(ctx context.Context, boardID int) (FullBoardInfo, error)
+	GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (FullBoardInfo, error)
 	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)
 	GetTask(ctx context.Context, taskID int) (Task, error)
 	GetRow(ctx context.Context, rowID int) (Row, error)
