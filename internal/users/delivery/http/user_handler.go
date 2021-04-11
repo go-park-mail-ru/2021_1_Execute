@@ -72,7 +72,7 @@ func createUserFromPatchRequest(input *PatchUserRequest) domain.User {
 func (handler *UserHandler) IsAuthorized(c echo.Context) error {
 	_, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 	return c.NoContent(http.StatusOK)
 }
@@ -80,7 +80,7 @@ func (handler *UserHandler) IsAuthorized(c echo.Context) error {
 func (handler *UserHandler) GetCurrentUser(c echo.Context) error {
 	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	ctx := context.Background()
@@ -91,12 +91,12 @@ func (handler *UserHandler) GetCurrentUser(c echo.Context) error {
 func (handler *UserHandler) GetUserByID(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.ForbiddenError, "ID should be int"))
+		return errors.Wrap(domain.ForbiddenError, "ID should be int")
 	}
 
 	_, err = handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	ctx := context.Background()
@@ -107,17 +107,17 @@ func (handler *UserHandler) GetUserByID(c echo.Context) error {
 func (handler *UserHandler) PatchUser(c echo.Context) error {
 	input := new(PatchUserRequest)
 	if err := c.Bind(input); err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
+		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
 	_, err := govalidator.ValidateStruct(input)
 	if err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.BadRequestError, err.Error()))
+		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
 	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	ctx := context.Background()
@@ -126,7 +126,7 @@ func (handler *UserHandler) PatchUser(c echo.Context) error {
 	err = handler.userUC.UpdateUser(ctx, userID, user)
 
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	return c.NoContent(http.StatusOK)
@@ -135,18 +135,18 @@ func (handler *UserHandler) PatchUser(c echo.Context) error {
 func (handler *UserHandler) DeleteUserByID(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return domain.GetEchoError(errors.Wrap(domain.ForbiddenError, "ID should be int"))
+		return errors.Wrap(domain.ForbiddenError, "ID should be int")
 	}
 
 	currentUserID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 
 	ctx := context.Background()
 	err = handler.userUC.DeleteUser(ctx, currentUserID, userID)
 	if err != nil {
-		return domain.GetEchoError(err)
+		return err
 	}
 	return c.NoContent(http.StatusOK)
 }

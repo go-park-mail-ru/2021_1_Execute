@@ -1,21 +1,20 @@
 package main
 
 import (
+	"2021_1_Execute/database"
+	"2021_1_Execute/internal/domain"
 	"2021_1_Execute/internal/files"
 	FilesHttpDelivery "2021_1_Execute/internal/files/delivery/http"
 	SessionsDelivery "2021_1_Execute/internal/session/delivery"
 	"2021_1_Execute/internal/session/repository/postgreSessionsRepository"
-	"io/ioutil"
 	"log"
 
 	UserHttpDelivery "2021_1_Execute/internal/users/delivery/http"
 	"2021_1_Execute/internal/users/repository/postgreUserRepository"
 	"2021_1_Execute/internal/users/usecase"
-	"context"
 	"flag"
 	"fmt"
 
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -24,34 +23,32 @@ var allowOrigins = []string{"http://127.0.0.1:3000", "http://localhost:3000", "h
 
 func main() {
 	clientPort := flag.Int("client-port", 3000, "")
-	serverPort := flag.Int("server-port", 1323, "")
+	serverPort := flag.Int("server-port", 1323, "") //postgresql://username:password@host:port/dbname
+	databaseUsername := flag.String("username", "postgres", "Input database username")
+	databasePassword := flag.String("password", "123456", "Input database password")
+	databaseHost := flag.String("db-host", "localhost", "Input database host")
+	databasePort := flag.Int("db-port", 5432, "Input database port")
+	databaseName := flag.String("db-name", "trello", "Input database name")
 	flag.Parse()
 	allowOrigins = append(allowOrigins, fmt.Sprint("http://89.208.199.114:", *clientPort))
 	fmt.Println(allowOrigins)
 
-	DBUri := "postgresql://postgres:123456@localhost:5432/trello"
-	config, err := pgxpool.ParseConfig(DBUri)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ctx := context.Background()
-
-	pool, err := pgxpool.ConnectConfig(ctx, config)
+	pool, err := database.GetPool(*databaseUsername, *databasePassword, *databaseName, *databaseHost, *databasePort)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer pool.Close()
 
-	initFile, err := ioutil.ReadFile("../database/trello.sql")
+	err = database.InitDatabase(pool)
 	if err != nil {
 		log.Fatal(err)
 	}
-	initComands := string(initFile)
-
-	_, err = pool.Exec(ctx, initComands)
 
 	e := echo.New()
+	e.HTTPErrorHandler = func(err error, c echo.Context) {
+		err = domain.GetEchoError(err)
+		e.DefaultHTTPErrorHandler(err, c)
+	}
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     allowOrigins,
