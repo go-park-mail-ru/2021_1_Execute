@@ -100,3 +100,19 @@ func (uc *boardsUsecase) DeleteBoard(ctx context.Context, boardID int, requester
 	}
 	return nil
 }
+
+func (uc *boardsUsecase) UpdateBoard(ctx context.Context, board domain.Board, requesterID int) error {
+	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, board.ID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	if requesterID != ownerID {
+		return domain.ForbiddenError
+	}
+	err = uc.boardsRepo.UpdateBoard(ctx, board)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+	return nil
+}

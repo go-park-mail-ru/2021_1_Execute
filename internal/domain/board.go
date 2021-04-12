@@ -32,7 +32,7 @@ type BoardUsecase interface {
 	AddBoard(ctx context.Context, board Board, userID int) (int, error)             // [x]
 	AddRow(ctx context.Context, row Row, boardID int, requesterID int) (int, error) //[ ]
 
-	UpdateBoard(ctx context.Context, board Board, requesterID int) error //[ ]
+	UpdateBoard(ctx context.Context, board Board, requesterID int) error //[x]
 	UpdateRow(ctx context.Context, row Row, requesterID int) error       //[ ]
 
 	MoveRow(ctx context.Context, boardID int, rowID int, newPosition int, requesterID int) error //[ ]

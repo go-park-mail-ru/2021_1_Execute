@@ -27,9 +27,9 @@ type boardUser struct {
 	Avatar string `json:"avatar"`
 }
 type boardUsers struct {
-	Owner   boardUser   `json:"owner"`
-	Admins  []boardUser `json:"admins"`
-	Members []boardUser `json:"members"`
+	Owner   boardUser   `json:"owner, omitempty"`
+	Admins  []boardUser `json:"admins, omitempty"`
+	Members []boardUser `json:"members, omitempty"`
 }
 type boardRows struct {
 	ID       int               `json:"id"`
@@ -100,9 +100,50 @@ func (handler *BoardsHandler) GetBoardByID(c echo.Context) error {
 
 }
 
-func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
-	return nil //todo
+type patchBoardByIDRequest struct {
+	Access      string     `json:"access,omitempty"`
+	IsStared    bool       `json:"isStared,omitempty"`
+	Name        string     `json:"name,omitempty"`
+	Description string     `json:"description,omitempty"`
+	Users       boardUsers `json:"users,omitempty"`
+	Move        rowsMove   `json:"move,omitempty"`
 }
+type rowsMove struct {
+	RowID       int `json:"row_id"`
+	NewPosition int `json:"new_position"`
+}
+
+func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
+	userID, err := handler.sessionHD.IsAuthorized(c)
+	if err != nil {
+		return err
+	}
+
+	boardID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return errors.Wrap(domain.ForbiddenError, "ID should be int")
+	}
+	input := new(patchBoardByIDRequest)
+	if err := c.Bind(input); err != nil {
+		return errors.Wrap(domain.BadRequestError, err.Error())
+	}
+
+	if input.Name != "" || input.Description != "" {
+		err = handler.boardUC.UpdateBoard(context.Background(), domain.Board{ID: boardID, Name: input.Name, Description: input.Description}, userID)
+		if err != nil {
+			return err
+		}
+	}
+	if input.Move.RowID != 0 { // fixme обработка отсутствия move
+		err = handler.boardUC.MoveRow(context.Background(), boardID, input.Move.RowID, input.Move.NewPosition, userID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
 func (handler *BoardsHandler) DeleteBoardByID(c echo.Context) error {
 	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
