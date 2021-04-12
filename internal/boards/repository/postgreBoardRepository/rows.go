@@ -41,6 +41,44 @@ func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row domain.Row, 
 }
 
 func (repo *PostgreBoardRepository) UpdateRow(ctx context.Context, row domain.Row) error {
+	outdatedRow, err := repo.GetRow(ctx, row.ID)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to get outdated row")
+	}
+
+	newRow := createUpdateRowObject(outdatedRow, row)
+
+	err = repo.updateRowQuery(ctx, newRow)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to query updating request")
+	}
+
+	return nil
+}
+
+func createUpdateRowObject(outdatedRow, newRow domain.Row) domain.Row {
+	var result domain.Row
+
+	result.ID = outdatedRow.ID
+
+	if newRow.Name == "" {
+		result.Name = outdatedRow.Name
+	} else {
+		result.Name = newRow.Name
+	}
+
+	if newRow.Position == -1 {
+		result.Position = outdatedRow.Position
+	} else {
+		result.Position = newRow.Position
+	}
+
+	return result
+}
+
+func (repo *PostgreBoardRepository) updateRowQuery(ctx context.Context, row domain.Row) error {
 	rows, err := repo.Pool.Query(ctx, "update rows set name = $1::text, position = $2::int where id = $3::int",
 		row.Name,
 		row.Position,

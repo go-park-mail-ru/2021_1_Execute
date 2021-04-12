@@ -41,7 +41,51 @@ func (repo *PostgreBoardRepository) AddTask(ctx context.Context, task domain.Tas
 }
 
 func (repo *PostgreBoardRepository) UpdateTask(ctx context.Context, task domain.Task) error {
-	rows, err := repo.Pool.Query(ctx, "update tasks set name = $1::text, description = $2::text, position = $3::int where id = $3::int",
+	outdatedTask, err := repo.GetTask(ctx, task.ID)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to get outdated task")
+	}
+
+	newTask := createUpdateTaskObject(outdatedTask, task)
+
+	err = repo.updateTaskQuery(ctx, newTask)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to query updating request")
+	}
+
+	return nil
+}
+
+func createUpdateTaskObject(outdatedTask, newTask domain.Task) domain.Task {
+	var result domain.Task
+
+	result.ID = outdatedTask.ID
+
+	if newTask.Name == "" {
+		result.Name = outdatedTask.Name
+	} else {
+		result.Name = newTask.Name
+	}
+
+	if newTask.Description == "" {
+		result.Description = outdatedTask.Description
+	} else {
+		result.Description = newTask.Description
+	}
+
+	if newTask.Position == -1 {
+		result.Position = outdatedTask.Position
+	} else {
+		result.Position = newTask.Position
+	}
+
+	return result
+}
+
+func (repo *PostgreBoardRepository) updateTaskQuery(ctx context.Context, task domain.Task) error {
+	rows, err := repo.Pool.Query(ctx, "update tasks set name = $1::text, description = $2::text, position = $3::int where id = $4::int",
 		task.Name,
 		task.Description,
 		task.Position,

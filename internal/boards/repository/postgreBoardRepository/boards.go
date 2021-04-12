@@ -41,6 +41,44 @@ func (repo *PostgreBoardRepository) AddOwner(ctx context.Context, boardID int, u
 }
 
 func (repo *PostgreBoardRepository) UpdateBoard(ctx context.Context, board domain.Board) error {
+	outdatedBoard, err := repo.GetBoard(ctx, board.ID)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to get outdated board")
+	}
+
+	newBoard := createUpdateBoardObject(outdatedBoard, board)
+
+	err = repo.updateBoardQuery(ctx, newBoard)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to query updating request")
+	}
+
+	return nil
+}
+
+func createUpdateBoardObject(outdatedBoard, newBoard domain.Board) domain.Board {
+	var result domain.Board
+
+	result.ID = outdatedBoard.ID
+
+	if newBoard.Name == "" {
+		result.Name = outdatedBoard.Name
+	} else {
+		result.Name = newBoard.Name
+	}
+
+	if newBoard.Description == "" {
+		result.Description = outdatedBoard.Description
+	} else {
+		result.Description = newBoard.Description
+	}
+
+	return result
+}
+
+func (repo *PostgreBoardRepository) updateBoardQuery(ctx context.Context, board domain.Board) error {
 	rows, err := repo.Pool.Query(ctx, "update boards set name = $1::text, description = $2::text where id = $3::int",
 		board.Name,
 		board.Description,
@@ -123,24 +161,22 @@ func (repo *PostgreBoardRepository) DeleteBoard(ctx context.Context, boardID int
 	return nil
 }
 
-func (repo *PostgreBoardRepository) GetBoardOwners(ctx context.Context, boardID int) ([]int, error) {
+func (repo *PostgreBoardRepository) GetBoardOwner(ctx context.Context, boardID int) (int, error) {
 	rows, err := repo.Pool.Query(ctx, "select user_id from owners where board_id = $1::int", boardID)
 	if err != nil {
-		return []int{}, errors.Wrap(err, "Unable to get owners")
+		return -1, errors.Wrap(err, "Unable to get owner")
 	}
 
-	var owners []int
+	var owner int
 
 	for rows.Next() {
-		var owner int
 		err = rows.Scan(&owner)
 		if err != nil {
-			return []int{}, errors.Wrap(err, "Unable to read owner")
+			return -1, errors.Wrap(err, "Unable to read owner")
 		}
-		owners = append(owners, owner)
 	}
 
 	rows.Close()
 
-	return owners, nil
+	return owner, nil
 }
