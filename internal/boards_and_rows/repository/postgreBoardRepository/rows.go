@@ -139,6 +139,8 @@ func (repo *PostgreBoardRepository) GetRow(ctx context.Context, rowID int) (doma
 		}
 	}
 
+	rows.Close()
+
 	if row.ID == 0 {
 		return domain.Row{}, domain.DBNotFoundError
 	}
@@ -188,4 +190,28 @@ func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int)
 	rows.Close()
 
 	return tasks, nil
+}
+
+func (repo *PostgreBoardRepository) GetRowsBoardID(ctx context.Context, rowID int) (int, error) {
+	rows, err := repo.Pool.Query(ctx, "select board_id from boards_rows where row_id = $1::int", rowID)
+	if err != nil {
+		return -1, errors.Wrap(err, "Unable to get board id")
+	}
+
+	var boardID int = -1
+
+	for rows.Next() {
+		err = rows.Scan(&boardID)
+		if err != nil {
+			return -1, errors.Wrap(err, "Unable to read board id")
+		}
+	}
+
+	rows.Close()
+
+	if boardID == -1 {
+		return -1, domain.DBNotFoundError
+	}
+
+	return boardID, nil
 }

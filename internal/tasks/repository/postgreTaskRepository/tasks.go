@@ -117,6 +117,8 @@ func (repo *PostgreTaskRepository) GetTask(ctx context.Context, taskID int) (dom
 		}
 	}
 
+	rows.Close()
+
 	if task.Name == "" {
 		return domain.Task{}, domain.DBNotFoundError
 	}
@@ -140,4 +142,55 @@ func (repo *PostgreTaskRepository) DeleteTask(ctx context.Context, taskID int) e
 	rows.Close()
 
 	return nil
+}
+
+func (repo *PostgreTaskRepository) GetTasksRowID(ctx context.Context, taskID int) (int, error) {
+	rows, err := repo.Pool.Query(ctx, "select row_id from rows_tasks where task_id = $1::int", taskID)
+	if err != nil {
+		return -1, errors.Wrap(err, "Unable to get row id")
+	}
+
+	var rowID int = -1
+
+	for rows.Next() {
+		err = rows.Scan(&rowID)
+		if err != nil {
+			return -1, errors.Wrap(err, "Unable to read row id")
+		}
+	}
+
+	rows.Close()
+
+	if rowID == -1 {
+		return -1, domain.DBNotFoundError
+	}
+
+	return rowID, nil
+}
+
+func (repo *PostgreTaskRepository) GetTasksBoardID(ctx context.Context, taskID int) (int, error) {
+	rows, err := repo.Pool.Query(ctx,
+		`select br.board_id from boards_rows as br
+	inner join rows_tasks as rt
+	on rt.task_id = $1::int and br.row_id = rt.row_id`, taskID)
+	if err != nil {
+		return -1, errors.Wrap(err, "Unable to get board id")
+	}
+
+	var boardID int = -1
+
+	for rows.Next() {
+		err = rows.Scan(&boardID)
+		if err != nil {
+			return -1, errors.Wrap(err, "Unable to read board id")
+		}
+	}
+
+	rows.Close()
+
+	if boardID == -1 {
+		return -1, domain.DBNotFoundError
+	}
+
+	return boardID, nil
 }
