@@ -50,7 +50,7 @@ func (handler *BoardsHandler) GetUsersBoards(c echo.Context) error {
 }
 
 type PostBoardRequest struct {
-	Name string `json:"name"`
+	Name string `json:"name" validate:"name"`
 }
 type PostBoardResponce struct {
 	ID int `json:"id"`
