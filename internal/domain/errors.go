@@ -24,6 +24,7 @@ var (
 	InternalServerError  = ServerError{"We are not responsible for this"}
 	ForbiddenError       = ServerError{"Forbidden"}
 	UnsupportedMediaType = ServerError{"Invalid media type"}
+	IDFormatError        = ServerError{"Incorrect data. ID should be non negative int"}
 )
 
 func GetEchoError(err error) error {
@@ -36,7 +37,7 @@ func GetEchoError(err error) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	case errors.Is(err, ServerConflictError):
 		return echo.NewHTTPError(http.StatusConflict, err.Error())
-	case errors.Is(err, BadRequestError):
+	case errors.Is(err, BadRequestError) || errors.Is(err, IDFormatError):
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	case errors.Is(err, ServerNotFoundError):
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())

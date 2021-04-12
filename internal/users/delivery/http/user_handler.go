@@ -91,7 +91,7 @@ func (handler *UserHandler) GetCurrentUser(c echo.Context) error {
 func (handler *UserHandler) GetUserByID(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return errors.Wrap(domain.ForbiddenError, "ID should be int")
+		return domain.IDFormatError
 	}
 
 	_, err = handler.sessionHD.IsAuthorized(c)
@@ -135,7 +135,7 @@ func (handler *UserHandler) PatchUser(c echo.Context) error {
 func (handler *UserHandler) DeleteUserByID(c echo.Context) error {
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return errors.Wrap(domain.ForbiddenError, "ID should be int")
+		return domain.IDFormatError
 	}
 
 	currentUserID, err := handler.sessionHD.IsAuthorized(c)

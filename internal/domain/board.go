@@ -30,21 +30,21 @@ type FullRowInfo struct {
 
 type BoardUsecase interface {
 	AddBoard(ctx context.Context, board Board, userID int) (int, error)             // [x]
-	AddRow(ctx context.Context, row Row, boardID int, requesterID int) (int, error) //[ ]
+	AddRow(ctx context.Context, row Row, boardID int, requesterID int) (int, error) //[x]
 
 	UpdateBoard(ctx context.Context, board Board, requesterID int) error //[x]
-	UpdateRow(ctx context.Context, row Row, requesterID int) error       //[ ]
+	//UpdateRow(ctx context.Context, row Row, requesterID int) error       //[ ]
 
-	MoveRow(ctx context.Context, boardID int, rowID int, newPosition int, requesterID int) error //[ ]
-	MoveTask(ctx context.Context, cardID int, newPosition int, requesterID int) error            //[ ]
-	CarryOverTask(ctx context.Context, cardID int, newPosition int, requesterID int) error       //[ ]
+	//MoveRow(ctx context.Context, boardID int, rowID int, newPosition int, requesterID int) error //[ ]
+	//MoveTask(ctx context.Context, cardID int, newPosition int, requesterID int) error            //[ ]
+	//CarryOverTask(ctx context.Context, cardID int, newPosition int, requesterID int) error       //[ ]
 
 	DeleteBoard(ctx context.Context, boardID int, requesterID int) error //[x]
-	DeleteRow(ctx context.Context, rowID int, requesterID int) error     //[ ]
+	DeleteRow(ctx context.Context, rowID int, requesterID int) error     //[x]
 
 	GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (FullBoardInfo, error) //[x]
 	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)                           //[x]
-	GetRow(ctx context.Context, rowID int, requesterID int) (Row, error)                       //[ ]
+	GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (FullRowInfo, error)       //[x]
 }
 
 type BoardRepository interface {
@@ -62,6 +62,7 @@ type BoardRepository interface {
 	GetBoardsRows(ctx context.Context, boardID int) ([]Row, error)
 	GetRowsTasks(ctx context.Context, rowID int) ([]Task, error)
 	GetRow(ctx context.Context, rowID int) (Row, error)
+	GetRowsBoardID(ctx context.Context, rowID int) (int, error)
 	GetBoard(ctx context.Context, boardID int) (Board, error)
 	GetBoardsOwner(ctx context.Context, boardID int) (int, error)
 }

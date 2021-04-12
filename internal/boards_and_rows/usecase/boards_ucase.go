@@ -64,16 +64,12 @@ func (uc *boardsUsecase) GetFullBoardInfo(ctx context.Context, boardID int, requ
 
 	fullRowsInfo := []domain.FullRowInfo{}
 	for _, row := range rows {
-		tasks, err := uc.boardsRepo.GetRowsTasks(ctx, row.ID)
+		rowInfo, err := uc.getFullRowInfo(ctx, row)
 		if err != nil {
-			return domain.FullBoardInfo{}, domain.DBErrorToServerError(err)
+			return domain.FullBoardInfo{}, err
 		}
-		fullRowsInfo = append(fullRowsInfo, domain.FullRowInfo{
-			ID:       row.ID,
-			Name:     row.Name,
-			Position: row.Position,
-			Tasks:    tasks,
-		})
+
+		fullRowsInfo = append(fullRowsInfo, rowInfo)
 	}
 	return domain.FullBoardInfo{
 		ID:          boardID,

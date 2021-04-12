@@ -7,7 +7,7 @@ import (
 )
 
 const nameRegexpr = "^([а-яА-Яa-zA-Z0-9!_?]{1,30})$"
-const descriptionRegexpr = "^([а-яА-Яa-zA-Z0-9][а-яА-Яa-zA-Z0-9 ()?,.!:;\'\'\"\"]*)$"
+const descriptionRegexpr = `^([а-яА-Яa-zA-Z0-9][а-яА-Яa-zA-Z0-9 ()?,.!:;'"]*)$`
 
 func init() {
 	govalidator.TagMap["name"] = govalidator.Validator(func(str string) bool {

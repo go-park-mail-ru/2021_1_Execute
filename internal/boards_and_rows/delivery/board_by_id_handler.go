@@ -15,13 +15,13 @@ type GetBoardByIDResponce struct {
 	Board getBoardByIDResponceContent `json:"board"`
 }
 type getBoardByIDResponceContent struct {
-	ID          int               `json:"id"`
-	Access      string            `json:"access"`
-	IsStared    bool              `json:"isStared"`
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Users       boardUsers        `json:"users"`
-	Rows        map[int]boardRows `json:"rows"`
+	ID          int              `json:"id"`
+	Access      string           `json:"access"`
+	IsStared    bool             `json:"isStared"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Users       boardUsers       `json:"users"`
+	Rows        map[int]boardRow `json:"rows"`
 }
 type boardUser struct {
 	ID     int    `json:"id"`
@@ -32,17 +32,6 @@ type boardUsers struct {
 	Admins  []boardUser `json:"admins, omitempty"`
 	Members []boardUser `json:"members, omitempty"`
 }
-type boardRows struct {
-	ID       int               `json:"id"`
-	Name     string            `json:"name"`
-	Position int               `json:"position"`
-	Tasks    map[int]boardTask `json:"tasks"`
-}
-type boardTask struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Position int    `json:"position"`
-}
 
 func BoardToGetResponce(board domain.FullBoardInfo) GetBoardByIDResponce {
 	boardUsers := boardUsers{
@@ -51,22 +40,9 @@ func BoardToGetResponce(board domain.FullBoardInfo) GetBoardByIDResponce {
 		Members: []boardUser{},
 	}
 
-	rows := make(map[int]boardRows)
+	rows := make(map[int]boardRow)
 	for _, row := range board.Rows {
-		tasks := make(map[int]boardTask)
-		for _, task := range row.Tasks {
-			tasks[task.Position] = boardTask{
-				ID:       task.ID,
-				Name:     task.Name,
-				Position: task.Position,
-			}
-		}
-		rows[row.Position] = boardRows{
-			ID:       row.ID,
-			Name:     row.Name,
-			Position: row.Position,
-			Tasks:    tasks,
-		}
+		rows[row.Position] = fullRowInfoToBoardRow(row)
 	}
 
 	content := getBoardByIDResponceContent{
@@ -89,10 +65,10 @@ func (handler *BoardsHandler) GetBoardByID(c echo.Context) error {
 
 	boardID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return errors.Wrap(domain.ForbiddenError, "ID should be int")
+		return domain.IDFormatError
 	}
 	if boardID < 0 {
-		return errors.Wrap(domain.BadRequestError, "ID should be positive")
+		return domain.IDFormatError
 	}
 
 	ctx := context.Background()
@@ -124,11 +100,8 @@ func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
 	}
 
 	boardID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return errors.Wrap(domain.ForbiddenError, "ID should be int")
-	}
-	if boardID < 0 {
-		return errors.Wrap(domain.BadRequestError, "ID should be positive")
+	if err != nil || boardID < 0 {
+		return domain.IDFormatError
 	}
 
 	input := new(patchBoardByIDRequest)
@@ -169,11 +142,8 @@ func (handler *BoardsHandler) DeleteBoardByID(c echo.Context) error {
 	}
 
 	boardID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return errors.Wrap(domain.ForbiddenError, "ID should be int")
-	}
-	if boardID < 0 {
-		return errors.Wrap(domain.BadRequestError, "ID should be positive")
+	if err != nil || boardID < 0 {
+		return domain.IDFormatError
 	}
 
 	ctx := context.Background()
