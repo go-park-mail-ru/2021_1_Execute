@@ -124,6 +124,8 @@ func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
 		return errors.Wrap(domain.ForbiddenError, "ID should be int")
 	}
 	input := new(patchBoardByIDRequest)
+	input.Move.NewPosition = -1
+	input.Move.RowID = -1
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -134,7 +136,10 @@ func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
 			return err
 		}
 	}
-	if input.Move.RowID != 0 { // fixme обработка отсутствия move
+	if input.Move.RowID >= 0 || input.Move.NewPosition >= 0 {
+		if !(input.Move.RowID >= 0 && input.Move.NewPosition >= 0) {
+			return domain.BadRequestError
+		}
 		err = handler.boardUC.MoveRow(context.Background(), boardID, input.Move.RowID, input.Move.NewPosition, userID)
 		if err != nil {
 			return err
