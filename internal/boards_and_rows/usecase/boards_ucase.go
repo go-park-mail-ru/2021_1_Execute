@@ -83,3 +83,20 @@ func (uc *boardsUsecase) GetFullBoardInfo(ctx context.Context, boardID int, requ
 		Rows:        fullRowsInfo,
 	}, nil
 }
+
+func (uc *boardsUsecase) DeleteBoard(ctx context.Context, boardID int, requesterID int) error {
+	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	if requesterID != ownerID {
+		return domain.ForbiddenError
+	}
+
+	err = uc.boardsRepo.DeleteBoard(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+	return nil
+}

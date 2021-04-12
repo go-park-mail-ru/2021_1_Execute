@@ -10,17 +10,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetBoardsResponce struct {
-	Boards []getBoardsResponceContent `json:"boards"`
-}
-type getBoardsResponceContent struct {
-	ID          int    `json:"id"`
-	Access      string `json:"access"`
-	IsStared    bool   `json:"isStared"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
 type GetBoardByIDResponce struct {
 	Board getBoardByIDResponceContent `json:"board"`
 }
@@ -91,35 +80,6 @@ func BoardToGetResponce(board domain.FullBoardInfo) GetBoardByIDResponce {
 	return GetBoardByIDResponce{Board: content}
 }
 
-func BoardsToGetResponce(boards []domain.Board) GetBoardsResponce {
-	responce := []getBoardsResponceContent{}
-	for _, board := range boards {
-		responce = append(responce, getBoardsResponceContent{
-			ID:          board.ID,
-			Access:      "",
-			IsStared:    false,
-			Name:        board.Name,
-			Description: board.Description,
-		})
-	}
-	return GetBoardsResponce{
-		Boards: responce,
-	}
-}
-func (handler *BoardsHandler) GetUsersBoards(c echo.Context) error {
-	userID, err := handler.sessionHD.IsAuthorized(c)
-	if err != nil {
-		return err
-	}
-
-	ctx := context.Background()
-	boards, err := handler.boardUC.GetUsersBoards(ctx, userID)
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, BoardsToGetResponce(boards))
-}
-
 func (handler *BoardsHandler) GetBoardByID(c echo.Context) error {
 	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
@@ -138,4 +98,25 @@ func (handler *BoardsHandler) GetBoardByID(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, BoardToGetResponce(board))
 
+}
+
+func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
+	return nil //todo
+}
+func (handler *BoardsHandler) DeleteBoardByID(c echo.Context) error {
+	userID, err := handler.sessionHD.IsAuthorized(c)
+	if err != nil {
+		return err
+	}
+
+	boardID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return errors.Wrap(domain.ForbiddenError, "ID should be int")
+	}
+	ctx := context.Background()
+	err = handler.boardUC.DeleteBoard(ctx, boardID, userID)
+	if err != nil {
+		return err
+	}
+	return c.NoContent(http.StatusOK)
 }

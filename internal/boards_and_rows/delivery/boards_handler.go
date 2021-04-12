@@ -2,31 +2,78 @@ package delivery
 
 import (
 	"2021_1_Execute/internal/domain"
+	"context"
+	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 )
 
-type BoardsHandler struct {
-	boardUC   domain.BoardUsecase
-	sessionHD domain.SessionHandler
+type GetBoardsResponce struct {
+	Boards []getBoardsResponceContent `json:"boards"`
+}
+type getBoardsResponceContent struct {
+	ID          int    `json:"id"`
+	Access      string `json:"access"`
+	IsStared    bool   `json:"isStared"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
-func NewBoardsHandler(e *echo.Echo, boardUC domain.BoardUsecase, sessionHD domain.SessionHandler) {
-	handler := &BoardsHandler{
-		boardUC:   boardUC,
-		sessionHD: sessionHD,
+func BoardsToGetResponce(boards []domain.Board) GetBoardsResponce {
+	responce := []getBoardsResponceContent{}
+	for _, board := range boards {
+		responce = append(responce, getBoardsResponceContent{
+			ID:          board.ID,
+			Access:      "",
+			IsStared:    false,
+			Name:        board.Name,
+			Description: board.Description,
+		})
+	}
+	return GetBoardsResponce{
+		Boards: responce,
+	}
+}
+func (handler *BoardsHandler) GetUsersBoards(c echo.Context) error {
+	userID, err := handler.sessionHD.IsAuthorized(c)
+	if err != nil {
+		return err
 	}
 
-	e.GET("api/boards", handler.GetUsersBoards)
-	e.POST("api/boards", handler.PostBoard)
-	e.GET("api/boards/:id", handler.GetBoardByID)
-	e.PATCH("api/boards/:id", handler.PatchBoardByID)
-	e.DELETE("api/boards/:id", handler.DeleteBoardByID)
+	ctx := context.Background()
+	boards, err := handler.boardUC.GetUsersBoards(ctx, userID)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, BoardsToGetResponce(boards))
 }
 
-func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
-	return nil //todo
+type PostBoardRequest struct {
+	Name string `json:"name"`
 }
-func (handler *BoardsHandler) DeleteBoardByID(c echo.Context) error {
-	return nil //todo
+type PostBoardResponce struct {
+	ID int `json:"id"`
+}
+
+func (handler *BoardsHandler) PostBoard(c echo.Context) error {
+	input := new(PostBoardRequest)
+	if err := c.Bind(input); err != nil {
+		return errors.Wrap(domain.BadRequestError, err.Error())
+	}
+
+	userID, err := handler.sessionHD.IsAuthorized(c)
+	if err != nil {
+		return err
+	}
+
+	newBoard := domain.Board{Name: input.Name}
+
+	ctx := context.Background()
+	boardID, err := handler.boardUC.AddBoard(ctx, newBoard, userID)
+	if err != nil {
+		return err
+	}
+	c.JSON(http.StatusOK, PostBoardResponce{ID: boardID})
+	return nil
 }
