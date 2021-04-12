@@ -29,13 +29,11 @@ func (repo *PostgreTaskRepository) AddTask(ctx context.Context, task domain.Task
 
 	rows.Close()
 
-	rows, err = repo.Pool.Query(ctx, "insert into rows_tasks (row_id, task_id) values ($1::int, $2::int)", rowID, taskID)
+	err = repo.connectRowAndTask(ctx, taskID, rowID)
 
 	if err != nil {
-		return -1, errors.Wrap(err, "Unable to link row and task")
+		return -1, errors.Wrap(err, "Unable to connect row and task")
 	}
-
-	rows.Close()
 
 	return taskID, nil
 }
@@ -55,6 +53,15 @@ func (repo *PostgreTaskRepository) UpdateTask(ctx context.Context, task domain.T
 		return errors.Wrap(err, "Unable to query updating request")
 	}
 
+	return nil
+}
+
+func (repo *PostgreTaskRepository) deleteConnectionBetweenTaskAndRow(ctx context.Context, taskID int) error {
+	rows, err := repo.Pool.Query(ctx, "delete from rows_tasks where task_id = $1::int", taskID)
+	if err != nil {
+		return errors.Wrap(err, "Unable to delete connection between row and id")
+	}
+	rows.Close()
 	return nil
 }
 
@@ -193,4 +200,30 @@ func (repo *PostgreTaskRepository) GetTasksBoardID(ctx context.Context, taskID i
 	}
 
 	return boardID, nil
+}
+
+func (repo *PostgreTaskRepository) connectRowAndTask(ctx context.Context, taskID, rowID int) error {
+	rows, err := repo.Pool.Query(ctx, "insert into rows_tasks (row_id, task_id) values ($1::int, $2::int)", rowID, taskID)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to link row and task")
+	}
+
+	rows.Close()
+
+	return nil
+}
+
+func (repo *PostgreTaskRepository) ChangeRow(ctx context.Context, taskID int, newRowID int) error {
+	err := repo.deleteConnectionBetweenTaskAndRow(ctx, taskID)
+	if err != nil {
+		return errors.Wrap(err, "Unable to delete outdated connections between row and task")
+	}
+
+	err = repo.connectRowAndTask(ctx, taskID, newRowID)
+	if err != nil {
+		return errors.Wrap(err, "Unable to change row")
+	}
+
+	return nil
 }
