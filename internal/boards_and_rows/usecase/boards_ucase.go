@@ -8,9 +8,10 @@ import (
 type boardsUsecase struct {
 	boardsRepo domain.BoardRepository
 	userUC     domain.UserUsecase
+	taskUC     domain.TaskUsecase
 }
 
-func NewBoardsUsecase(repo domain.BoardRepository, userUsercase domain.UserUsecase) domain.BoardUsecase {
+func NewBoardsUsecase(repo domain.BoardRepository, userUsercase domain.UserUsecase, taskUsercase domain.TaskUsecase) domain.BoardUsecase {
 	return &boardsUsecase{
 		boardsRepo: repo,
 		userUC:     userUsercase,

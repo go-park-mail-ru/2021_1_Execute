@@ -64,7 +64,66 @@ func (uc *boardsUsecase) getFullRowInfo(ctx context.Context, row domain.Row) (do
 
 func (uc *boardsUsecase) DeleteRow(ctx context.Context, rowID int, requesterID int) error {
 	err := uc.checkRights(ctx, rowID, requesterID)
+	if err != nil {
+		return err
+	}
 
 	err = uc.boardsRepo.DeleteRow(ctx, rowID)
 	return domain.DBErrorToServerError(err)
+}
+
+func (uc *boardsUsecase) MoveRow(ctx context.Context, boardID int, rowID int, newPosition int, requesterID int) error {
+	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	if requesterID != ownerID {
+		return domain.ForbiddenError
+	}
+
+	rows, err := uc.boardsRepo.GetBoardsRows(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	if newPosition >= len(rows) {
+		newPosition = len(rows) - 1
+	}
+
+	currentRow, err := uc.boardsRepo.GetRow(ctx, rowID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	for _, row := range rows {
+		if row.Position <= currentRow.Position || row.Position > newPosition {
+			continue
+		}
+		row.Position -= 1
+		err = uc.boardsRepo.UpdateRow(ctx, row)
+		if err != nil {
+			return domain.DBErrorToServerError(err)
+		}
+	}
+
+	currentRow.Position = newPosition
+	err = uc.boardsRepo.UpdateRow(ctx, currentRow)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+	return nil
+}
+
+func (uc *boardsUsecase) UpdateRow(ctx context.Context, row domain.Row, requesterID int) error {
+	err := uc.checkRights(ctx, row.ID, requesterID)
+	if err != nil {
+		return err
+	}
+
+	err = uc.boardsRepo.UpdateRow(ctx, row)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+	return nil
 }

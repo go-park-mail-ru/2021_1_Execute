@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
@@ -121,4 +122,69 @@ func (handler *BoardsHandler) DeleteRow(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusOK)
+}
+
+type patchRowRequest struct {
+	Name      string     `json:"name,omitempty" valid:"name"`
+	CarryOver moveObject `json:"carry_over,omitempty"`
+	Move      moveObject `json:"move,omitempty"`
+}
+
+type moveObject struct {
+	CardID      int `json:"card_id"`
+	NewPosition int `json:"new_position"`
+}
+
+func (handler *BoardsHandler) PatchRow(c echo.Context) error {
+	input := new(patchRowRequest)
+	input.CarryOver = moveObject{-1, -1}
+	input.Move = moveObject{-1, -1}
+	if err := c.Bind(input); err != nil {
+		return errors.Wrap(domain.BadRequestError, err.Error())
+	}
+
+	_, err := govalidator.ValidateStruct(input)
+	if err != nil {
+		return errors.Wrap(domain.BadRequestError, err.Error())
+	}
+
+	rowID, err := strconv.Atoi(c.Param("id"))
+	if err != nil || rowID < 0 {
+		return domain.IDFormatError
+	}
+
+	userID, err := handler.sessionHD.IsAuthorized(c)
+	if err != nil {
+		return err
+	}
+
+	if input.Name != "" {
+		newRow := domain.Row{
+			ID:   rowID,
+			Name: input.Name,
+		}
+		err = handler.boardUC.UpdateRow(context.Background(), newRow, userID)
+		if err != nil {
+			return err
+		}
+	}
+	if input.Move.NewPosition >= 0 || input.Move.CardID >= 0 {
+		if !(input.Move.NewPosition >= 0 && input.Move.CardID >= 0) {
+			return errors.Wrap(domain.BadRequestError, "Need new position and ID")
+		}
+		err = handler.taskUC.MoveTask(context.Background(), input.Move.CardID, input.Move.NewPosition, userID)
+		if err != nil {
+			return err
+		}
+	}
+	if input.CarryOver.NewPosition >= 0 || input.CarryOver.CardID >= 0 {
+		if !(input.CarryOver.NewPosition >= 0 && input.CarryOver.CardID >= 0) {
+			return errors.Wrap(domain.BadRequestError, "Need new position and ID")
+		}
+		err = handler.taskUC.CarryOverTask(context.Background(), input.CarryOver.CardID, input.CarryOver.NewPosition, input.CarryOver.NewPosition, userID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

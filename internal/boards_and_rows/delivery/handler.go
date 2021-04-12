@@ -9,12 +9,14 @@ import (
 type BoardsHandler struct {
 	boardUC   domain.BoardUsecase
 	sessionHD domain.SessionHandler
+	taskUC    domain.TaskUsecase
 }
 
-func NewBoardsHandler(e *echo.Echo, boardUC domain.BoardUsecase, sessionHD domain.SessionHandler) {
+func NewBoardsHandler(e *echo.Echo, boardUC domain.BoardUsecase, sessionHD domain.SessionHandler, taskUC domain.TaskUsecase) {
 	handler := &BoardsHandler{
 		boardUC:   boardUC,
 		sessionHD: sessionHD,
+		taskUC:    taskUC,
 	}
 
 	e.GET("api/boards", handler.GetUsersBoards)
