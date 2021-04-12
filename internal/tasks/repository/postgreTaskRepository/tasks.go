@@ -1,4 +1,4 @@
-package postgreBoardRepository
+package postgreTaskRepository
 
 import (
 	"2021_1_Execute/internal/domain"
@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (repo *PostgreBoardRepository) AddTask(ctx context.Context, task domain.Task, rowID int) (int, error) {
+func (repo *PostgreTaskRepository) AddTask(ctx context.Context, task domain.Task, rowID int) (int, error) {
 	rows, err := repo.Pool.Query(ctx, "insert into tasks (name, description, position) values ($1::text, $2::text, $3::int) returning id", task.Name, task.Description, task.Position)
 
 	if err != nil {
@@ -40,7 +40,7 @@ func (repo *PostgreBoardRepository) AddTask(ctx context.Context, task domain.Tas
 	return taskID, nil
 }
 
-func (repo *PostgreBoardRepository) UpdateTask(ctx context.Context, task domain.Task) error {
+func (repo *PostgreTaskRepository) UpdateTask(ctx context.Context, task domain.Task) error {
 	outdatedTask, err := repo.GetTask(ctx, task.ID)
 
 	if err != nil {
@@ -84,7 +84,7 @@ func createUpdateTaskObject(outdatedTask, newTask domain.Task) domain.Task {
 	return result
 }
 
-func (repo *PostgreBoardRepository) updateTaskQuery(ctx context.Context, task domain.Task) error {
+func (repo *PostgreTaskRepository) updateTaskQuery(ctx context.Context, task domain.Task) error {
 	rows, err := repo.Pool.Query(ctx, "update tasks set name = $1::text, description = $2::text, position = $3::int where id = $4::int",
 		task.Name,
 		task.Description,
@@ -101,36 +101,7 @@ func (repo *PostgreBoardRepository) updateTaskQuery(ctx context.Context, task do
 	return nil
 }
 
-func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int) ([]domain.Task, error) {
-	rows, err := repo.Pool.Query(ctx,
-		`select tasks.id, tasks.name, tasks.description, task.position
-	from tasks
-	inner join rows_tasks as rt
-	on rt.row_id = $1::int and rt.task_id = tasks.id`, rowID)
-
-	if err != nil {
-		return []domain.Task{}, errors.Wrap(err, "Unable to get row's tasks")
-	}
-
-	var tasks []domain.Task
-
-	for rows.Next() {
-		var task domain.Task
-		err = rows.Scan(&task.ID, &task.Name, &task.Description, &task.Position)
-
-		if err != nil {
-			return []domain.Task{}, errors.Wrap(err, "Unable to get task")
-		}
-
-		tasks = append(tasks, task)
-	}
-
-	rows.Close()
-
-	return tasks, nil
-}
-
-func (repo *PostgreBoardRepository) GetTask(ctx context.Context, taskID int) (domain.Task, error) {
+func (repo *PostgreTaskRepository) GetTask(ctx context.Context, taskID int) (domain.Task, error) {
 	rows, err := repo.Pool.Query(ctx, "select id, name, description, position from tasks where id = $1::int", taskID)
 
 	if err != nil {
@@ -153,10 +124,13 @@ func (repo *PostgreBoardRepository) GetTask(ctx context.Context, taskID int) (do
 	return task, nil
 }
 
-func (repo *PostgreBoardRepository) DeleteTask(ctx context.Context, taskID int) error {
-	task, err := repo.GetRow(ctx, taskID)
+func (repo *PostgreTaskRepository) DeleteTask(ctx context.Context, taskID int) error {
+	task, err := repo.GetTask(ctx, taskID)
 	if err != nil {
 		return err
+	}
+	if task.Name == "" {
+		return domain.DBNotFoundError
 	}
 
 	rows, err := repo.Pool.Query(ctx, "delete from tasks where id = $1::int", task.ID)

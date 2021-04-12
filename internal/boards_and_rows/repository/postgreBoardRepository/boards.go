@@ -161,7 +161,7 @@ func (repo *PostgreBoardRepository) DeleteBoard(ctx context.Context, boardID int
 	return nil
 }
 
-func (repo *PostgreBoardRepository) GetBoardOwner(ctx context.Context, boardID int) (int, error) {
+func (repo *PostgreBoardRepository) GetBoardsOwner(ctx context.Context, boardID int) (int, error) {
 	rows, err := repo.Pool.Query(ctx, "select user_id from owners where board_id = $1::int", boardID)
 	if err != nil {
 		return -1, errors.Wrap(err, "Unable to get owner")
@@ -179,4 +179,27 @@ func (repo *PostgreBoardRepository) GetBoardOwner(ctx context.Context, boardID i
 	rows.Close()
 
 	return owner, nil
+}
+
+func (repo *PostgreBoardRepository) GetRowsBoardID(ctx context.Context, rowID int) (int, error) {
+	rows, err := repo.Pool.Query(ctx, "select board_id from boards_rows where row_id = $1::int", rowID)
+
+	if err != nil {
+		return -1, errors.Wrap(err, "Unable to get board id")
+	}
+
+	var boardID int = -1
+
+	for rows.Next() {
+		err = rows.Scan(&boardID)
+		if err != nil {
+			return -1, errors.Wrap(err, "Unable to read board id")
+		}
+	}
+
+	if boardID == -1 {
+		return -1, domain.DBNotFoundError
+	}
+
+	return boardID, nil
 }

@@ -160,3 +160,32 @@ func (repo *PostgreBoardRepository) DeleteRow(ctx context.Context, rowID int) er
 
 	return nil
 }
+
+func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int) ([]domain.Task, error) {
+	rows, err := repo.Pool.Query(ctx,
+		`select tasks.id, tasks.name, tasks.description, task.position
+	from tasks
+	inner join rows_tasks as rt
+	on rt.row_id = $1::int and rt.task_id = tasks.id`, rowID)
+
+	if err != nil {
+		return []domain.Task{}, errors.Wrap(err, "Unable to get row's tasks")
+	}
+
+	var tasks []domain.Task
+
+	for rows.Next() {
+		var task domain.Task
+		err = rows.Scan(&task.ID, &task.Name, &task.Description, &task.Position)
+
+		if err != nil {
+			return []domain.Task{}, errors.Wrap(err, "Unable to get task")
+		}
+
+		tasks = append(tasks, task)
+	}
+
+	rows.Close()
+
+	return tasks, nil
+}
