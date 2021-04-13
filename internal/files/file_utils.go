@@ -13,6 +13,7 @@ import (
 
 const destinationFolder = "/static/"
 const localDestinationFolder = "../static/"
+const removePrefix = ".."
 
 type fileUtil struct {
 }
@@ -29,7 +30,7 @@ func (fileUtil *fileUtil) GetLocalDestinationFolder() string {
 }
 
 func (fileUtil *fileUtil) DeleteFile(name string) error {
-	err := os.Remove(localDestinationFolder + name)
+	err := os.Remove(removePrefix + name)
 	if err != nil {
 		return errors.Wrap(domain.InternalServerError, "Error while deleting file: "+err.Error())
 	}

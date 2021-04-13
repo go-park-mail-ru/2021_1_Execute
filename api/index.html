@@ -690,7 +690,7 @@
     var defs = {}
             defs["AccessTypes"] = {
   "type" : "string",
-  "enum" : [ "Guest", "Member", "Admin", "Owner" ]
+  "enum" : [ "guest", "member", "admin", "owner" ]
 };
             defs["AllOfBoardBody_usersAdminsItems"] = {
   "allOf" : [ {
@@ -705,11 +705,6 @@
             defs["AllOfBoardBody_usersOwner"] = {
   "allOf" : [ {
     "$ref" : "#/components/schemas/UserOuter"
-  } ]
-};
-            defs["AllOfBoard_rowsRow"] = {
-  "allOf" : [ {
-    "$ref" : "#/components/schemas/Row"
   } ]
 };
             defs["AllOfGetBoardByIdResponseBoard"] = {
@@ -732,11 +727,6 @@
     "$ref" : "#/components/schemas/Task"
   } ]
 };
-            defs["AllOfRowTasksItems"] = {
-  "allOf" : [ {
-    "$ref" : "#/components/schemas/TaskOuter"
-  } ]
-};
             defs["AllOfTaskUsersItems"] = {
   "allOf" : [ {
     "$ref" : "#/components/schemas/UserOuter"
@@ -749,10 +739,7 @@
     "type" : "object",
     "properties" : {
       "rows" : {
-        "type" : "array",
-        "items" : {
-          "$ref" : "#/components/schemas/Board_rows"
-        }
+        "$ref" : "#/components/schemas/Board_rows"
       }
     }
   } ]
@@ -829,16 +816,8 @@
             defs["Board_rows"] = {
   "type" : "object",
   "properties" : {
-    "id" : {
-      "type" : "integer"
-    },
-    "position" : {
-      "type" : "integer"
-    },
-    "row" : {
-      "allOf" : [ {
-        "$ref" : "#/components/schemas/Row"
-      } ]
+    "0" : {
+      "$ref" : "#/components/schemas/Row"
     }
   }
 };
@@ -955,22 +934,11 @@
       "$ref" : "#/components/schemas/PatchRowRequest_carry_over"
     },
     "move" : {
-      "$ref" : "#/components/schemas/PatchRowRequest_move"
+      "$ref" : "#/components/schemas/PatchRowRequest_carry_over"
     }
   }
 };
             defs["PatchRowRequest_carry_over"] = {
-  "type" : "object",
-  "properties" : {
-    "from_row" : {
-      "type" : "integer"
-    },
-    "new_position" : {
-      "type" : "integer"
-    }
-  }
-};
-            defs["PatchRowRequest_move"] = {
   "type" : "object",
   "properties" : {
     "card_id" : {
@@ -1062,16 +1030,25 @@
             defs["Row"] = {
   "type" : "object",
   "properties" : {
+    "id" : {
+      "type" : "integer"
+    },
+    "position" : {
+      "type" : "integer"
+    },
     "name" : {
       "type" : "string"
     },
     "tasks" : {
-      "type" : "array",
-      "items" : {
-        "allOf" : [ {
-          "$ref" : "#/components/schemas/TaskOuter"
-        } ]
-      }
+      "$ref" : "#/components/schemas/Row_tasks"
+    }
+  }
+};
+            defs["Row_tasks"] = {
+  "type" : "object",
+  "properties" : {
+    "0" : {
+      "$ref" : "#/components/schemas/TaskOuter"
     }
   }
 };
@@ -1179,6 +1156,9 @@
                       <a href="#api-Tasks-apiTasksPost">apiTasksPost</a>
                     </li>
                   <li class="nav-header" data-group="Users"><a href="#api-Users">API Methods - Users</a></li>
+                    <li data-group="Users" data-name="apiAuthorizedGet" class="">
+                      <a href="#api-Users-apiAuthorizedGet">apiAuthorizedGet</a>
+                    </li>
                     <li data-group="Users" data-name="apiDownloadGet" class="">
                       <a href="#api-Users-apiDownloadGet">apiDownloadGet</a>
                     </li>
@@ -1191,11 +1171,11 @@
                     <li data-group="Users" data-name="apiUploadPost" class="">
                       <a href="#api-Users-apiUploadPost">apiUploadPost</a>
                     </li>
-                    <li data-group="Users" data-name="apiUsersDelete" class="">
-                      <a href="#api-Users-apiUsersDelete">apiUsersDelete</a>
-                    </li>
                     <li data-group="Users" data-name="apiUsersGet" class="">
                       <a href="#api-Users-apiUsersGet">apiUsersGet</a>
+                    </li>
+                    <li data-group="Users" data-name="apiUsersIdDelete" class="">
+                      <a href="#api-Users-apiUsersIdDelete">apiUsersIdDelete</a>
                     </li>
                     <li data-group="Users" data-name="apiUsersIdGet" class="">
                       <a href="#api-Users-apiUsersIdGet">apiUsersIdGet</a>
@@ -1221,8 +1201,7 @@
             <h2 id="welcome-to-apidoc">API and SDK Documentation</h2>
               <div class="app-desc">Version: 0.1.0</div>
             <hr>
-            <div><a href="https://app.swaggerhub.com/apis-docs/MKondakova/backend_trello/0.1.0">Более красивая схема</a></div>
-
+            <div><a href="https://app.swaggerhub.com/apis-docs/MKondakova/backend_trello/0.1.0">Более красивая версия тут</a></div>
           </div>
         </div>
         <div id="sections">
@@ -2071,6 +2050,14 @@ except ApiException as e:
                             </div>
 
                             <h3> Status: 401 - Неавторизованный запрос </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 403 - Недостаточно прав </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>
@@ -3361,7 +3348,7 @@ except ApiException as e:
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">Изменение столбца</p>
+                        <p class="marked">Изменение столбца. При carry over запрос посылается на id нового столбца.</p>
                         <p></p>
                         <br />
                         <pre class="prettyprint language-html prettyprinted" data-type="patch"><code><span class="pln">/api/rows/{id}</span></code></pre>
@@ -5274,6 +5261,229 @@ except ApiException as e:
                   </section>
                 <section id="api-Users">
                   <h1>Users</h1>
+                    <div id="api-Users-apiAuthorizedGet">
+                      <article id="api-Users-apiAuthorizedGet-0" data-group="User" data-name="apiAuthorizedGet" data-version="0">
+                        <div class="pull-left">
+                          <h1>apiAuthorizedGet</h1>
+                          <p></p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">Запрос на подтверждение авторизованности</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/api/authorized</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Users-apiAuthorizedGet-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Users-apiAuthorizedGet-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Users-apiAuthorizedGet-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Users-apiAuthorizedGet-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Users-apiAuthorizedGet-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Users-apiAuthorizedGet-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Users-apiAuthorizedGet-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Users-apiAuthorizedGet-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Users-apiAuthorizedGet-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Users-apiAuthorizedGet-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Users-apiAuthorizedGet-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Users-apiAuthorizedGet-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+ -H "Authorization: Bearer [[accessToken]]"\
+"//api/authorized"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.UsersApi;
+
+import java.io.File;
+import java.util.*;
+
+public class UsersApiExample {
+
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+
+        UsersApi apiInstance = new UsersApi();
+        try {
+            apiInstance.apiAuthorizedGet();
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsersApi#apiAuthorizedGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.UsersApi;
+
+public class UsersApiExample {
+
+    public static void main(String[] args) {
+        UsersApi apiInstance = new UsersApi();
+        try {
+            apiInstance.apiAuthorizedGet();
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsersApi#apiAuthorizedGet");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
+
+UsersApi *apiInstance = [[UsersApi alloc] init];
+
+[apiInstance apiAuthorizedGetWithCompletionHandler: 
+              ^(NSError* error) {
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
+var defaultClient = Trello.ApiClient.instance;
+
+
+var api = new Trello.UsersApi()
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+api.apiAuthorizedGet(callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class apiAuthorizedGetExample
+    {
+        public void main()
+        {
+
+
+            var apiInstance = new UsersApi();
+
+            try
+            {
+                apiInstance.apiAuthorizedGet();
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling UsersApi.apiAuthorizedGet: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+
+$api_instance = new Swagger\Client\ApiUsersApi();
+
+try {
+    $api_instance->apiAuthorizedGet();
+} catch (Exception $e) {
+    echo 'Exception when calling UsersApi->apiAuthorizedGet: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::UsersApi;
+
+
+my $api_instance = WWW::SwaggerClient::UsersApi->new();
+
+eval { 
+    $api_instance->apiAuthorizedGet();
+};
+if ($@) {
+    warn "Exception when calling UsersApi->apiAuthorizedGet: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiAuthorizedGet-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+
+# create an instance of the API class
+api_instance = swagger_client.UsersApi()
+
+try: 
+    api_instance.api_authorized_get()
+except ApiException as e:
+    print("Exception when calling UsersApi->apiAuthorizedGet: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Вы авторизованы </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 401 - Вы не авторизованы </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
                     <div id="api-Users-apiDownloadGet">
                       <article id="api-Users-apiDownloadGet-0" data-group="User" data-name="apiDownloadGet" data-version="0">
                         <div class="pull-left">
@@ -6333,237 +6543,6 @@ except ApiException as e:
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Users-apiUsersDelete">
-                      <article id="api-Users-apiUsersDelete-0" data-group="User" data-name="apiUsersDelete" data-version="0">
-                        <div class="pull-left">
-                          <h1>apiUsersDelete</h1>
-                          <p></p>
-                        </div>
-                        <div class="pull-right"></div>
-                        <div class="clearfix"></div>
-                        <p></p>
-                        <p class="marked">Удаление пользователя</p>
-                        <p></p>
-                        <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/api/users</span></code></pre>
-                        <p>
-                          <h3>Usage and SDK Samples</h3>
-                        </p>
-                        <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Users-apiUsersDelete-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Users-apiUsersDelete-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Users-apiUsersDelete-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Users-apiUsersDelete-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Users-apiUsersDelete-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Users-apiUsersDelete-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Users-apiUsersDelete-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Users-apiUsersDelete-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Users-apiUsersDelete-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Users-apiUsersDelete-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Users-apiUsersDelete-0-python">Python</a></li>
-                        </ul>
-
-                        <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Users-apiUsersDelete-0-curl">
-                           <pre class="prettyprint"><code class="language-bsh">curl -X DELETE\
- -H "Authorization: Bearer [[accessToken]]"\
-"//api/users"</code></pre>
-                          </div>
-                          <div class="tab-pane" id="examples-Users-apiUsersDelete-0-java">
-                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
-import io.swagger.client.auth.*;
-import io.swagger.client.model.*;
-import io.swagger.client.api.UsersApi;
-
-import java.io.File;
-import java.util.*;
-
-public class UsersApiExample {
-
-    public static void main(String[] args) {
-        ApiClient defaultClient = Configuration.getDefaultApiClient();
-
-
-        UsersApi apiInstance = new UsersApi();
-        try {
-            apiInstance.apiUsersDelete();
-        } catch (ApiException e) {
-            System.err.println("Exception when calling UsersApi#apiUsersDelete");
-            e.printStackTrace();
-        }
-    }
-}</code></pre>
-                          </div>
-
-                          <div class="tab-pane" id="examples-Users-apiUsersDelete-0-android">
-                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.UsersApi;
-
-public class UsersApiExample {
-
-    public static void main(String[] args) {
-        UsersApi apiInstance = new UsersApi();
-        try {
-            apiInstance.apiUsersDelete();
-        } catch (ApiException e) {
-            System.err.println("Exception when calling UsersApi#apiUsersDelete");
-            e.printStackTrace();
-        }
-    }
-}</code></pre>
-                          </div>
-  <!--
-  <div class="tab-pane" id="examples-Users-apiUsersDelete-0-groovy">
-  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
-  </div> -->
-                            <div class="tab-pane" id="examples-Users-apiUsersDelete-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-
-UsersApi *apiInstance = [[UsersApi alloc] init];
-
-[apiInstance apiUsersDeleteWithCompletionHandler: 
-              ^(NSError* error) {
-                            if (error) {
-                                NSLog(@"Error: %@", error);
-                            }
-                        }];
-</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-Users-apiUsersDelete-0-javascript">
-                              <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
-var defaultClient = Trello.ApiClient.instance;
-
-
-var api = new Trello.UsersApi()
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully.');
-  }
-};
-api.apiUsersDelete(callback);
-</code></pre>
-                            </div>
-
-                            <!--<div class="tab-pane" id="examples-Users-apiUsersDelete-0-angular">
-              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
-            </div>-->
-                            <div class="tab-pane" id="examples-Users-apiUsersDelete-0-csharp">
-                              <pre class="prettyprint"><code class="language-cs">using System;
-using System.Diagnostics;
-using IO.Swagger.Api;
-using IO.Swagger.Client;
-using IO.Swagger.Model;
-
-namespace Example
-{
-    public class apiUsersDeleteExample
-    {
-        public void main()
-        {
-
-
-            var apiInstance = new UsersApi();
-
-            try
-            {
-                apiInstance.apiUsersDelete();
-            }
-            catch (Exception e)
-            {
-                Debug.Print("Exception when calling UsersApi.apiUsersDelete: " + e.Message );
-            }
-        }
-    }
-}
-</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-Users-apiUsersDelete-0-php">
-                              <pre class="prettyprint"><code class="language-php"><&#63;php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-
-$api_instance = new Swagger\Client\ApiUsersApi();
-
-try {
-    $api_instance->apiUsersDelete();
-} catch (Exception $e) {
-    echo 'Exception when calling UsersApi->apiUsersDelete: ', $e->getMessage(), PHP_EOL;
-}
-?></code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-Users-apiUsersDelete-0-perl">
-                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
-use WWW::SwaggerClient::Configuration;
-use WWW::SwaggerClient::UsersApi;
-
-
-my $api_instance = WWW::SwaggerClient::UsersApi->new();
-
-eval { 
-    $api_instance->apiUsersDelete();
-};
-if ($@) {
-    warn "Exception when calling UsersApi->apiUsersDelete: $@\n";
-}</code></pre>
-                            </div>
-
-                            <div class="tab-pane" id="examples-Users-apiUsersDelete-0-python">
-                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
-import time
-import swagger_client
-from swagger_client.rest import ApiException
-from pprint import pprint
-
-
-# create an instance of the API class
-api_instance = swagger_client.UsersApi()
-
-try: 
-    api_instance.api_users_delete()
-except ApiException as e:
-    print("Exception when calling UsersApi->apiUsersDelete: %s\n" % e)</code></pre>
-                            </div>
-                          </div>
-
-                          <h2>Parameters</h2>
-
-
-
-
-
-
-                          <h2>Responses</h2>
-                            <h3> Status: 200 - Информация получена </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                            </div>
-
-                            <h3> Status: 403 - Недостаточно прав </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                            </div>
-
-                            <h3> Status: 404 - Пользователь не найден </h3>
-
-                            <ul class="nav nav-tabs nav-tabs-examples" >
-                            </ul>
-
-                            <div class="tab-content" style='margin-bottom: 10px;'>
-                            </div>
-
-                        </article>
-                      </div>
-                      <hr>
                     <div id="api-Users-apiUsersGet">
                       <article id="api-Users-apiUsersGet-0" data-group="User" data-name="apiUsersGet" data-version="0">
                         <div class="pull-left">
@@ -6827,6 +6806,275 @@ except ApiException as e:
                             </div>
 
                             <h3> Status: 401 - Неавторизованный запрос </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 404 - Пользователь не найден </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Users-apiUsersIdDelete">
+                      <article id="api-Users-apiUsersIdDelete-0" data-group="User" data-name="apiUsersIdDelete" data-version="0">
+                        <div class="pull-left">
+                          <h1>apiUsersIdDelete</h1>
+                          <p></p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">Удаление пользователя</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/api/users/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Users-apiUsersIdDelete-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdDelete-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdDelete-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Users-apiUsersIdDelete-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Users-apiUsersIdDelete-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdDelete-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Users-apiUsersIdDelete-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Users-apiUsersIdDelete-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdDelete-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdDelete-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Users-apiUsersIdDelete-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Users-apiUsersIdDelete-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X DELETE\
+ -H "Authorization: Bearer [[accessToken]]"\
+"//api/users/{id}"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.UsersApi;
+
+import java.io.File;
+import java.util.*;
+
+public class UsersApiExample {
+
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+
+        UsersApi apiInstance = new UsersApi();
+        Integer id = 56; // Integer | ID пользователя
+        try {
+            apiInstance.apiUsersIdDelete(id);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsersApi#apiUsersIdDelete");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.UsersApi;
+
+public class UsersApiExample {
+
+    public static void main(String[] args) {
+        UsersApi apiInstance = new UsersApi();
+        Integer id = 56; // Integer | ID пользователя
+        try {
+            apiInstance.apiUsersIdDelete(id);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling UsersApi#apiUsersIdDelete");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
+Integer *id = 56; // ID пользователя
+
+UsersApi *apiInstance = [[UsersApi alloc] init];
+
+[apiInstance apiUsersIdDeleteWith:id
+              completionHandler: ^(NSError* error) {
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var Trello = require('__trello');
+var defaultClient = Trello.ApiClient.instance;
+
+
+var api = new Trello.UsersApi()
+var id = 56; // {{Integer}} ID пользователя
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+api.apiUsersIdDelete(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class apiUsersIdDeleteExample
+    {
+        public void main()
+        {
+
+
+            var apiInstance = new UsersApi();
+            var id = 56;  // Integer | ID пользователя
+
+            try
+            {
+                apiInstance.apiUsersIdDelete(id);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling UsersApi.apiUsersIdDelete: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+
+$api_instance = new Swagger\Client\ApiUsersApi();
+$id = 56; // Integer | ID пользователя
+
+try {
+    $api_instance->apiUsersIdDelete($id);
+} catch (Exception $e) {
+    echo 'Exception when calling UsersApi->apiUsersIdDelete: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::UsersApi;
+
+
+my $api_instance = WWW::SwaggerClient::UsersApi->new();
+my $id = 56; # Integer | ID пользователя
+
+eval { 
+    $api_instance->apiUsersIdDelete(id => $id);
+};
+if ($@) {
+    warn "Exception when calling UsersApi->apiUsersIdDelete: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Users-apiUsersIdDelete-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+
+# create an instance of the API class
+api_instance = swagger_client.UsersApi()
+id = 56 # Integer | ID пользователя
+
+try: 
+    api_instance.api_users_id_delete(id)
+except ApiException as e:
+    print("Exception when calling UsersApi->apiUsersIdDelete: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_apiUsersIdDelete_id">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      Integer
+                                                  </span>
+                                  
+                                                      <div class="inner description">
+                                                          ID пользователя
+                                                      </div>
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - Пользователь удален </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 403 - Недостаточно прав </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>

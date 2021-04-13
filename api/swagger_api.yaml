@@ -66,6 +66,16 @@ paths:
           description: Выход прошел успешно
         401:
           description: Неавторизованный запрос
+  /api/authorized:
+    get:
+      tags:
+        - Users
+      description: Запрос на подтверждение авторизованности
+      responses:
+        200:
+          description: Вы авторизованы
+        401:
+          description: Вы не авторизованы
   /api/users:
     post:
       tags:
@@ -116,17 +126,7 @@ paths:
           description: Пользователь не найден
         400:
           description: Запрос сформирован неверно
-    delete:
-      tags:
-        - Users
-      description: Удаление пользователя
-      responses:
-        200:
-          description: Информация получена
-        404:
-          description: Пользователь не найден
-        403:
-          description: Недостаточно прав
+    
   /api/users/{id}:
     parameters:
       - name: id
@@ -150,6 +150,17 @@ paths:
           description: Неавторизованный запрос
         404:
           description: Пользователь не найден
+    delete:
+      tags:
+        - Users
+      description: Удаление пользователя
+      responses:
+        200:
+          description: Пользователь удален
+        404:
+          description: Пользователь не найден
+        403:
+          description: Недостаточно прав
           
   /api/boards:
     get:
@@ -208,6 +219,8 @@ paths:
           description: Неавторизованный запрос
         404:
           description: Доска не найдена
+        403:
+          description: Недостаточно прав
     patch:
       tags:
         - Boards
@@ -286,7 +299,7 @@ paths:
     patch:
       tags:
         - Rows
-      description: Изменение столбца
+      description: Изменение столбца. При carry over запрос посылается на id нового столбца.
       requestBody:
         content:
           application/json:
@@ -520,8 +533,7 @@ components:
         carry_over:
           type: object
           properties:
-            #id исходного столбца 
-            from_row:
+            card_id:
               type: integer
             new_position:
               type: integer
@@ -542,17 +554,10 @@ components:
         - type: object
           properties:
             rows:
-              type: array
-              items:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  position:
-                    type: integer
-                  row:
-                    allOf:
-                      - $ref: "#/components/schemas/Row"
+              type: object
+              properties:
+                0:
+                  $ref: "#/components/schemas/Row"
     BoardBody:
       type: object
       properties:
@@ -585,13 +590,17 @@ components:
     Row:
       type: object
       properties:
+        id:
+          type: integer
+        position:
+          type: integer
         name:
           type: string
         tasks:
-          type: array
-          items:
-            allOf:
-              - $ref: "#/components/schemas/TaskOuter"
+          type: object
+          properties:
+            0:
+              $ref: "#/components/schemas/TaskOuter"
     BoardOutter:
       type: object
       properties:
@@ -628,7 +637,7 @@ components:
           type: integer
     AccessTypes:
       type: string
-      enum: [Guest, Member, Admin, Owner]
+      enum: [guest, member, admin, owner]
     UserOuter:
       type: object
       properties:
