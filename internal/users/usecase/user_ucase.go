@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/users"
 	"context"
 
 	"github.com/pkg/errors"
@@ -9,27 +10,27 @@ import (
 )
 
 type userUsecase struct {
-	userRepo domain.UserRepository
+	userRepo users.UserRepository
 }
 
-func NewUserUsecase(repo domain.UserRepository) domain.UserUsecase {
+func NewUserUsecase(repo users.UserRepository) users.UserUsecase {
 	return &userUsecase{
 		userRepo: repo,
 	}
 }
 
-func setPassword(user domain.User) (domain.User, error) {
+func setPassword(user users.User) (users.User, error) {
 	passwordHashBytes, err := bcrypt.GenerateFromPassword(
 		[]byte(user.Password), bcrypt.MinCost)
 	if err != nil {
-		return domain.User{}, errors.Wrap(domain.InternalServerError, "Error while hashing:"+err.Error())
+		return users.User{}, errors.Wrap(domain.InternalServerError, "Error while hashing:"+err.Error())
 	}
 
 	user.Password = string(passwordHashBytes)
 	return user, nil
 }
 
-func (uc *userUsecase) Registration(ctx context.Context, user domain.User) (int, error) {
+func (uc *userUsecase) Registration(ctx context.Context, user users.User) (int, error) {
 	user, err := setPassword(user)
 	userId, err := uc.userRepo.AddUser(ctx, user)
 	if err != nil {
@@ -39,7 +40,7 @@ func (uc *userUsecase) Registration(ctx context.Context, user domain.User) (int,
 }
 
 func (uc *userUsecase) UpdateAvatar(ctx context.Context, userID int, path string) error {
-	changedUser := domain.User{
+	changedUser := users.User{
 		ID:     userID,
 		Avatar: path,
 	}
@@ -47,7 +48,7 @@ func (uc *userUsecase) UpdateAvatar(ctx context.Context, userID int, path string
 	return domain.DBErrorToServerError(err)
 }
 
-func (uc *userUsecase) UpdateUser(ctx context.Context, changerID int, changedUser domain.User) error {
+func (uc *userUsecase) UpdateUser(ctx context.Context, changerID int, changedUser users.User) error {
 	var err error
 	if changerID != changedUser.ID {
 		return errors.Wrap(domain.ForbiddenError, "Not enough rights")
@@ -73,12 +74,12 @@ func (uc *userUsecase) DeleteUser(ctx context.Context, changerID int, userID int
 	return domain.DBErrorToServerError(err)
 }
 
-func (uc *userUsecase) GetUserByID(ctx context.Context, userID int) (domain.User, error) {
+func (uc *userUsecase) GetUserByID(ctx context.Context, userID int) (users.User, error) {
 	user, err := uc.userRepo.GetUserByID(ctx, userID)
 	return user, domain.DBErrorToServerError(err)
 }
 
-func (uc *userUsecase) Authentication(ctx context.Context, user domain.User) (int, error) {
+func (uc *userUsecase) Authentication(ctx context.Context, user users.User) (int, error) {
 	userFromBD, err := uc.userRepo.GetUserByEmail(ctx, user.Email)
 	if err != nil {
 		return 0, domain.DBErrorToServerError(err)

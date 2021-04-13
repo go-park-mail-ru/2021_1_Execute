@@ -12,12 +12,12 @@ import (
 
 type FilesHandler struct {
 	userUC    domain.UserUsecase
-	fileUT    domain.FileUtil
+	fileUT    files.FileUtil
 	sessionHD domain.SessionHandler
 }
 
 func NewFilesHandler(e *echo.Echo, userUsecase domain.UserUsecase,
-	fileUtil domain.FileUtil, sessionsHandler domain.SessionHandler) {
+	fileUtil files.FileUtil, sessionsHandler domain.SessionHandler) {
 	handler := &FilesHandler{
 		userUC:    userUsecase,
 		fileUT:    fileUtil,

@@ -2,6 +2,9 @@ package http
 
 import (
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/session"
+	"2021_1_Execute/internal/users"
+	"2021_1_Execute/internal/users/models"
 	"context"
 	"net/http"
 	"strconv"
@@ -11,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+<<<<<<< HEAD
 type GetUserByIdResponse struct {
 	Email     string `json:"email" `
 	Username  string `json:"username"`
@@ -27,12 +31,14 @@ type PatchUserRequest struct {
 	NewPassword string `json:"password,omitempty" valid:"password"`
 }
 
+=======
+>>>>>>> architecture
 type UserHandler struct {
-	userUC    domain.UserUsecase
-	sessionHD domain.SessionHandler
+	userUC    users.UserUsecase
+	sessionHD session.SessionHandler
 }
 
-func NewUserHandler(e *echo.Echo, userUsecase domain.UserUsecase, sessionsHandler domain.SessionHandler) {
+func NewUserHandler(e *echo.Echo, userUsecase users.UserUsecase, sessionsHandler session.SessionHandler) {
 	handler := &UserHandler{
 		userUC:    userUsecase,
 		sessionHD: sessionsHandler,
@@ -45,28 +51,6 @@ func NewUserHandler(e *echo.Echo, userUsecase domain.UserUsecase, sessionsHandle
 	e.POST("/api/users/", handler.Registration)
 	e.DELETE("/api/logout/", handler.Logout)
 	e.GET("/api/authorized/", handler.IsAuthorized)
-}
-func createGetUserByIdBody(user domain.User) GetUserByIdResponse {
-	return GetUserByIdResponse{
-		Email:     user.Email,
-		Username:  user.Username,
-		AvatarURL: user.Avatar,
-	}
-}
-
-func createGetUserByIdResponse(user domain.User) GetUserByIdBody {
-	return GetUserByIdBody{
-		Response: createGetUserByIdBody(user),
-	}
-}
-
-func createUserFromPatchRequest(input *PatchUserRequest) domain.User {
-	return domain.User{
-		Email:    input.NewEmail,
-		Username: input.NewUsername,
-		Password: input.NewPassword,
-		Avatar:   "",
-	}
 }
 
 func (handler *UserHandler) IsAuthorized(c echo.Context) error {
@@ -84,8 +68,8 @@ func (handler *UserHandler) GetCurrentUser(c echo.Context) error {
 	}
 
 	ctx := context.Background()
-	user, err := handler.userUC.GetUserByID(ctx, userID)
-	return c.JSON(http.StatusOK, createGetUserByIdResponse(user))
+	user, err := handler.userUC.GetUserByID(ctx, userId)
+	return c.JSON(http.StatusOK, models.CreateGetUserByIdResponse(user))
 }
 
 func (handler *UserHandler) GetUserByID(c echo.Context) error {
@@ -101,11 +85,11 @@ func (handler *UserHandler) GetUserByID(c echo.Context) error {
 
 	ctx := context.Background()
 	user, err := handler.userUC.GetUserByID(ctx, userID)
-	return c.JSON(http.StatusOK, createGetUserByIdResponse(user))
+	return c.JSON(http.StatusOK, models.CreateGetUserByIdResponse(user))
 }
 
 func (handler *UserHandler) PatchUser(c echo.Context) error {
-	input := new(PatchUserRequest)
+	input := new(models.PatchUserRequest)
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -121,7 +105,7 @@ func (handler *UserHandler) PatchUser(c echo.Context) error {
 	}
 
 	ctx := context.Background()
-	user := createUserFromPatchRequest(input)
+	user := models.CreateUserFromPatchRequest(input)
 	user.ID = userID
 	err = handler.userUC.UpdateUser(ctx, userID, user)
 

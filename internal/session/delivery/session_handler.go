@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/session"
 	"context"
 	"net/http"
 	"time"
@@ -15,10 +16,10 @@ const CookieName = "trello_session"
 const CookieLifeTime = 12 * time.Hour
 
 type sessionHandler struct {
-	sessionRepo domain.SessionsRepository
+	sessionRepo session.SessionsRepository
 }
 
-func NewSessionHandler(repo domain.SessionsRepository) domain.SessionHandler {
+func NewSessionHandler(repo session.SessionsRepository) session.SessionHandler {
 	return &sessionHandler{
 		sessionRepo: repo,
 	}

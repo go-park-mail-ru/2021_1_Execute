@@ -2,6 +2,7 @@ package http
 
 import (
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/users/models"
 	"context"
 	"net/http"
 
@@ -10,38 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type UserLoginRequest struct {
-	Email    string `json:"email" valid:"email"`
-	Password string `json:"password" valid:"password" `
-}
-
-type EntranceResponse struct {
-	ID int `json:"id"`
-}
-
-type UserRegistrationRequest struct {
-	Email    string `json:"email" valid:"email"`
-	Username string `json:"username" valid:"username"`
-	Password string `json:"password" valid:"password" `
-}
-
-func LoginRequestToUser(input *UserLoginRequest) domain.User {
-	return domain.User{
-		Email:    input.Email,
-		Password: input.Password,
-	}
-}
-
-func RegistrationRequestToUser(input *UserRegistrationRequest) domain.User {
-	return domain.User{
-		Email:    input.Email,
-		Password: input.Password,
-		Username: input.Username,
-	}
-}
-
 func (handler *UserHandler) Login(c echo.Context) error {
-	input := new(UserLoginRequest)
+	input := new(models.UserLoginRequest)
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -52,7 +23,7 @@ func (handler *UserHandler) Login(c echo.Context) error {
 	}
 
 	ctx := context.Background()
-	userID, err := handler.userUC.Authentication(ctx, LoginRequestToUser(input))
+	userID, err := handler.userUC.Authentication(ctx, models.LoginRequestToUser(input))
 	if err != nil {
 		return err
 	}
@@ -62,11 +33,11 @@ func (handler *UserHandler) Login(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, &EntranceResponse{ID: userID})
+	return c.JSON(http.StatusOK, &models.EntranceResponse{ID: userID})
 }
 
 func (handler *UserHandler) Registration(c echo.Context) error {
-	input := new(UserRegistrationRequest)
+	input := new(models.UserRegistrationRequest)
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -77,7 +48,7 @@ func (handler *UserHandler) Registration(c echo.Context) error {
 	}
 
 	ctx := context.Background()
-	userID, err := handler.userUC.Registration(ctx, RegistrationRequestToUser(input))
+	userID, err := handler.userUC.Registration(ctx, models.RegistrationRequestToUser(input))
 	if err != nil {
 		return err
 	}
@@ -86,7 +57,7 @@ func (handler *UserHandler) Registration(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, &EntranceResponse{ID: userID})
+	return c.JSON(http.StatusOK, &models.EntranceResponse{ID: userID})
 }
 
 func (handler *UserHandler) Logout(c echo.Context) error {

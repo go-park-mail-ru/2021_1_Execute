@@ -1,4 +1,4 @@
-package domain
+package files
 
 import "mime/multipart"
 
