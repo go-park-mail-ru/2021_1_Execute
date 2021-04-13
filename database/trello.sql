@@ -15,13 +15,14 @@ create table if not exists BOARDS (
 create table if not exists ROWS (
   id serial primary key,
   name text,
-  position integer
+  position integer not null
 );
 
 create table if not exists TASKS (
   id serial primary key,
   name text,
   description text,
+  position integer not null,
   check (name != '')
 );
 
