@@ -23,16 +23,15 @@ func NewBoardsHandler(e *echo.Echo, boardUC boards_and_rows.BoardUsecase,
 		taskUC:    taskUC,
 	}
 
-	e.GET("api/boards", handler.GetUsersBoards)
-	e.POST("api/boards", handler.PostBoard)
+	e.GET("api/boards/", handler.GetUsersBoards)
+	e.POST("api/boards/", handler.PostBoard)
 
-	e.GET("api/boards/:id", handler.GetBoardByID)
-	e.PATCH("api/boards/:id", handler.PatchBoardByID)
-	e.DELETE("api/boards/:id", handler.DeleteBoardByID)
+	e.GET("api/boards/:id/", handler.GetBoardByID)
+	e.PATCH("api/boards/:id/", handler.PatchBoardByID)
+	e.DELETE("api/boards/:id/", handler.DeleteBoardByID)
 
-	e.POST("api/rows", handler.PostRow)
-	e.GET("api/rows/:id", handler.GetRow)
-	e.PATCH("api/rows/:id", handler.PatchRow)
-	e.DELETE("api/rows/:id", handler.DeleteRow)
-
+	e.POST("api/rows/", handler.PostRow)
+	e.GET("api/rows/:id/", handler.GetRow)
+	e.PATCH("api/rows/:id/", handler.PatchRow)
+	e.DELETE("api/rows/:id/", handler.DeleteRow)
 }

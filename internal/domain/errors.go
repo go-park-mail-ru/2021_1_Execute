@@ -70,7 +70,7 @@ func DBErrorToServerError(err error) error {
 
 	switch {
 	case errors.Is(err, DBNotFoundError):
-		return ServerNotFoundError
+		return errors.Wrap(ServerNotFoundError, err.Error())
 	case errors.Is(err, DBConflictError):
 		return errors.Wrap(ServerConflictError, err.Error())
 	default:

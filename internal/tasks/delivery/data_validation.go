@@ -6,7 +6,7 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
-const nameRegexpr = "^([а-яА-Яa-zA-Z0-9!_?]{0,30})$"
+const nameRegexpr = "^([а-яА-Яa-zA-Z0-9][а-яА-Яa-zA-Z0-9!_? ]{0,30})$"
 const descriptionRegexpr = `^([а-яА-Яa-zA-Z0-9][а-яА-Яa-zA-Z0-9 ()?,.!:;'"]*)$`
 
 func init() {

@@ -9,6 +9,7 @@ import (
 )
 
 const PathToInitDBFile = "database/trello.sql"
+const PathToDropDBFile = "database/drop.sql"
 
 func GetPool(username, password, dbname, host string, port int) (*pgxpool.Pool, error) {
 	DBUri := "postgresql://" + username + ":" + password + "@" + host + ":" + strconv.Itoa(port) + "/" + dbname
@@ -32,6 +33,18 @@ func InitDatabase(pool *pgxpool.Pool) error {
 		return err
 	}
 	initComands := string(initFile)
+
+	ctx := context.Background()
+	_, err = pool.Exec(ctx, initComands)
+	return err
+}
+
+func DropDatabase(pool *pgxpool.Pool) error {
+	dropFile, err := ioutil.ReadFile(PathToDropDBFile)
+	if err != nil {
+		return err
+	}
+	initComands := string(dropFile)
 
 	ctx := context.Background()
 	_, err = pool.Exec(ctx, initComands)

@@ -10,7 +10,7 @@ import (
 )
 
 func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row boards_and_rows.Row, boardID int) (int, error) {
-	rows, err := repo.Pool.Query(ctx, "insert into rows (name, position) values ($1::text, $2::text) returning id", row.Name, row.Position)
+	rows, err := repo.Pool.Query(ctx, "insert into rows (name, position) values ($1::text, $2::int) returning id", row.Name, row.Position)
 
 	if err != nil {
 		return -1, errors.Wrap(err, "Unable to insert row")
@@ -167,7 +167,7 @@ func (repo *PostgreBoardRepository) DeleteRow(ctx context.Context, rowID int) er
 
 func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int) ([]tasks.Task, error) {
 	rows, err := repo.Pool.Query(ctx,
-		`select tasks.id, tasks.name, tasks.description, task.position
+		`select tasks.id, tasks.name, tasks.description, tasks.position
 	from tasks
 	inner join rows_tasks as rt
 	on rt.row_id = $1::int and rt.task_id = tasks.id`, rowID)

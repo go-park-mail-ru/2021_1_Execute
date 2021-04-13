@@ -18,7 +18,7 @@ func BoardsToGetResponce(boards []boards_and_rows.Board) GetBoardsResponce {
 	for _, board := range boards {
 		responce = append(responce, getBoardsResponceContent{
 			ID:          board.ID,
-			Access:      "",
+			Access:      "guest",
 			IsStared:    false,
 			Name:        board.Name,
 			Description: board.Description,
@@ -85,7 +85,7 @@ func BoardToGetResponce(board boards_and_rows.FullBoardInfo) GetBoardByIDResponc
 
 	content := getBoardByIDResponceContent{
 		ID:          board.ID,
-		Access:      "",
+		Access:      "guest",
 		IsStared:    false,
 		Name:        board.Name,
 		Description: board.Description,

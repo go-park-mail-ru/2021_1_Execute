@@ -53,9 +53,13 @@ func main() {
 
 	e := echo.New()
 	e.HTTPErrorHandler = func(err error, c echo.Context) {
-		err = domain.GetEchoError(err)
-		e.DefaultHTTPErrorHandler(err, c)
+		echoErr := domain.GetEchoError(err)
+		e.DefaultHTTPErrorHandler(echoErr, c)
 	}
+
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status} err=${error}\n",
+	}))
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     allowOrigins,

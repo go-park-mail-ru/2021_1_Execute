@@ -18,8 +18,8 @@ func NewTasksHandler(e *echo.Echo, sessionHD session.SessionHandler, taskUC task
 		taskUC:    taskUC,
 	}
 
-	e.GET("api/tasks/:id", handler.GetTask)
-	e.POST("api/tasks", handler.PostTask)
-	e.PATCH("api/tasks/:id", handler.PatchTask)
-	e.DELETE("api/tasks/:id", handler.DeleteTask)
+	e.GET("api/tasks/:id/", handler.GetTask)
+	e.POST("api/tasks/", handler.PostTask)
+	e.PATCH("api/tasks/:id/", handler.PatchTask)
+	e.DELETE("api/tasks/:id/", handler.DeleteTask)
 }
