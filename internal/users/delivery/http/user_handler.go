@@ -14,25 +14,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-<<<<<<< HEAD
-type GetUserByIdResponse struct {
-	Email     string `json:"email" `
-	Username  string `json:"username"`
-	AvatarURL string `json:"avatarUrl"`
-}
-
-type GetUserByIdBody struct {
-	Response GetUserByIdResponse `json:"user"`
-}
-
-type PatchUserRequest struct {
-	NewEmail    string `json:"email,omitempty" valid:"email"`
-	NewUsername string `json:"username,omitempty" valid:"username"`
-	NewPassword string `json:"password,omitempty" valid:"password"`
-}
-
-=======
->>>>>>> architecture
 type UserHandler struct {
 	userUC    users.UserUsecase
 	sessionHD session.SessionHandler
@@ -68,7 +49,7 @@ func (handler *UserHandler) GetCurrentUser(c echo.Context) error {
 	}
 
 	ctx := context.Background()
-	user, err := handler.userUC.GetUserByID(ctx, userId)
+	user, err := handler.userUC.GetUserByID(ctx, userID)
 	return c.JSON(http.StatusOK, models.CreateGetUserByIdResponse(user))
 }
 

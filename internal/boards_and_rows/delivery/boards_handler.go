@@ -1,6 +1,8 @@
 package delivery
 
 import (
+	"2021_1_Execute/internal/boards_and_rows"
+	"2021_1_Execute/internal/boards_and_rows/models"
 	"2021_1_Execute/internal/domain"
 	"context"
 	"net/http"
@@ -9,32 +11,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetBoardsResponce struct {
-	Boards []getBoardsResponceContent `json:"boards"`
-}
-type getBoardsResponceContent struct {
-	ID          int    `json:"id"`
-	Access      string `json:"access"`
-	IsStared    bool   `json:"isStared"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-func BoardsToGetResponce(boards []domain.Board) GetBoardsResponce {
-	responce := []getBoardsResponceContent{}
-	for _, board := range boards {
-		responce = append(responce, getBoardsResponceContent{
-			ID:          board.ID,
-			Access:      "",
-			IsStared:    false,
-			Name:        board.Name,
-			Description: board.Description,
-		})
-	}
-	return GetBoardsResponce{
-		Boards: responce,
-	}
-}
 func (handler *BoardsHandler) GetUsersBoards(c echo.Context) error {
 	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
@@ -46,18 +22,11 @@ func (handler *BoardsHandler) GetUsersBoards(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, BoardsToGetResponce(boards))
-}
-
-type PostBoardRequest struct {
-	Name string `json:"name" validate:"name"`
-}
-type PostBoardResponce struct {
-	ID int `json:"id"`
+	return c.JSON(http.StatusOK, models.BoardsToGetResponce(boards))
 }
 
 func (handler *BoardsHandler) PostBoard(c echo.Context) error {
-	input := new(PostBoardRequest)
+	input := new(models.PostBoardRequest)
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -67,13 +36,13 @@ func (handler *BoardsHandler) PostBoard(c echo.Context) error {
 		return err
 	}
 
-	newBoard := domain.Board{Name: input.Name}
+	newBoard := boards_and_rows.Board{Name: input.Name}
 
 	ctx := context.Background()
 	boardID, err := handler.boardUC.AddBoard(ctx, newBoard, userID)
 	if err != nil {
 		return err
 	}
-	c.JSON(http.StatusOK, PostBoardResponce{ID: boardID})
+	c.JSON(http.StatusOK, models.PostBoardResponce{ID: boardID})
 	return nil
 }

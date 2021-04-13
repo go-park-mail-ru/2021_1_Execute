@@ -1,17 +1,18 @@
 package delivery
 
 import (
-	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/session"
+	"2021_1_Execute/internal/tasks"
 
 	"github.com/labstack/echo"
 )
 
 type TasksHandler struct {
-	sessionHD domain.SessionHandler
-	taskUC    domain.TaskUsecase
+	sessionHD session.SessionHandler
+	taskUC    tasks.TaskUsecase
 }
 
-func NewTasksHandler(e *echo.Echo, sessionHD domain.SessionHandler, taskUC domain.TaskUsecase) {
+func NewTasksHandler(e *echo.Echo, sessionHD session.SessionHandler, taskUC tasks.TaskUsecase) {
 	handler := &TasksHandler{
 		sessionHD: sessionHD,
 		taskUC:    taskUC,

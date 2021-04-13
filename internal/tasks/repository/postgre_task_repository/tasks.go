@@ -1,13 +1,14 @@
-package postgreTaskRepository
+package postgre_task_repository
 
 import (
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/tasks"
 	"context"
 
 	"github.com/pkg/errors"
 )
 
-func (repo *PostgreTaskRepository) AddTask(ctx context.Context, task domain.Task, rowID int) (int, error) {
+func (repo *PostgreTaskRepository) AddTask(ctx context.Context, task tasks.Task, rowID int) (int, error) {
 	rows, err := repo.Pool.Query(ctx, "insert into tasks (name, description, position) values ($1::text, $2::text, $3::int) returning id", task.Name, task.Description, task.Position)
 
 	if err != nil {
@@ -38,7 +39,7 @@ func (repo *PostgreTaskRepository) AddTask(ctx context.Context, task domain.Task
 	return taskID, nil
 }
 
-func (repo *PostgreTaskRepository) UpdateTask(ctx context.Context, task domain.Task) error {
+func (repo *PostgreTaskRepository) UpdateTask(ctx context.Context, task tasks.Task) error {
 	outdatedTask, err := repo.GetTask(ctx, task.ID)
 
 	if err != nil {
@@ -65,8 +66,8 @@ func (repo *PostgreTaskRepository) deleteConnectionBetweenTaskAndRow(ctx context
 	return nil
 }
 
-func createUpdateTaskObject(outdatedTask, newTask domain.Task) domain.Task {
-	var result domain.Task
+func createUpdateTaskObject(outdatedTask, newTask tasks.Task) tasks.Task {
+	var result tasks.Task
 
 	result.ID = outdatedTask.ID
 
@@ -91,7 +92,7 @@ func createUpdateTaskObject(outdatedTask, newTask domain.Task) domain.Task {
 	return result
 }
 
-func (repo *PostgreTaskRepository) updateTaskQuery(ctx context.Context, task domain.Task) error {
+func (repo *PostgreTaskRepository) updateTaskQuery(ctx context.Context, task tasks.Task) error {
 	rows, err := repo.Pool.Query(ctx, "update tasks set name = $1::text, description = $2::text, position = $3::int where id = $4::int",
 		task.Name,
 		task.Description,
@@ -108,26 +109,26 @@ func (repo *PostgreTaskRepository) updateTaskQuery(ctx context.Context, task dom
 	return nil
 }
 
-func (repo *PostgreTaskRepository) GetTask(ctx context.Context, taskID int) (domain.Task, error) {
+func (repo *PostgreTaskRepository) GetTask(ctx context.Context, taskID int) (tasks.Task, error) {
 	rows, err := repo.Pool.Query(ctx, "select id, name, description, position from tasks where id = $1::int", taskID)
 
 	if err != nil {
-		return domain.Task{}, errors.Wrap(err, "Unable to get task")
+		return tasks.Task{}, errors.Wrap(err, "Unable to get task")
 	}
 
-	var task domain.Task
+	var task tasks.Task
 
 	for rows.Next() {
 		err = rows.Scan(&task.ID, &task.Name, &task.Description, &task.Position)
 		if err != nil {
-			return domain.Task{}, errors.Wrap(err, "Unable to read task")
+			return tasks.Task{}, errors.Wrap(err, "Unable to read task")
 		}
 	}
 
 	rows.Close()
 
 	if task.Name == "" {
-		return domain.Task{}, domain.DBNotFoundError
+		return tasks.Task{}, domain.DBNotFoundError
 	}
 
 	return task, nil

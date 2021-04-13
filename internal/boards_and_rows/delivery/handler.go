@@ -1,18 +1,22 @@
 package delivery
 
 import (
-	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/boards_and_rows"
+	"2021_1_Execute/internal/session"
+	"2021_1_Execute/internal/tasks"
 
 	"github.com/labstack/echo"
 )
 
 type BoardsHandler struct {
-	boardUC   domain.BoardUsecase
-	sessionHD domain.SessionHandler
-	taskUC    domain.TaskUsecase
+	boardUC   boards_and_rows.BoardUsecase
+	sessionHD session.SessionHandler
+	taskUC    tasks.TaskUsecase
 }
 
-func NewBoardsHandler(e *echo.Echo, boardUC domain.BoardUsecase, sessionHD domain.SessionHandler, taskUC domain.TaskUsecase) {
+func NewBoardsHandler(e *echo.Echo, boardUC boards_and_rows.BoardUsecase,
+	sessionHD session.SessionHandler, taskUC tasks.TaskUsecase) {
+
 	handler := &BoardsHandler{
 		boardUC:   boardUC,
 		sessionHD: sessionHD,

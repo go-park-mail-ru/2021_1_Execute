@@ -1,6 +1,10 @@
-package domain
+package boards_and_rows
 
-import "context"
+import (
+	"2021_1_Execute/internal/tasks"
+	"2021_1_Execute/internal/users"
+	"context"
+)
 
 type Board struct {
 	ID          int    `json:"id"`
@@ -18,14 +22,14 @@ type FullBoardInfo struct {
 	ID          int           `json:"id"`
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
-	Owner       User          `json:"-"`
+	Owner       users.User    `json:"-"`
 	Rows        []FullRowInfo `json:"rows"`
 }
 type FullRowInfo struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Position int    `json:"position"`
-	Tasks    []Task `json:"tasks"`
+	ID       int          `json:"id"`
+	Name     string       `json:"name"`
+	Position int          `json:"position"`
+	Tasks    []tasks.Task `json:"tasks"`
 }
 
 type BoardUsecase interface {
@@ -62,7 +66,7 @@ type BoardRepository interface {
 	GetBoardsOwner(ctx context.Context, boardID int) (int, error)
 
 	GetBoardsRows(ctx context.Context, boardID int) ([]Row, error)
-	GetRowsTasks(ctx context.Context, rowID int) ([]Task, error)
+	GetRowsTasks(ctx context.Context, rowID int) ([]tasks.Task, error)
 
 	GetRowsBoardID(ctx context.Context, rowID int) (int, error)
 }

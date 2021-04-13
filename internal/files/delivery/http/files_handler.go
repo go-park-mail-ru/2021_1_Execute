@@ -2,6 +2,9 @@ package http
 
 import (
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/files"
+	"2021_1_Execute/internal/session"
+	"2021_1_Execute/internal/users"
 	"context"
 	"net/http"
 	"strings"
@@ -11,13 +14,13 @@ import (
 )
 
 type FilesHandler struct {
-	userUC    domain.UserUsecase
+	userUC    users.UserUsecase
 	fileUT    files.FileUtil
-	sessionHD domain.SessionHandler
+	sessionHD session.SessionHandler
 }
 
-func NewFilesHandler(e *echo.Echo, userUsecase domain.UserUsecase,
-	fileUtil files.FileUtil, sessionsHandler domain.SessionHandler) {
+func NewFilesHandler(e *echo.Echo, userUsecase users.UserUsecase,
+	fileUtil files.FileUtil, sessionsHandler session.SessionHandler) {
 	handler := &FilesHandler{
 		userUC:    userUsecase,
 		fileUT:    fileUtil,

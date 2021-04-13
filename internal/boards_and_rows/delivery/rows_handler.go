@@ -1,6 +1,8 @@
 package delivery
 
 import (
+	"2021_1_Execute/internal/boards_and_rows"
+	"2021_1_Execute/internal/boards_and_rows/models"
 	"2021_1_Execute/internal/domain"
 	"context"
 	"net/http"
@@ -11,25 +13,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type postRowRequest struct {
-	BoardID  int    `json:"board_id"`
-	Name     string `json:"name" valid:"name"`
-	Position int    `json:"position"`
-}
-
-type postRowResponce struct {
-	ID int `json:"id"`
-}
-
-func postRowToRow(request *postRowRequest) domain.Row {
-	return domain.Row{
-		Name:     request.Name,
-		Position: request.Position,
-	}
-}
-
 func (handler *BoardsHandler) PostRow(c echo.Context) error {
-	input := new(postRowRequest)
+	input := new(models.PostRowRequest)
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -45,45 +30,12 @@ func (handler *BoardsHandler) PostRow(c echo.Context) error {
 		return err
 	}
 
-	rowID, err := handler.boardUC.AddRow(context.Background(), postRowToRow(input), input.BoardID, userID)
+	rowID, err := handler.boardUC.AddRow(context.Background(), models.PostRowToRow(input), input.BoardID, userID)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, postRowResponce{ID: rowID})
-}
-
-type getRowResponce struct {
-	Row boardRow `json:"row"`
-}
-
-type boardRow struct {
-	ID       int               `json:"id"`
-	Name     string            `json:"name"`
-	Position int               `json:"position"`
-	Tasks    map[int]boardTask `json:"tasks"`
-}
-type boardTask struct {
-	ID       int    `json:"id"`
-	Name     string `json:"name"`
-	Position int    `json:"position"`
-}
-
-func fullRowInfoToBoardRow(row domain.FullRowInfo) boardRow {
-	tasks := make(map[int]boardTask)
-	for _, task := range row.Tasks {
-		tasks[task.Position] = boardTask{
-			ID:       task.ID,
-			Name:     task.Name,
-			Position: task.Position,
-		}
-	}
-	return boardRow{
-		ID:       row.ID,
-		Name:     row.Name,
-		Position: row.Position,
-		Tasks:    tasks,
-	}
+	return c.JSON(http.StatusOK, models.PostRowResponce{ID: rowID})
 }
 
 func (handler *BoardsHandler) GetRow(c echo.Context) error {
@@ -102,7 +54,7 @@ func (handler *BoardsHandler) GetRow(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, getRowResponce{Row: fullRowInfoToBoardRow(row)})
+	return c.JSON(http.StatusOK, models.GetRowResponce{Row: models.FullRowInfoToBoardRow(row)})
 }
 
 func (handler *BoardsHandler) DeleteRow(c echo.Context) error {
@@ -124,21 +76,10 @@ func (handler *BoardsHandler) DeleteRow(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-type patchRowRequest struct {
-	Name      string     `json:"name,omitempty" valid:"name"`
-	CarryOver moveObject `json:"carry_over,omitempty"`
-	Move      moveObject `json:"move,omitempty"`
-}
-
-type moveObject struct {
-	CardID      int `json:"card_id"`
-	NewPosition int `json:"new_position"`
-}
-
 func (handler *BoardsHandler) PatchRow(c echo.Context) error {
-	input := new(patchRowRequest)
-	input.CarryOver = moveObject{-1, -1}
-	input.Move = moveObject{-1, -1}
+	input := new(models.PatchRowRequest)
+	input.CarryOver = models.MoveObject{-1, -1}
+	input.Move = models.MoveObject{-1, -1}
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -159,7 +100,7 @@ func (handler *BoardsHandler) PatchRow(c echo.Context) error {
 	}
 
 	if input.Name != "" {
-		newRow := domain.Row{
+		newRow := boards_and_rows.Row{
 			ID:   rowID,
 			Name: input.Name,
 		}

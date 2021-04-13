@@ -1,11 +1,12 @@
 package usecase
 
 import (
+	"2021_1_Execute/internal/boards_and_rows"
 	"2021_1_Execute/internal/domain"
 	"context"
 )
 
-func (uc *boardsUsecase) AddRow(ctx context.Context, row domain.Row, boardID int, requesterID int) (int, error) {
+func (uc *boardsUsecase) AddRow(ctx context.Context, row boards_and_rows.Row, boardID int, requesterID int) (int, error) {
 	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
 	if err != nil {
 		return 0, domain.DBErrorToServerError(err)
@@ -39,22 +40,22 @@ func (uc *boardsUsecase) checkRights(ctx context.Context, rowID int, requesterID
 	return nil
 }
 
-func (uc *boardsUsecase) GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (domain.FullRowInfo, error) {
+func (uc *boardsUsecase) GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (boards_and_rows.FullRowInfo, error) {
 	err := uc.checkRights(ctx, rowID, requesterID)
 
 	row, err := uc.boardsRepo.GetRow(ctx, rowID)
 	if err != nil {
-		return domain.FullRowInfo{}, domain.DBErrorToServerError(err)
+		return boards_and_rows.FullRowInfo{}, domain.DBErrorToServerError(err)
 	}
 	return uc.getFullRowInfo(ctx, row)
 }
 
-func (uc *boardsUsecase) getFullRowInfo(ctx context.Context, row domain.Row) (domain.FullRowInfo, error) {
+func (uc *boardsUsecase) getFullRowInfo(ctx context.Context, row boards_and_rows.Row) (boards_and_rows.FullRowInfo, error) {
 	tasks, err := uc.boardsRepo.GetRowsTasks(ctx, row.ID)
 	if err != nil {
-		return domain.FullRowInfo{}, domain.DBErrorToServerError(err)
+		return boards_and_rows.FullRowInfo{}, domain.DBErrorToServerError(err)
 	}
-	return domain.FullRowInfo{
+	return boards_and_rows.FullRowInfo{
 		ID:       row.ID,
 		Name:     row.Name,
 		Position: row.Position,
@@ -115,7 +116,7 @@ func (uc *boardsUsecase) MoveRow(ctx context.Context, boardID int, rowID int, ne
 	return nil
 }
 
-func (uc *boardsUsecase) UpdateRow(ctx context.Context, row domain.Row, requesterID int) error {
+func (uc *boardsUsecase) UpdateRow(ctx context.Context, row boards_and_rows.Row, requesterID int) error {
 	err := uc.checkRights(ctx, row.ID, requesterID)
 	if err != nil {
 		return err

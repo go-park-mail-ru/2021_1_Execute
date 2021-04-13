@@ -6,12 +6,19 @@ import (
 	"2021_1_Execute/internal/files"
 	FilesHttpDelivery "2021_1_Execute/internal/files/delivery/http"
 	SessionsDelivery "2021_1_Execute/internal/session/delivery"
-	"2021_1_Execute/internal/session/repository/postgreSessionsRepository"
+	"2021_1_Execute/internal/session/repository/postgre_sessions_repository"
+	"2021_1_Execute/internal/tasks/repository/postgre_task_repository"
 	"log"
 
+	BoardsHttpDelivery "2021_1_Execute/internal/boards_and_rows/delivery"
+	"2021_1_Execute/internal/boards_and_rows/repository/postgre_board_repository"
 	UserHttpDelivery "2021_1_Execute/internal/users/delivery/http"
-	"2021_1_Execute/internal/users/repository/postgreUserRepository"
-	"2021_1_Execute/internal/users/usecase"
+
+	BoardUC "2021_1_Execute/internal/boards_and_rows/usecase"
+	TasksHttpDelivery "2021_1_Execute/internal/tasks/delivery"
+	TaskUC "2021_1_Execute/internal/tasks/usecase"
+	"2021_1_Execute/internal/users/repository/postgre_user_repository"
+	UserUC "2021_1_Execute/internal/users/usecase"
 	"flag"
 	"fmt"
 
@@ -60,14 +67,23 @@ func main() {
 
 	fileUtil := files.NewFileUtil()
 
-	sessionRepo := postgreSessionsRepository.NewPostgreSessionsRepository(pool)
+	sessionRepo := postgre_sessions_repository.NewPostgreSessionsRepository(pool)
 	sessionHandler := SessionsDelivery.NewSessionHandler(sessionRepo)
 
-	userRepo := postgreUserRepository.NewPostgreUserRepository(pool, fileUtil)
-	userUC := usecase.NewUserUsecase(userRepo)
+	userRepo := postgre_user_repository.NewPostgreUserRepository(pool, fileUtil)
+	userUC := UserUC.NewUserUsecase(userRepo)
+
+	tasksRepo := postgre_task_repository.NewPostgreTaskRepository(pool)
+	boardRepo := postgre_board_repository.NewPostgreBoardRepository(pool)
+
+	taskUC := TaskUC.NewTasksUsecase(tasksRepo, boardRepo)
+	boardUC := BoardUC.NewBoardsUsecase(boardRepo, userUC, taskUC)
 
 	UserHttpDelivery.NewUserHandler(e, userUC, sessionHandler)
 	FilesHttpDelivery.NewFilesHandler(e, userUC, fileUtil, sessionHandler)
+	BoardsHttpDelivery.NewBoardsHandler(e, boardUC, sessionHandler, taskUC)
+	TasksHttpDelivery.NewTasksHandler(e, sessionHandler, taskUC)
+
 	e.Logger.Fatal(e.Start(fmt.Sprint(":", *serverPort)))
 }
 

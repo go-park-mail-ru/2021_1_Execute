@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/tasks"
 	"context"
 	"net/http"
 	"strconv"
@@ -21,8 +22,8 @@ type postTaskResponse struct {
 	ID int `json:"id"`
 }
 
-func taskRequestToTask(req *postTaskRequest) domain.Task {
-	return domain.Task{
+func taskRequestToTask(req *postTaskRequest) tasks.Task {
+	return tasks.Task{
 		Name:     req.Name,
 		Position: req.Position,
 	}
@@ -60,7 +61,7 @@ func (handler *TasksHandler) PostTask(c echo.Context) error {
 }
 
 type getTaskResponse struct {
-	Task domain.Task `json:"task"`
+	Task tasks.Task `json:"task"`
 }
 
 func (handler *TasksHandler) GetTask(c echo.Context) error {
@@ -106,8 +107,8 @@ type patchTaskRequest struct {
 	Description string `json:"description,omitempty" valid:"description"`
 }
 
-func patchTaskToTask(req *patchTaskRequest) domain.Task {
-	return domain.Task{
+func patchTaskToTask(req *patchTaskRequest) tasks.Task {
+	return tasks.Task{
 		Name:        req.Name,
 		Description: req.Description,
 	}

@@ -1,25 +1,25 @@
 package usecase
 
 import (
+	"2021_1_Execute/internal/boards_and_rows"
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/tasks"
 	"context"
 )
 
 type tasksUsecase struct {
-	tasksRepo  domain.TaskRepository
-	boardsRepo domain.BoardRepository
-	tasksUC    domain.TaskUsecase
+	tasksRepo  tasks.TaskRepository
+	boardsRepo boards_and_rows.BoardRepository
 }
 
-func NewTasksUsecase(taskRepo domain.TaskRepository, boardRepo domain.BoardRepository, taskUsecase domain.TaskUsecase) domain.TaskUsecase {
+func NewTasksUsecase(taskRepo tasks.TaskRepository, boardRepo boards_and_rows.BoardRepository) tasks.TaskUsecase {
 	return &tasksUsecase{
 		tasksRepo:  taskRepo,
 		boardsRepo: boardRepo,
-		tasksUC:    taskUsecase,
 	}
 }
 
-func (uc *tasksUsecase) AddTask(ctx context.Context, task domain.Task, rowID, requesterID int) (int, error) {
+func (uc *tasksUsecase) AddTask(ctx context.Context, task tasks.Task, rowID, requesterID int) (int, error) {
 	boardID, err := uc.boardsRepo.GetRowsBoardID(ctx, rowID)
 	if err != nil {
 		return -1, domain.DBErrorToServerError(err)
@@ -42,7 +42,7 @@ func (uc *tasksUsecase) AddTask(ctx context.Context, task domain.Task, rowID, re
 	return taskID, nil
 }
 
-func (uc *tasksUsecase) UpdateTask(ctx context.Context, task domain.Task, requesterID int) error {
+func (uc *tasksUsecase) UpdateTask(ctx context.Context, task tasks.Task, requesterID int) error {
 	err := uc.checkRights(ctx, task.ID, requesterID)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (uc *tasksUsecase) CarryOverTask(ctx context.Context, taskID, newPosition, 
 		return domain.DBErrorToServerError(err)
 	}
 
-	err = uc.tasksRepo.UpdateTask(ctx, domain.Task{
+	err = uc.tasksRepo.UpdateTask(ctx, tasks.Task{
 		ID:       taskID,
 		Position: newPosition,
 	})
@@ -92,15 +92,15 @@ func (uc *tasksUsecase) DeleteTask(ctx context.Context, taskID, requesterID int)
 	return nil
 }
 
-func (uc *tasksUsecase) GetTask(ctx context.Context, taskID, requesterID int) (domain.Task, error) {
+func (uc *tasksUsecase) GetTask(ctx context.Context, taskID, requesterID int) (tasks.Task, error) {
 	err := uc.checkRights(ctx, taskID, requesterID)
 	if err != nil {
-		return domain.Task{}, err
+		return tasks.Task{}, err
 	}
 
 	task, err := uc.tasksRepo.GetTask(ctx, taskID)
 	if err != nil {
-		return domain.Task{}, domain.DBErrorToServerError(err)
+		return tasks.Task{}, domain.DBErrorToServerError(err)
 	}
 
 	return task, nil
@@ -140,7 +140,7 @@ func (uc *tasksUsecase) MoveTask(ctx context.Context, taskID, newPosition, reque
 		return err
 	}
 
-	err = uc.tasksRepo.UpdateTask(ctx, domain.Task{
+	err = uc.tasksRepo.UpdateTask(ctx, tasks.Task{
 		ID:       taskID,
 		Position: newPosition,
 	})

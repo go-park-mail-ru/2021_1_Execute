@@ -1,13 +1,15 @@
-package postgreBoardRepository
+package postgre_board_repository
 
 import (
+	"2021_1_Execute/internal/boards_and_rows"
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/tasks"
 	"context"
 
 	"github.com/pkg/errors"
 )
 
-func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row domain.Row, boardID int) (int, error) {
+func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row boards_and_rows.Row, boardID int) (int, error) {
 	rows, err := repo.Pool.Query(ctx, "insert into rows (name, position) values ($1::text, $2::text) returning id", row.Name, row.Position)
 
 	if err != nil {
@@ -40,7 +42,7 @@ func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row domain.Row, 
 	return rowID, nil
 }
 
-func (repo *PostgreBoardRepository) UpdateRow(ctx context.Context, row domain.Row) error {
+func (repo *PostgreBoardRepository) UpdateRow(ctx context.Context, row boards_and_rows.Row) error {
 	outdatedRow, err := repo.GetRow(ctx, row.ID)
 
 	if err != nil {
@@ -58,8 +60,8 @@ func (repo *PostgreBoardRepository) UpdateRow(ctx context.Context, row domain.Ro
 	return nil
 }
 
-func createUpdateRowObject(outdatedRow, newRow domain.Row) domain.Row {
-	var result domain.Row
+func createUpdateRowObject(outdatedRow, newRow boards_and_rows.Row) boards_and_rows.Row {
+	var result boards_and_rows.Row
 
 	result.ID = outdatedRow.ID
 
@@ -78,7 +80,7 @@ func createUpdateRowObject(outdatedRow, newRow domain.Row) domain.Row {
 	return result
 }
 
-func (repo *PostgreBoardRepository) updateRowQuery(ctx context.Context, row domain.Row) error {
+func (repo *PostgreBoardRepository) updateRowQuery(ctx context.Context, row boards_and_rows.Row) error {
 	rows, err := repo.Pool.Query(ctx, "update rows set name = $1::text, position = $2::int where id = $3::int",
 		row.Name,
 		row.Position,
@@ -94,7 +96,7 @@ func (repo *PostgreBoardRepository) updateRowQuery(ctx context.Context, row doma
 	return nil
 }
 
-func (repo *PostgreBoardRepository) GetBoardsRows(ctx context.Context, boardID int) ([]domain.Row, error) {
+func (repo *PostgreBoardRepository) GetBoardsRows(ctx context.Context, boardID int) ([]boards_and_rows.Row, error) {
 	rows, err := repo.Pool.Query(ctx,
 		`select rows.id, rows.name, rows.position
 	from rows
@@ -102,17 +104,17 @@ func (repo *PostgreBoardRepository) GetBoardsRows(ctx context.Context, boardID i
 	on br.board_id = $1::int and br.row_id = rows.id`, boardID)
 
 	if err != nil {
-		return []domain.Row{}, errors.Wrap(err, "Unable to get boards's rows")
+		return []boards_and_rows.Row{}, errors.Wrap(err, "Unable to get boards's rows")
 	}
 
-	var boardRows []domain.Row
+	var boardRows []boards_and_rows.Row
 
 	for rows.Next() {
-		var row domain.Row
+		var row boards_and_rows.Row
 		err = rows.Scan(&row.ID, &row.Name, &row.Position)
 
 		if err != nil {
-			return []domain.Row{}, errors.Wrap(err, "Unable to get row")
+			return []boards_and_rows.Row{}, errors.Wrap(err, "Unable to get row")
 		}
 
 		boardRows = append(boardRows, row)
@@ -123,26 +125,26 @@ func (repo *PostgreBoardRepository) GetBoardsRows(ctx context.Context, boardID i
 	return boardRows, nil
 }
 
-func (repo *PostgreBoardRepository) GetRow(ctx context.Context, rowID int) (domain.Row, error) {
+func (repo *PostgreBoardRepository) GetRow(ctx context.Context, rowID int) (boards_and_rows.Row, error) {
 	rows, err := repo.Pool.Query(ctx, "select id, name, position from rows where id = $1::int", rowID)
 
 	if err != nil {
-		return domain.Row{}, errors.Wrap(err, "Unable to get row")
+		return boards_and_rows.Row{}, errors.Wrap(err, "Unable to get row")
 	}
 
-	var row domain.Row
+	var row boards_and_rows.Row
 
 	for rows.Next() {
 		err = rows.Scan(&row.ID, &row.Name, &row.Position)
 		if err != nil {
-			return domain.Row{}, errors.Wrap(err, "Unable to read row")
+			return boards_and_rows.Row{}, errors.Wrap(err, "Unable to read row")
 		}
 	}
 
 	rows.Close()
 
 	if row.ID == 0 {
-		return domain.Row{}, domain.DBNotFoundError
+		return boards_and_rows.Row{}, domain.DBNotFoundError
 	}
 
 	return row, nil
@@ -163,7 +165,7 @@ func (repo *PostgreBoardRepository) DeleteRow(ctx context.Context, rowID int) er
 	return nil
 }
 
-func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int) ([]domain.Task, error) {
+func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int) ([]tasks.Task, error) {
 	rows, err := repo.Pool.Query(ctx,
 		`select tasks.id, tasks.name, tasks.description, task.position
 	from tasks
@@ -171,25 +173,25 @@ func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int)
 	on rt.row_id = $1::int and rt.task_id = tasks.id`, rowID)
 
 	if err != nil {
-		return []domain.Task{}, errors.Wrap(err, "Unable to get row's tasks")
+		return []tasks.Task{}, errors.Wrap(err, "Unable to get row's tasks")
 	}
 
-	var tasks []domain.Task
+	var result []tasks.Task
 
 	for rows.Next() {
-		var task domain.Task
+		var task tasks.Task
 		err = rows.Scan(&task.ID, &task.Name, &task.Description, &task.Position)
 
 		if err != nil {
-			return []domain.Task{}, errors.Wrap(err, "Unable to get task")
+			return []tasks.Task{}, errors.Wrap(err, "Unable to get task")
 		}
 
-		tasks = append(tasks, task)
+		result = append(result, task)
 	}
 
 	rows.Close()
 
-	return tasks, nil
+	return result, nil
 }
 
 func (repo *PostgreBoardRepository) GetRowsBoardID(ctx context.Context, rowID int) (int, error) {
