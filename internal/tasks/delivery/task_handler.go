@@ -111,6 +111,7 @@ func patchTaskToTask(req *patchTaskRequest) tasks.Task {
 	return tasks.Task{
 		Name:        req.Name,
 		Description: req.Description,
+		Position:    -1,
 	}
 }
 
