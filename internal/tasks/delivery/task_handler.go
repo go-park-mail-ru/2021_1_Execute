@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
@@ -43,6 +44,11 @@ func (handler *TasksHandler) PostTask(c echo.Context) error {
 	}
 	if input.Position < 0 {
 		return errors.Wrap(domain.BadRequestError, "Position should be non negative")
+	}
+
+	_, err = govalidator.ValidateStruct(input)
+	if err != nil {
+		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
 	taskID, err := handler.taskUC.AddTask(context.Background(), taskRequestToTask(input), input.RowID, userID)
@@ -97,7 +103,7 @@ func (handler *TasksHandler) DeleteTask(c echo.Context) error {
 
 type patchTaskRequest struct {
 	Name        string `json:"name,omitempty" valid:"name"`
-	Description string `json:"description,omitempty"`
+	Description string `json:"description,omitempty" valid:"description"`
 }
 
 func patchTaskToTask(req *patchTaskRequest) domain.Task {
@@ -121,6 +127,11 @@ func (handler *TasksHandler) PatchTask(c echo.Context) error {
 	input := new(patchTaskRequest)
 
 	if err := c.Bind(input); err != nil {
+		return errors.Wrap(domain.BadRequestError, err.Error())
+	}
+
+	_, err = govalidator.ValidateStruct(input)
+	if err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
