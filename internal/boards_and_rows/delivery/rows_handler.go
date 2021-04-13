@@ -113,6 +113,17 @@ func (handler *BoardsHandler) PatchRow(c echo.Context) error {
 		if !(input.Move.NewPosition >= 0 && input.Move.CardID >= 0) {
 			return errors.Wrap(domain.BadRequestError, "Need new position and ID")
 		}
+
+		task, err := handler.taskUC.GetTask(context.Background(), input.Move.CardID, userID)
+		if err != nil {
+			return err
+		}
+
+		err = handler.boardUC.UpdateTasksPositions(context.Background(), rowID, task.Position, input.CarryOver.NewPosition, userID)
+		if err != nil {
+			return err
+		}
+
 		err = handler.taskUC.MoveTask(context.Background(), input.Move.CardID, input.Move.NewPosition, userID)
 		if err != nil {
 			return err
@@ -121,6 +132,30 @@ func (handler *BoardsHandler) PatchRow(c echo.Context) error {
 	if input.CarryOver.NewPosition >= 0 || input.CarryOver.CardID >= 0 {
 		if !(input.CarryOver.NewPosition >= 0 && input.CarryOver.CardID >= 0) {
 			return errors.Wrap(domain.BadRequestError, "Need new position and ID")
+		}
+		task, err := handler.taskUC.GetTask(context.Background(), input.CarryOver.CardID, userID)
+		if err != nil {
+			return err
+		}
+		oldRow, err := handler.taskUC.GetTasksRowID(context.Background(), input.CarryOver.CardID, userID)
+		if err != nil {
+			return err
+		}
+		fullInfo, err := handler.boardUC.GetFullRowInfo(context.Background(), oldRow, userID)
+		if err != nil {
+			return nil
+		}
+		err = handler.boardUC.UpdateTasksPositions(context.Background(), oldRow, task.Position, len(fullInfo.Tasks), userID)
+		if err != nil {
+			return err
+		}
+		fullInfo, err = handler.boardUC.GetFullRowInfo(context.Background(), rowID, userID)
+		if err != nil {
+			return nil
+		}
+		err = handler.boardUC.UpdateTasksPositions(context.Background(), rowID, len(fullInfo.Tasks), input.CarryOver.NewPosition, userID)
+		if err != nil {
+			return err
 		}
 		err = handler.taskUC.CarryOverTask(context.Background(), input.CarryOver.CardID, input.CarryOver.NewPosition, input.CarryOver.NewPosition, userID)
 		if err != nil {

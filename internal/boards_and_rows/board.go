@@ -46,6 +46,7 @@ type BoardUsecase interface {
 	GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (FullBoardInfo, error)
 	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)
 	GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (FullRowInfo, error)
+	UpdateTasksPositions(ctx context.Context, rowID, currentPos, newPos, requesterID int) error
 }
 
 type BoardRepository interface {

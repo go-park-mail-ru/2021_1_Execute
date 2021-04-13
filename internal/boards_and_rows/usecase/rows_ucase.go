@@ -3,6 +3,7 @@ package usecase
 import (
 	"2021_1_Execute/internal/boards_and_rows"
 	"2021_1_Execute/internal/domain"
+	"2021_1_Execute/internal/tasks"
 	"context"
 )
 
@@ -126,5 +127,44 @@ func (uc *boardsUsecase) UpdateRow(ctx context.Context, row boards_and_rows.Row,
 	if err != nil {
 		return domain.DBErrorToServerError(err)
 	}
+	return nil
+}
+
+func (uc *boardsUsecase) UpdateTasksPositions(ctx context.Context, rowID, currentPos, newPos, requesterID int) error {
+	err := uc.checkRights(ctx, rowID, requesterID)
+	if err != nil {
+		return err
+	}
+
+	fullInfo, err := uc.getFullRowInfo(ctx, boards_and_rows.Row{ID: rowID})
+	if err != nil {
+		return err
+	}
+
+	for _, task := range fullInfo.Tasks {
+		switch {
+		case currentPos > newPos:
+			if task.Position >= newPos && task.Position < currentPos {
+				err = uc.taskUC.UpdateTask(ctx, tasks.Task{
+					ID:       task.ID,
+					Position: task.Position + 1,
+				}, requesterID)
+				if err != nil {
+					return err
+				}
+			}
+		case currentPos < newPos:
+			if task.Position > currentPos && task.Position <= newPos {
+				err = uc.taskUC.UpdateTask(ctx, tasks.Task{
+					ID:       task.ID,
+					Position: task.Position - 1,
+				}, requesterID)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	return nil
 }
