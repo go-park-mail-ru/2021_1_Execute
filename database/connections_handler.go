@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"strconv"
 
+	"github.com/jackc/pgx/v4/log/logrusadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/sirupsen/logrus"
 )
 
 const PathToInitDBFile = "database/trello.sql"
@@ -17,6 +19,7 @@ func GetPool(username, password, dbname, host string, port int) (*pgxpool.Pool, 
 	if err != nil {
 		return nil, err
 	}
+	config.ConnConfig.Logger = logrusadapter.NewLogger(logrus.New())
 
 	ctx := context.Background()
 
