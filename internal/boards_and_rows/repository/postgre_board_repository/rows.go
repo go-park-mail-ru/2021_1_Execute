@@ -10,9 +10,27 @@ import (
 )
 
 func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row boards_and_rows.Row, boardID int) (int, error) {
+	repo.logger.Log(ctx, logLevelDebug, "AddRow", map[string]interface{}{
+		"package": "postgre_board_repository",
+		"method":  "repo.AddRow",
+		"data": map[string]interface{}{
+			"row":      row,
+			"board_id": boardID,
+		},
+	})
+
 	rows, err := repo.Pool.Query(ctx, "insert into rows (name, position) values ($1::text, $2::int) returning id", row.Name, row.Position)
 
 	if err != nil {
+		repo.logger.Log(ctx, logLevelError, "Unable to insert row", map[string]interface{}{
+			"package": "postgre_board_repository",
+			"method":  "repo.AddRow",
+			"data": map[string]interface{}{
+				"row":      row,
+				"board_id": boardID,
+			},
+			"error": err,
+		})
 		return -1, errors.Wrap(err, "Unable to insert row")
 	}
 
@@ -21,6 +39,15 @@ func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row boards_and_r
 	for rows.Next() {
 		err = rows.Scan(&rowID)
 		if err != nil {
+			repo.logger.Log(ctx, logLevelError, "Unable to get row id", map[string]interface{}{
+				"package": "postgre_board_repository",
+				"method":  "repo.AddRow",
+				"data": map[string]interface{}{
+					"row":      row,
+					"board_id": boardID,
+				},
+				"error": err,
+			})
 			return -1, errors.Wrap(err, "Unable to get row id")
 		}
 	}
@@ -34,6 +61,15 @@ func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row boards_and_r
 	rows, err = repo.Pool.Query(ctx, "insert into boards_rows (board_id, row_id) values ($1::int, $2::int)", boardID, rowID)
 
 	if err != nil {
+		repo.logger.Log(ctx, logLevelError, "Unable to link board and row", map[string]interface{}{
+			"package": "postgre_board_repository",
+			"method":  "repo.AddRow",
+			"data": map[string]interface{}{
+				"row":      row,
+				"board_id": boardID,
+			},
+			"error": err,
+		})
 		return -1, errors.Wrap(err, "Unable to link board and row")
 	}
 
@@ -43,6 +79,14 @@ func (repo *PostgreBoardRepository) AddRow(ctx context.Context, row boards_and_r
 }
 
 func (repo *PostgreBoardRepository) UpdateRow(ctx context.Context, row boards_and_rows.Row) error {
+	repo.logger.Log(ctx, logLevelDebug, "UpdateRow", map[string]interface{}{
+		"package": "postgre_board_repository",
+		"method":  "repo.UpdateRow",
+		"data": map[string]boards_and_rows.Row{
+			"row": row,
+		},
+	})
+
 	outdatedRow, err := repo.GetRow(ctx, row.ID)
 
 	if err != nil {
@@ -81,6 +125,14 @@ func createUpdateRowObject(outdatedRow, newRow boards_and_rows.Row) boards_and_r
 }
 
 func (repo *PostgreBoardRepository) updateRowQuery(ctx context.Context, row boards_and_rows.Row) error {
+	repo.logger.Log(ctx, logLevelDebug, "updateRowQuery", map[string]interface{}{
+		"package": "postgre_board_repository",
+		"method":  "repo.updateRowQuery",
+		"data": map[string]boards_and_rows.Row{
+			"row": row,
+		},
+	})
+
 	rows, err := repo.Pool.Query(ctx, "update rows set name = $1::text, position = $2::int where id = $3::int",
 		row.Name,
 		row.Position,
@@ -88,6 +140,14 @@ func (repo *PostgreBoardRepository) updateRowQuery(ctx context.Context, row boar
 	)
 
 	if err != nil {
+		repo.logger.Log(ctx, logLevelError, "Unable to update row", map[string]interface{}{
+			"package": "postgre_board_repository",
+			"method":  "repo.updateRowQuery",
+			"data": map[string]boards_and_rows.Row{
+				"row": row,
+			},
+			"error": err,
+		})
 		return errors.Wrap(err, "Unable to update row")
 	}
 
@@ -97,6 +157,14 @@ func (repo *PostgreBoardRepository) updateRowQuery(ctx context.Context, row boar
 }
 
 func (repo *PostgreBoardRepository) GetBoardsRows(ctx context.Context, boardID int) ([]boards_and_rows.Row, error) {
+	repo.logger.Log(ctx, logLevelDebug, "GetBoardsRows", map[string]interface{}{
+		"package": "postgre_board_repository",
+		"method":  "repo.GetBoardsRows",
+		"data": map[string]int{
+			"board_id": boardID,
+		},
+	})
+
 	rows, err := repo.Pool.Query(ctx,
 		`select rows.id, rows.name, rows.position
 	from rows
@@ -104,6 +172,14 @@ func (repo *PostgreBoardRepository) GetBoardsRows(ctx context.Context, boardID i
 	on br.board_id = $1::int and br.row_id = rows.id`, boardID)
 
 	if err != nil {
+		repo.logger.Log(ctx, logLevelError, "Unable to get boards's rows", map[string]interface{}{
+			"package": "postgre_board_repository",
+			"method":  "repo.GetBoardsRows",
+			"data": map[string]int{
+				"board_id": boardID,
+			},
+			"error": err,
+		})
 		return []boards_and_rows.Row{}, errors.Wrap(err, "Unable to get boards's rows")
 	}
 
@@ -114,6 +190,14 @@ func (repo *PostgreBoardRepository) GetBoardsRows(ctx context.Context, boardID i
 		err = rows.Scan(&row.ID, &row.Name, &row.Position)
 
 		if err != nil {
+			repo.logger.Log(ctx, logLevelError, "Unable to get row", map[string]interface{}{
+				"package": "postgre_board_repository",
+				"method":  "repo.GetBoardsRows",
+				"data": map[string]int{
+					"board_id": boardID,
+				},
+				"error": err,
+			})
 			return []boards_and_rows.Row{}, errors.Wrap(err, "Unable to get row")
 		}
 
@@ -126,9 +210,25 @@ func (repo *PostgreBoardRepository) GetBoardsRows(ctx context.Context, boardID i
 }
 
 func (repo *PostgreBoardRepository) GetRow(ctx context.Context, rowID int) (boards_and_rows.Row, error) {
+	repo.logger.Log(ctx, logLevelDebug, "GetRow", map[string]interface{}{
+		"package": "postgre_board_repository",
+		"method":  "repo.GetRow",
+		"data": map[string]int{
+			"row_id": rowID,
+		},
+	})
+
 	rows, err := repo.Pool.Query(ctx, "select id, name, position from rows where id = $1::int", rowID)
 
 	if err != nil {
+		repo.logger.Log(ctx, logLevelError, "Unable to get row", map[string]interface{}{
+			"package": "postgre_board_repository",
+			"method":  "repo.GetRow",
+			"data": map[string]int{
+				"row_id": rowID,
+			},
+			"error": err,
+		})
 		return boards_and_rows.Row{}, errors.Wrap(err, "Unable to get row")
 	}
 
@@ -137,6 +237,14 @@ func (repo *PostgreBoardRepository) GetRow(ctx context.Context, rowID int) (boar
 	for rows.Next() {
 		err = rows.Scan(&row.ID, &row.Name, &row.Position)
 		if err != nil {
+			repo.logger.Log(ctx, logLevelError, "Unable to read row", map[string]interface{}{
+				"package": "postgre_board_repository",
+				"method":  "repo.GetRow",
+				"data": map[string]int{
+					"row_id": rowID,
+				},
+				"error": err,
+			})
 			return boards_and_rows.Row{}, errors.Wrap(err, "Unable to read row")
 		}
 	}
@@ -151,6 +259,14 @@ func (repo *PostgreBoardRepository) GetRow(ctx context.Context, rowID int) (boar
 }
 
 func (repo *PostgreBoardRepository) DeleteRow(ctx context.Context, rowID int) error {
+	repo.logger.Log(ctx, logLevelDebug, "DeleteRow", map[string]interface{}{
+		"package": "postgre_board_repository",
+		"method":  "repo.DeleteRow",
+		"data": map[string]int{
+			"row_id": rowID,
+		},
+	})
+
 	row, err := repo.GetRow(ctx, rowID)
 	if err != nil {
 		return err
@@ -158,6 +274,14 @@ func (repo *PostgreBoardRepository) DeleteRow(ctx context.Context, rowID int) er
 
 	rows, err := repo.Pool.Query(ctx, "delete from rows where id = $1::int", row.ID)
 	if err != nil {
+		repo.logger.Log(ctx, logLevelError, "Unable to delete row", map[string]interface{}{
+			"package": "postgre_board_repository",
+			"method":  "repo.DeleteRow",
+			"data": map[string]boards_and_rows.Row{
+				"row": row,
+			},
+			"error": err,
+		})
 		return errors.Wrap(err, "Unable to delete row")
 	}
 	rows.Close()
@@ -166,6 +290,14 @@ func (repo *PostgreBoardRepository) DeleteRow(ctx context.Context, rowID int) er
 }
 
 func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int) ([]tasks.Task, error) {
+	repo.logger.Log(ctx, logLevelDebug, "GetRowsTasks", map[string]interface{}{
+		"package": "postgre_board_repository",
+		"method":  "repo.GetRowsTasks",
+		"data": map[string]int{
+			"row_id": rowID,
+		},
+	})
+
 	rows, err := repo.Pool.Query(ctx,
 		`select tasks.id, tasks.name, tasks.description, tasks.position
 	from tasks
@@ -173,6 +305,14 @@ func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int)
 	on rt.row_id = $1::int and rt.task_id = tasks.id`, rowID)
 
 	if err != nil {
+		repo.logger.Log(ctx, logLevelError, "Unable to get row's tasks", map[string]interface{}{
+			"package": "postgre_board_repository",
+			"method":  "repo.GetRowsTasks",
+			"data": map[string]int{
+				"row_id": rowID,
+			},
+			"error": err,
+		})
 		return []tasks.Task{}, errors.Wrap(err, "Unable to get row's tasks")
 	}
 
@@ -183,7 +323,15 @@ func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int)
 		err = rows.Scan(&task.ID, &task.Name, &task.Description, &task.Position)
 
 		if err != nil {
-			return []tasks.Task{}, errors.Wrap(err, "Unable to get task")
+			repo.logger.Log(ctx, logLevelError, "Unable to read task", map[string]interface{}{
+				"package": "postgre_board_repository",
+				"method":  "repo.GetRowsTasks",
+				"data": map[string]int{
+					"row_id": rowID,
+				},
+				"error": err,
+			})
+			return []tasks.Task{}, errors.Wrap(err, "Unable to read task")
 		}
 
 		result = append(result, task)
@@ -195,8 +343,24 @@ func (repo *PostgreBoardRepository) GetRowsTasks(ctx context.Context, rowID int)
 }
 
 func (repo *PostgreBoardRepository) GetRowsBoardID(ctx context.Context, rowID int) (int, error) {
+	repo.logger.Log(ctx, logLevelDebug, "GetRowsBoardID", map[string]interface{}{
+		"package": "postgre_board_repository",
+		"method":  "repo.GetRowsBoardID",
+		"data": map[string]int{
+			"row_id": rowID,
+		},
+	})
+
 	rows, err := repo.Pool.Query(ctx, "select board_id from boards_rows where row_id = $1::int", rowID)
 	if err != nil {
+		repo.logger.Log(ctx, logLevelError, "Unable to get board id", map[string]interface{}{
+			"package": "postgre_board_repository",
+			"method":  "repo.GetRowsBoardID",
+			"data": map[string]int{
+				"row_id": rowID,
+			},
+			"error": err,
+		})
 		return -1, errors.Wrap(err, "Unable to get board id")
 	}
 
@@ -205,6 +369,14 @@ func (repo *PostgreBoardRepository) GetRowsBoardID(ctx context.Context, rowID in
 	for rows.Next() {
 		err = rows.Scan(&boardID)
 		if err != nil {
+			repo.logger.Log(ctx, logLevelError, "Unable to read board id", map[string]interface{}{
+				"package": "postgre_board_repository",
+				"method":  "repo.GetRowsBoardID",
+				"data": map[string]int{
+					"row_id": rowID,
+				},
+				"error": err,
+			})
 			return -1, errors.Wrap(err, "Unable to read board id")
 		}
 	}
