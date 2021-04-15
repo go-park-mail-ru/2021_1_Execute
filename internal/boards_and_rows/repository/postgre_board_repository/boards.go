@@ -5,11 +5,12 @@ import (
 	"2021_1_Execute/internal/domain"
 	"context"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 )
 
 func (repo *PostgreBoardRepository) AddBoard(ctx context.Context, board boards_and_rows.Board) (int, error) {
-	repo.logger.Log(ctx, logLevelDebug, "AddBoard", map[string]interface{}{
+	repo.logger.Log(ctx, pgx.LogLevelDebug, "AddBoard", map[string]interface{}{
 		"package": "postgre_board_repository",
 		"method":  "repo.AddBoard",
 		"data": map[string]boards_and_rows.Board{
@@ -54,7 +55,7 @@ func (repo *PostgreBoardRepository) AddBoard(ctx context.Context, board boards_a
 }
 
 func (repo *PostgreBoardRepository) AddOwner(ctx context.Context, boardID int, userID int) error {
-	repo.logger.Log(ctx, logLevelDebug, "AddOwner", map[string]interface{}{
+	repo.logger.Log(ctx, pgx.LogLevelDebug, "AddOwner", map[string]interface{}{
 		"package": "postgre_board_repository",
 		"method":  "repo.AddOwner",
 		"data": map[string]int{
@@ -84,7 +85,7 @@ func (repo *PostgreBoardRepository) AddOwner(ctx context.Context, boardID int, u
 }
 
 func (repo *PostgreBoardRepository) UpdateBoard(ctx context.Context, board boards_and_rows.Board) error {
-	repo.logger.Log(ctx, logLevelDebug, "UpdateBoard", map[string]interface{}{
+	repo.logger.Log(ctx, pgx.LogLevelDebug, "UpdateBoard", map[string]interface{}{
 		"package": "postgre_board_repository",
 		"method":  "repo.UpdateBoard",
 		"data": map[string]boards_and_rows.Board{
@@ -130,7 +131,7 @@ func createUpdateBoardObject(outdatedBoard, newBoard boards_and_rows.Board) boar
 }
 
 func (repo *PostgreBoardRepository) updateBoardQuery(ctx context.Context, board boards_and_rows.Board) error {
-	repo.logger.Log(ctx, logLevelDebug, "updateBoardQuery", map[string]interface{}{
+	repo.logger.Log(ctx, pgx.LogLevelDebug, "updateBoardQuery", map[string]interface{}{
 		"package": "postgre_board_repository",
 		"method":  "repo.updateBoardQuery",
 		"data": map[string]boards_and_rows.Board{
@@ -162,7 +163,7 @@ func (repo *PostgreBoardRepository) updateBoardQuery(ctx context.Context, board 
 }
 
 func (repo *PostgreBoardRepository) GetBoard(ctx context.Context, boardID int) (boards_and_rows.Board, error) {
-	repo.logger.Log(ctx, logLevelDebug, "GetBoard", map[string]interface{}{
+	repo.logger.Log(ctx, pgx.LogLevelDebug, "GetBoard", map[string]interface{}{
 		"package": "postgre_board_repository",
 		"method":  "repo.GetBoard",
 		"data": map[string]int{
@@ -211,7 +212,7 @@ func (repo *PostgreBoardRepository) GetBoard(ctx context.Context, boardID int) (
 }
 
 func (repo *PostgreBoardRepository) GetUsersBoards(ctx context.Context, userID int) ([]boards_and_rows.Board, error) {
-	repo.logger.Log(ctx, logLevelDebug, "GetUsersBoards", map[string]interface{}{
+	repo.logger.Log(ctx, pgx.LogLevelDebug, "GetUsersBoards", map[string]interface{}{
 		"package": "postgre_board_repository",
 		"method":  "repo.GetUsersBoards",
 		"data": map[string]int{
@@ -264,7 +265,7 @@ func (repo *PostgreBoardRepository) GetUsersBoards(ctx context.Context, userID i
 }
 
 func (repo *PostgreBoardRepository) DeleteBoard(ctx context.Context, boardID int) error {
-	repo.logger.Log(ctx, logLevelDebug, "DeleteBoard", map[string]interface{}{
+	repo.logger.Log(ctx, pgx.LogLevelDebug, "DeleteBoard", map[string]interface{}{
 		"package": "postgre_board_repository",
 		"method":  "repo.DeleteBoard",
 		"data": map[string]int{
@@ -295,7 +296,7 @@ func (repo *PostgreBoardRepository) DeleteBoard(ctx context.Context, boardID int
 }
 
 func (repo *PostgreBoardRepository) GetBoardsOwner(ctx context.Context, boardID int) (int, error) {
-	repo.logger.Log(ctx, logLevelDebug, "GetBoardsOwner", map[string]interface{}{
+	repo.logger.Log(ctx, pgx.LogLevelDebug, "GetBoardsOwner", map[string]interface{}{
 		"package": "postgre_board_repository",
 		"method":  "repo.GetBoardsOwner",
 		"data": map[string]int{

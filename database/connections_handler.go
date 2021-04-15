@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/log/logrusadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/sirupsen/logrus"
@@ -20,6 +21,7 @@ func GetPool(username, password, dbname, host string, port int) (*pgxpool.Pool, 
 		return nil, err
 	}
 	config.ConnConfig.Logger = logrusadapter.NewLogger(logrus.New())
+	config.ConnConfig.LogLevel = pgx.LogLevelDebug
 
 	ctx := context.Background()
 
