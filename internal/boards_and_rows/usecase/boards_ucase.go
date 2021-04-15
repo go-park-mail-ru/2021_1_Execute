@@ -18,6 +18,7 @@ func NewBoardsUsecase(repo boards_and_rows.BoardRepository, userUsercase users.U
 	return &boardsUsecase{
 		boardsRepo: repo,
 		userUC:     userUsercase,
+		taskUC:     taskUsercase,
 	}
 }
 
