@@ -56,8 +56,23 @@ func (uc *tasksUsecase) UpdateTask(ctx context.Context, task tasks.Task, request
 	return nil
 }
 
-func (uc *tasksUsecase) CarryOverTask(ctx context.Context, taskID, newPosition, newRowID, requesterID int) error {
+func (uc *tasksUsecase) CarryOver(ctx context.Context, taskID, newRowID, newPosition, requesterID int) error {
 	err := uc.checkRights(ctx, taskID, requesterID)
+	if err != nil {
+		return err
+	}
+
+	oldRowID, err := uc.tasksRepo.GetTasksRowID(ctx, taskID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	oldRow, err := uc.boardsRepo.GetRowsTasks(ctx, oldRowID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	err = uc.MoveTask(ctx, taskID, len(oldRow)-1, requesterID)
 	if err != nil {
 		return err
 	}
@@ -67,14 +82,20 @@ func (uc *tasksUsecase) CarryOverTask(ctx context.Context, taskID, newPosition, 
 		return domain.DBErrorToServerError(err)
 	}
 
-	err = uc.tasksRepo.UpdateTask(ctx, tasks.Task{
-		ID:       taskID,
-		Position: newPosition,
-	})
+	newRow, err := uc.boardsRepo.GetRowsTasks(ctx, newRowID)
 	if err != nil {
 		return domain.DBErrorToServerError(err)
 	}
 
+	err = uc.tasksRepo.UpdateTask(ctx, tasks.Task{ID: taskID, Position: len(newRow) - 1})
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	err = uc.MoveTask(ctx, taskID, newPosition, requesterID)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -84,6 +105,17 @@ func (uc *tasksUsecase) DeleteTask(ctx context.Context, taskID, requesterID int)
 		return err
 	}
 
+	rowID, err := uc.tasksRepo.GetTasksRowID(ctx, taskID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	rowsTasks, err := uc.boardsRepo.GetRowsTasks(ctx, rowID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	err = uc.MoveTask(ctx, taskID, len(rowsTasks)-1, requesterID)
 	err = uc.tasksRepo.DeleteTask(ctx, taskID)
 	if err != nil {
 		return domain.DBErrorToServerError(err)
@@ -135,17 +167,58 @@ func (uc *tasksUsecase) GetTasksRowID(ctx context.Context, taskID, requesterID i
 }
 
 func (uc *tasksUsecase) MoveTask(ctx context.Context, taskID, newPosition, requesterID int) error {
+
 	err := uc.checkRights(ctx, taskID, requesterID)
 	if err != nil {
 		return err
 	}
 
-	err = uc.tasksRepo.UpdateTask(ctx, tasks.Task{
-		ID:       taskID,
-		Position: newPosition,
-	})
+	rowID, err := uc.tasksRepo.GetTasksRowID(ctx, taskID)
 	if err != nil {
 		return domain.DBErrorToServerError(err)
+	}
+
+	rowsTasks, err := uc.boardsRepo.GetRowsTasks(ctx, rowID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	currentTask, err := uc.tasksRepo.GetTask(ctx, taskID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	if newPosition >= len(rowsTasks) {
+		newPosition = len(rowsTasks) - 1
+	}
+
+	for _, task := range rowsTasks {
+		if task.ID == currentTask.ID {
+			err = uc.tasksRepo.UpdateTask(ctx, tasks.Task{
+				ID:       task.ID,
+				Position: newPosition,
+			})
+			if err != nil {
+				return domain.DBErrorToServerError(err)
+			}
+		}
+		if currentTask.Position > newPosition && task.Position >= newPosition && task.Position < currentTask.Position {
+			err = uc.tasksRepo.UpdateTask(ctx, tasks.Task{
+				ID:       task.ID,
+				Position: task.Position + 1,
+			})
+			if err != nil {
+				return domain.DBErrorToServerError(err)
+			}
+		} else if currentTask.Position < newPosition && task.Position > currentTask.Position && task.Position <= newPosition {
+			err = uc.tasksRepo.UpdateTask(ctx, tasks.Task{
+				ID:       task.ID,
+				Position: task.Position - 1,
+			})
+			if err != nil {
+				return domain.DBErrorToServerError(err)
+			}
+		}
 	}
 
 	return nil

@@ -13,7 +13,7 @@ type TaskUsecase interface {
 	AddTask(ctx context.Context, task Task, rowID, requesterID int) (int, error)
 
 	UpdateTask(ctx context.Context, task Task, requesterID int) error
-	CarryOverTask(ctx context.Context, taskID, newPosition, newRowID, requesterID int) error
+	CarryOver(ctx context.Context, taskID, newRowID, newPosition, requesterID int) error
 
 	DeleteTask(ctx context.Context, taskID, requesterID int) error
 

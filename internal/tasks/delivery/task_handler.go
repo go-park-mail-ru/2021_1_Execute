@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"2021_1_Execute/internal/domain"
-	"2021_1_Execute/internal/tasks"
+	"2021_1_Execute/internal/tasks/models"
 	"context"
 	"net/http"
 	"strconv"
@@ -12,30 +12,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-type postTaskRequest struct {
-	RowID    int    `json:"row_id"`
-	Name     string `json:"name" valid:"name"`
-	Position int    `json:"position"`
-}
-
-type postTaskResponse struct {
-	ID int `json:"id"`
-}
-
-func taskRequestToTask(req *postTaskRequest) tasks.Task {
-	return tasks.Task{
-		Name:     req.Name,
-		Position: req.Position,
-	}
-}
-
 func (handler *TasksHandler) PostTask(c echo.Context) error {
 	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
 		return err
 	}
 
-	input := new(postTaskRequest)
+	input := new(models.PostTaskRequest)
 
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
@@ -52,16 +35,12 @@ func (handler *TasksHandler) PostTask(c echo.Context) error {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
-	taskID, err := handler.taskUC.AddTask(context.Background(), taskRequestToTask(input), input.RowID, userID)
+	taskID, err := handler.taskUC.AddTask(context.Background(), models.TaskRequestToTask(input), input.RowID, userID)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, postTaskResponse{ID: taskID})
-}
-
-type getTaskResponse struct {
-	Task tasks.Task `json:"task"`
+	return c.JSON(http.StatusOK, models.PostTaskResponse{ID: taskID})
 }
 
 func (handler *TasksHandler) GetTask(c echo.Context) error {
@@ -80,7 +59,7 @@ func (handler *TasksHandler) GetTask(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, getTaskResponse{Task: task})
+	return c.JSON(http.StatusOK, models.GetTaskResponse{Task: task})
 }
 
 func (handler *TasksHandler) DeleteTask(c echo.Context) error {
@@ -102,19 +81,6 @@ func (handler *TasksHandler) DeleteTask(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-type patchTaskRequest struct {
-	Name        string `json:"name,omitempty" valid:"name"`
-	Description string `json:"description,omitempty" valid:"description"`
-}
-
-func patchTaskToTask(req *patchTaskRequest) tasks.Task {
-	return tasks.Task{
-		Name:        req.Name,
-		Description: req.Description,
-		Position:    -1,
-	}
-}
-
 func (handler *TasksHandler) PatchTask(c echo.Context) error {
 	userID, err := handler.sessionHD.IsAuthorized(c)
 	if err != nil {
@@ -126,7 +92,7 @@ func (handler *TasksHandler) PatchTask(c echo.Context) error {
 		return domain.IDFormatError
 	}
 
-	input := new(patchTaskRequest)
+	input := new(models.PatchTaskRequest)
 
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
@@ -137,7 +103,7 @@ func (handler *TasksHandler) PatchTask(c echo.Context) error {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
-	task := patchTaskToTask(input)
+	task := models.PatchTaskToTask(input)
 	task.ID = taskID
 
 	err = handler.taskUC.UpdateTask(context.Background(), task, userID)
