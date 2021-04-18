@@ -5,6 +5,8 @@ go 1.13
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/google/uuid v1.2.0
+	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
+	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
