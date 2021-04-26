@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"2021_1_Execute/internal/boards_and_rows"
-	"2021_1_Execute/internal/boards_and_rows/models"
+	http_models "2021_1_Execute/internal/boards_and_rows/models/http"
 	"2021_1_Execute/internal/domain"
 	"context"
 	"net/http"
@@ -14,7 +14,7 @@ import (
 )
 
 func (handler *BoardsHandler) PostRow(c echo.Context) error {
-	input := new(models.PostRowRequest)
+	input := new(http_models.PostRowRequest)
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -30,12 +30,12 @@ func (handler *BoardsHandler) PostRow(c echo.Context) error {
 		return err
 	}
 
-	rowID, err := handler.boardUC.AddRow(context.Background(), models.PostRowToRow(input), input.BoardID, userID)
+	rowID, err := handler.boardUC.AddRow(context.Background(), http_models.PostRowToRow(input), input.BoardID, userID)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, models.PostRowResponce{ID: rowID})
+	return c.JSON(http.StatusOK, http_models.PostRowResponce{ID: rowID})
 }
 
 func (handler *BoardsHandler) GetRow(c echo.Context) error {
@@ -54,7 +54,7 @@ func (handler *BoardsHandler) GetRow(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, models.GetRowResponce{Row: models.FullRowInfoToBoardRow(row)})
+	return c.JSON(http.StatusOK, http_models.GetRowResponce{Row: http_models.FullRowInfoToBoardRow(row)})
 }
 
 func (handler *BoardsHandler) DeleteRow(c echo.Context) error {
@@ -77,9 +77,9 @@ func (handler *BoardsHandler) DeleteRow(c echo.Context) error {
 }
 
 func (handler *BoardsHandler) PatchRow(c echo.Context) error {
-	input := new(models.PatchRowRequest)
-	input.CarryOver = models.MoveObject{-1, -1}
-	input.Move = models.MoveObject{-1, -1}
+	input := new(http_models.PatchRowRequest)
+	input.CarryOver = http_models.MoveObject{-1, -1}
+	input.Move = http_models.MoveObject{-1, -1}
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}

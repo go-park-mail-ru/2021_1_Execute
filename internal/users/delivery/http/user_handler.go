@@ -66,6 +66,10 @@ func (handler *UserHandler) GetUserByID(c echo.Context) error {
 
 	ctx := context.Background()
 	user, err := handler.userUC.GetUserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
 	return c.JSON(http.StatusOK, models.CreateGetUserByIdResponse(user))
 }
 

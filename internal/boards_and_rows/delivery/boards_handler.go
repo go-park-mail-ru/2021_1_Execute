@@ -2,7 +2,8 @@ package delivery
 
 import (
 	"2021_1_Execute/internal/boards_and_rows"
-	"2021_1_Execute/internal/boards_and_rows/models"
+	http_models "2021_1_Execute/internal/boards_and_rows/models/http"
+
 	"2021_1_Execute/internal/domain"
 	"context"
 	"net/http"
@@ -22,11 +23,11 @@ func (handler *BoardsHandler) GetUsersBoards(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, models.BoardsToGetResponce(boards))
+	return c.JSON(http.StatusOK, http_models.BoardsToGetResponce(boards))
 }
 
 func (handler *BoardsHandler) PostBoard(c echo.Context) error {
-	input := new(models.PostBoardRequest)
+	input := new(http_models.PostBoardRequest)
 	if err := c.Bind(input); err != nil {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
@@ -43,6 +44,6 @@ func (handler *BoardsHandler) PostBoard(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	c.JSON(http.StatusOK, models.PostBoardResponce{ID: boardID})
+	c.JSON(http.StatusOK, http_models.PostBoardResponce{ID: boardID})
 	return nil
 }

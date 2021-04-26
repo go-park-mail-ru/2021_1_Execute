@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"2021_1_Execute/internal/boards_and_rows"
+	"2021_1_Execute/internal/boards_and_rows/models"
 	"2021_1_Execute/internal/domain"
 	"context"
 )
@@ -40,22 +41,22 @@ func (uc *boardsUsecase) checkRights(ctx context.Context, rowID int, requesterID
 	return nil
 }
 
-func (uc *boardsUsecase) GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (boards_and_rows.FullRowInfo, error) {
+func (uc *boardsUsecase) GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (models.FullRowInfo, error) {
 	err := uc.checkRights(ctx, rowID, requesterID)
 
 	row, err := uc.boardsRepo.GetRow(ctx, rowID)
 	if err != nil {
-		return boards_and_rows.FullRowInfo{}, domain.DBErrorToServerError(err)
+		return models.FullRowInfo{}, domain.DBErrorToServerError(err)
 	}
 	return uc.getFullRowInfo(ctx, row)
 }
 
-func (uc *boardsUsecase) getFullRowInfo(ctx context.Context, row boards_and_rows.Row) (boards_and_rows.FullRowInfo, error) {
+func (uc *boardsUsecase) getFullRowInfo(ctx context.Context, row boards_and_rows.Row) (models.FullRowInfo, error) {
 	tasks, err := uc.boardsRepo.GetRowsTasks(ctx, row.ID)
 	if err != nil {
-		return boards_and_rows.FullRowInfo{}, domain.DBErrorToServerError(err)
+		return models.FullRowInfo{}, domain.DBErrorToServerError(err)
 	}
-	return boards_and_rows.FullRowInfo{
+	return models.FullRowInfo{
 		ID:       row.ID,
 		Name:     row.Name,
 		Position: row.Position,

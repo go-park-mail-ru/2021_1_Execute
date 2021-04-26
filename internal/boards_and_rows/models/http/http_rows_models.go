@@ -1,6 +1,9 @@
-package models
+package http
 
-import "2021_1_Execute/internal/boards_and_rows"
+import (
+	"2021_1_Execute/internal/boards_and_rows"
+	"2021_1_Execute/internal/boards_and_rows/models"
+)
 
 type PostRowRequest struct {
 	BoardID  int    `json:"board_id"`
@@ -35,7 +38,7 @@ type BoardTask struct {
 	Position int    `json:"position"`
 }
 
-func FullRowInfoToBoardRow(row boards_and_rows.FullRowInfo) boardRow {
+func FullRowInfoToBoardRow(row models.FullRowInfo) boardRow {
 	tasks := make(map[int]BoardTask)
 	for _, task := range row.Tasks {
 		tasks[task.Position] = BoardTask{

@@ -1,6 +1,9 @@
-package models
+package http
 
-import "2021_1_Execute/internal/boards_and_rows"
+import (
+	"2021_1_Execute/internal/boards_and_rows"
+	"2021_1_Execute/internal/boards_and_rows/models"
+)
 
 type GetBoardsResponce struct {
 	Boards []getBoardsResponceContent `json:"boards"`
@@ -71,7 +74,7 @@ type rowsMove struct {
 	NewPosition int `json:"new_position"`
 }
 
-func BoardToGetResponce(board boards_and_rows.FullBoardInfo) GetBoardByIDResponce {
+func BoardToGetResponce(board models.FullBoardInfo) GetBoardByIDResponce {
 	boardUsers := boardUsers{
 		Owner:   boardUser{ID: board.Owner.ID, Avatar: board.Owner.Avatar},
 		Admins:  []boardUser{},
