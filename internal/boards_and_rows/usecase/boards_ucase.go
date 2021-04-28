@@ -118,3 +118,50 @@ func (uc *boardsUsecase) UpdateBoard(ctx context.Context, board boards_and_rows.
 	}
 	return nil
 }
+
+func (uc *boardsUsecase) changeBoardsAdmins(ctx context.Context, boardID int, newUserID int, requesterID int, isAddAction bool) error {
+	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+	adminsIDs, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
+
+	requesterIsAdmin := false
+	for id := range adminsIDs {
+		if id == requesterID {
+			requesterIsAdmin = true
+			break
+		}
+	}
+
+	if requesterID != ownerID && !requesterIsAdmin {
+		return domain.ForbiddenError
+	}
+
+	if requesterID == newUserID {
+		return domain.BadRequestError
+	}
+
+	_, err = uc.userUC.GetUserByID(ctx, newUserID)
+	if err != nil {
+		return err
+	}
+
+	if isAddAction {
+		err = uc.boardsRepo.AddAdminToBoard(ctx, boardID, newUserID)
+	} else {
+		err = uc.boardsRepo.DeleteAdminFromBoard(ctx, boardID, newUserID)
+	}
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+	return nil
+}
+
+func (uc *boardsUsecase) AddAdminToBoard(ctx context.Context, boardID int, newUserID int, requesterID int) error {
+	return uc.changeBoardsAdmins(ctx, boardID, newUserID, requesterID, true)
+}
+
+func (uc *boardsUsecase) DeleteAdminFromBoard(ctx context.Context, boardID int, newUserID int, requesterID int) error {
+	return uc.changeBoardsAdmins(ctx, boardID, newUserID, requesterID, false)
+}

@@ -123,9 +123,11 @@ func (repo *PostgreBoardRepository) GetBoard(ctx context.Context, boardID int) (
 func (repo *PostgreBoardRepository) GetUsersBoards(ctx context.Context, userID int) ([]boards_and_rows.Board, error) {
 	rows, err := repo.Pool.Query(ctx,
 		`select boards.id, boards.name, boards.description
-	from boards
-	inner join owners
-	on owners.user_id = $1::int and owners.board_id = boards.id`, userID)
+		from owners
+		where owners.user_id = $1::int and owners.board_id = boards.id
+		left join administrators
+		on administrators.user_id = $1::int and administrators.board_id = boards.id
+		inner join boards`, userID) //todo is it works?
 
 	if err != nil {
 		return []boards_and_rows.Board{}, errors.Wrap(err, "Unable to get user's boards")
@@ -182,4 +184,14 @@ func (repo *PostgreBoardRepository) GetBoardsOwner(ctx context.Context, boardID 
 	rows.Close()
 
 	return owner, nil
+}
+
+func (repo *PostgreBoardRepository) GetBoardsAdmins(ctx context.Context, boardID int) ([]int, error) {
+
+}
+func (repo *PostgreBoardRepository) AddAdminToBoard(ctx context.Context, boardID int, userID int) error {
+
+}
+func (repo *PostgreBoardRepository) DeleteAdminFromBoard(ctx context.Context, boardID int, userID int) error {
+
 }

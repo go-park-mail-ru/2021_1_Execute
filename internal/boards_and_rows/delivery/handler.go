@@ -30,6 +30,9 @@ func NewBoardsHandler(e *echo.Echo, boardUC boards_and_rows.BoardUsecase,
 	e.PATCH("api/boards/:id/", handler.PatchBoardByID)
 	e.DELETE("api/boards/:id/", handler.DeleteBoardByID)
 
+	e.POST("api/boards/:id/users/:userId", handler.AddAdminToBoard)
+	e.DELETE("api/boards/:id/users/:userId", handler.DeleteAdminFromBoard)
+
 	e.POST("api/rows/", handler.PostRow)
 	e.GET("api/rows/:id/", handler.GetRow)
 	e.PATCH("api/rows/:id/", handler.PatchRow)
