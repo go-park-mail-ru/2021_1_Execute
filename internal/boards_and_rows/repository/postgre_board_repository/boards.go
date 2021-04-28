@@ -187,11 +187,45 @@ func (repo *PostgreBoardRepository) GetBoardsOwner(ctx context.Context, boardID 
 }
 
 func (repo *PostgreBoardRepository) GetBoardsAdmins(ctx context.Context, boardID int) ([]int, error) {
+	rows, err := repo.Pool.Query(ctx, "select user_id from administrators where board_id = $1::int", boardID)
+	if err != nil {
+		return []int{}, errors.Wrap(err, "Unable to get admins")
+	}
 
+	var admins []int
+
+	for rows.Next() {
+		var id int
+		err = rows.Scan(&id)
+		if err != nil {
+			return []int{}, errors.Wrap(err, "Unable to read admin")
+		}
+		admins = append(admins, id)
+	}
+
+	rows.Close()
+
+	return admins, nil
 }
+
 func (repo *PostgreBoardRepository) AddAdminToBoard(ctx context.Context, boardID int, userID int) error {
+	rows, err := repo.Pool.Query(ctx, "insert into administrators (user_id, board_id) values ($1::int, $2::int)", userID, boardID)
 
+	if err != nil {
+		return errors.Wrap(err, "Unable to link user and board")
+	}
+
+	rows.Close()
+
+	return nil
 }
-func (repo *PostgreBoardRepository) DeleteAdminFromBoard(ctx context.Context, boardID int, userID int) error {
 
+func (repo *PostgreBoardRepository) DeleteAdminFromBoard(ctx context.Context, boardID int, userID int) error {
+	rows, err := repo.Pool.Query(ctx, "delete from administrators where user_id = $1::int and board_id = $2::int", userID, boardID)
+	if err != nil {
+		return errors.Wrap(err, "Unable to delete admin")
+	}
+	rows.Close()
+
+	return nil
 }
