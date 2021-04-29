@@ -124,10 +124,12 @@ func (repo *PostgreBoardRepository) GetUsersBoards(ctx context.Context, userID i
 	rows, err := repo.Pool.Query(ctx,
 		`select boards.id, boards.name, boards.description
 		from owners
-		where owners.user_id = $1::int and owners.board_id = boards.id
+	    inner join owners as o
+            on o.user_id = $1::int
 		left join administrators
-		on administrators.user_id = $1::int and administrators.board_id = boards.id
-		inner join boards`, userID) //todo is it works?
+		    on administrators.user_id = $1::int
+		inner join boards 
+            on boards.id = owners.board_id or boards.id = administrators.board_id`, userID)
 
 	if err != nil {
 		return []boards_and_rows.Board{}, errors.Wrap(err, "Unable to get user's boards")
