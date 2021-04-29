@@ -52,7 +52,7 @@ type BoardRepository interface {
 	GetBoard(ctx context.Context, boardID int) (Board, error)
 	GetRow(ctx context.Context, rowID int) (Row, error)
 
-	GetUsersBoards(ctx context.Context, userID int) ([]Board, error) //todo join from administration
+	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)
 
 	GetBoardsOwner(ctx context.Context, boardID int) (int, error)
 	GetBoardsAdmins(ctx context.Context, boardID int) ([]int, error)
