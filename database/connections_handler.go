@@ -3,9 +3,13 @@ package database
 import (
 	"context"
 	"io/ioutil"
+	"os"
 	"strconv"
 
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/log/logrusadapter"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/sirupsen/logrus"
 )
 
 const PathToInitDBFile = "database/trello.sql"
@@ -17,6 +21,16 @@ func GetPool(username, password, dbname, host string, port int) (*pgxpool.Pool, 
 	if err != nil {
 		return nil, err
 	}
+
+	logger := &logrus.Logger{
+		Out:          os.Stderr,
+		Hooks:        make(logrus.LevelHooks),
+		Formatter:    new(logrus.TextFormatter),
+		Level:        logrus.DebugLevel,
+		ReportCaller: false,
+	}
+	config.ConnConfig.Logger = logrusadapter.NewLogger(logger)
+	config.ConnConfig.LogLevel = pgx.LogLevelDebug
 
 	ctx := context.Background()
 
