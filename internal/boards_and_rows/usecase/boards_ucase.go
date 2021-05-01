@@ -23,26 +23,26 @@ func NewBoardsUsecase(repo boards_and_rows.BoardRepository, userUsercase users.U
 	}
 }
 
-func (uc *boardsUsecase) checkAccessToBoard(ctx context.Context, boardID, requesterID int) error {
+func (uc *boardsUsecase) checkAccessToBoard(ctx context.Context, boardID, requesterID int) ([]int, error) {
 	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
 	if err != nil {
-		return domain.DBErrorToServerError(err)
+		return []int{}, domain.DBErrorToServerError(err)
 	}
 
 	adminsID, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
 	if err != nil {
-		return domain.DBErrorToServerError(err)
+		return []int{}, domain.DBErrorToServerError(err)
 	}
 
 	adminsID = append(adminsID, ownerID)
 
 	for _, id := range adminsID {
 		if requesterID == id {
-			return nil
+			return adminsID, nil
 		}
 	}
 
-	return domain.ForbiddenError
+	return []int{}, domain.ForbiddenError
 }
 
 func (uc *boardsUsecase) AddBoard(ctx context.Context, board boards_and_rows.Board, userID int) (int, error) {
@@ -66,25 +66,24 @@ func (uc *boardsUsecase) GetUsersBoards(ctx context.Context, userID int) ([]boar
 }
 
 func (uc *boardsUsecase) GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (models.FullBoardInfo, error) {
-	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	usersID, err := uc.checkAccessToBoard(ctx, boardID, requesterID)
+
+	if err != nil {
+		return models.FullBoardInfo{}, domain.ForbiddenError
+	}
+
+	owner, err := uc.userUC.GetUserByID(ctx, usersID[len(usersID)-1])
 	if err != nil {
 		return models.FullBoardInfo{}, domain.DBErrorToServerError(err)
 	}
 
-	// adminsID, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
-	// if err != nil {
-	// 	return models.FullBoardInfo{}, domain.DBErrorToServerError(err)
-	// }
-
-	// checkAccess
-
-	if requesterID != ownerID {
-		return models.FullBoardInfo{}, domain.ForbiddenError
-	}
-
-	owner, err := uc.userUC.GetUserByID(ctx, ownerID)
-	if requesterID != ownerID {
-		return models.FullBoardInfo{}, domain.ForbiddenError
+	var admins []users.User
+	for i := 0; i < len(usersID)-1; i++ {
+		usr, err := uc.userUC.GetUserByID(ctx, usersID[i])
+		if err != nil {
+			return models.FullBoardInfo{}, domain.DBErrorToServerError(err)
+		}
+		admins = append(admins, usr)
 	}
 
 	board, err := uc.boardsRepo.GetBoard(ctx, boardID)
@@ -111,6 +110,7 @@ func (uc *boardsUsecase) GetFullBoardInfo(ctx context.Context, boardID int, requ
 		Name:        board.Name,
 		Description: board.Description,
 		Owner:       owner,
+		Admins:      admins,
 		Rows:        fullRowsInfo,
 	}, nil
 }
@@ -133,18 +133,16 @@ func (uc *boardsUsecase) DeleteBoard(ctx context.Context, boardID int, requester
 }
 
 func (uc *boardsUsecase) UpdateBoard(ctx context.Context, board boards_and_rows.Board, requesterID int) error {
-	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, board.ID)
+	_, err := uc.checkAccessToBoard(ctx, board.ID, requesterID)
 	if err != nil {
-		return domain.DBErrorToServerError(err)
+		return err
 	}
 
-	if requesterID != ownerID {
-		return domain.ForbiddenError
-	}
 	err = uc.boardsRepo.UpdateBoard(ctx, board)
 	if err != nil {
 		return domain.DBErrorToServerError(err)
 	}
+
 	return nil
 }
 

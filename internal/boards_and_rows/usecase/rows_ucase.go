@@ -8,13 +8,9 @@ import (
 )
 
 func (uc *boardsUsecase) AddRow(ctx context.Context, row boards_and_rows.Row, boardID int, requesterID int) (int, error) {
-	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	_, err := uc.checkAccessToBoard(ctx, boardID, requesterID)
 	if err != nil {
-		return 0, domain.DBErrorToServerError(err)
-	}
-
-	if requesterID != ownerID {
-		return 0, domain.ForbiddenError
+		return 0, err
 	}
 
 	rowID, err := uc.boardsRepo.AddRow(ctx, row, boardID)
@@ -27,22 +23,22 @@ func (uc *boardsUsecase) AddRow(ctx context.Context, row boards_and_rows.Row, bo
 func (uc *boardsUsecase) checkRights(ctx context.Context, rowID int, requesterID int) error {
 	boardID, err := uc.boardsRepo.GetRowsBoardID(ctx, rowID)
 	if err != nil {
-		domain.DBErrorToServerError(err)
+		return domain.DBErrorToServerError(err)
 	}
 
-	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	_, err = uc.checkAccessToBoard(ctx, boardID, requesterID)
 	if err != nil {
-		domain.DBErrorToServerError(err)
+		return err
 	}
 
-	if requesterID != ownerID {
-		return domain.ForbiddenError
-	}
 	return nil
 }
 
 func (uc *boardsUsecase) GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (models.FullRowInfo, error) {
 	err := uc.checkRights(ctx, rowID, requesterID)
+	if err != nil {
+		return models.FullRowInfo{}, err
+	}
 
 	row, err := uc.boardsRepo.GetRow(ctx, rowID)
 	if err != nil {
@@ -71,6 +67,10 @@ func (uc *boardsUsecase) DeleteRow(ctx context.Context, rowID int, requesterID i
 	}
 
 	boardID, err := uc.boardsRepo.GetRowsBoardID(ctx, rowID)
+	if err != nil {
+		return err
+	}
+
 	rows, err := uc.boardsRepo.GetBoardsRows(ctx, boardID)
 	if err != nil {
 		return domain.DBErrorToServerError(err)
@@ -88,13 +88,9 @@ func (uc *boardsUsecase) DeleteRow(ctx context.Context, rowID int, requesterID i
 }
 
 func (uc *boardsUsecase) MoveRow(ctx context.Context, boardID int, rowID int, newPosition int, requesterID int) error {
-	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	_, err := uc.checkAccessToBoard(ctx, boardID, requesterID)
 	if err != nil {
-		return domain.DBErrorToServerError(err)
-	}
-
-	if requesterID != ownerID {
-		return domain.ForbiddenError
+		return err
 	}
 
 	rows, err := uc.boardsRepo.GetBoardsRows(ctx, boardID)
@@ -155,6 +151,9 @@ func (uc *boardsUsecase) UpdateTasksPositions(ctx context.Context, rowID, taskID
 	}
 
 	err = uc.taskUC.MoveTask(ctx, taskID, newPos, requesterID)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
