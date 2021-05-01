@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"2021_1_Execute/internal/boards_and_rows"
+	"2021_1_Execute/internal/boards_and_rows/models"
 	"2021_1_Execute/internal/domain"
 	"2021_1_Execute/internal/tasks"
 	"2021_1_Execute/internal/users"
@@ -42,41 +43,41 @@ func (uc *boardsUsecase) GetUsersBoards(ctx context.Context, userID int) ([]boar
 	return boards, nil
 }
 
-func (uc *boardsUsecase) GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (boards_and_rows.FullBoardInfo, error) {
+func (uc *boardsUsecase) GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (models.FullBoardInfo, error) {
 	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
 	if err != nil {
-		return boards_and_rows.FullBoardInfo{}, domain.DBErrorToServerError(err)
+		return models.FullBoardInfo{}, domain.DBErrorToServerError(err)
 	}
 
 	if requesterID != ownerID {
-		return boards_and_rows.FullBoardInfo{}, domain.ForbiddenError
+		return models.FullBoardInfo{}, domain.ForbiddenError
 	}
 
 	owner, err := uc.userUC.GetUserByID(ctx, ownerID)
 	if requesterID != ownerID {
-		return boards_and_rows.FullBoardInfo{}, domain.ForbiddenError
+		return models.FullBoardInfo{}, domain.ForbiddenError
 	}
 
 	board, err := uc.boardsRepo.GetBoard(ctx, boardID)
 	if err != nil {
-		return boards_and_rows.FullBoardInfo{}, domain.DBErrorToServerError(err)
+		return models.FullBoardInfo{}, domain.DBErrorToServerError(err)
 	}
 
 	rows, err := uc.boardsRepo.GetBoardsRows(ctx, boardID)
 	if err != nil {
-		return boards_and_rows.FullBoardInfo{}, domain.DBErrorToServerError(err)
+		return models.FullBoardInfo{}, domain.DBErrorToServerError(err)
 	}
 
-	fullRowsInfo := []boards_and_rows.FullRowInfo{}
+	fullRowsInfo := []models.FullRowInfo{}
 	for _, row := range rows {
 		rowInfo, err := uc.getFullRowInfo(ctx, row)
 		if err != nil {
-			return boards_and_rows.FullBoardInfo{}, err
+			return models.FullBoardInfo{}, err
 		}
 
 		fullRowsInfo = append(fullRowsInfo, rowInfo)
 	}
-	return boards_and_rows.FullBoardInfo{
+	return models.FullBoardInfo{
 		ID:          boardID,
 		Name:        board.Name,
 		Description: board.Description,

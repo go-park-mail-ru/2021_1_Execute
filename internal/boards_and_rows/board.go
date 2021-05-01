@@ -1,8 +1,8 @@
 package boards_and_rows
 
 import (
+	"2021_1_Execute/internal/boards_and_rows/models"
 	"2021_1_Execute/internal/tasks"
-	"2021_1_Execute/internal/users"
 	"context"
 )
 
@@ -18,20 +18,6 @@ type Row struct {
 	Position int    `json:"position"`
 }
 
-type FullBoardInfo struct {
-	ID          int           `json:"id"`
-	Name        string        `json:"name"`
-	Description string        `json:"description"`
-	Owner       users.User    `json:"-"`
-	Rows        []FullRowInfo `json:"rows"`
-}
-type FullRowInfo struct {
-	ID       int          `json:"id"`
-	Name     string       `json:"name"`
-	Position int          `json:"position"`
-	Tasks    []tasks.Task `json:"tasks"`
-}
-
 type BoardUsecase interface {
 	AddBoard(ctx context.Context, board Board, userID int) (int, error)
 	AddRow(ctx context.Context, row Row, boardID int, requesterID int) (int, error)
@@ -43,9 +29,9 @@ type BoardUsecase interface {
 	DeleteBoard(ctx context.Context, boardID int, requesterID int) error
 	DeleteRow(ctx context.Context, rowID int, requesterID int) error
 
-	GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (FullBoardInfo, error)
+	GetFullBoardInfo(ctx context.Context, boardID int, requesterID int) (models.FullBoardInfo, error)
 	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)
-	GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (FullRowInfo, error)
+	GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (models.FullRowInfo, error)
 	UpdateTasksPositions(ctx context.Context, rowID, taskID, newPos, requesterID int) error
 }
 

@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"2021_1_Execute/internal/boards_and_rows"
-	"2021_1_Execute/internal/boards_and_rows/models"
+	http_models "2021_1_Execute/internal/boards_and_rows/models/http"
 	"2021_1_Execute/internal/domain"
 	"context"
 	"net/http"
@@ -32,7 +32,7 @@ func (handler *BoardsHandler) GetBoardByID(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, models.BoardToGetResponce(board))
+	return c.JSON(http.StatusOK, http_models.BoardToGetResponce(board))
 
 }
 
@@ -47,7 +47,7 @@ func (handler *BoardsHandler) PatchBoardByID(c echo.Context) error {
 		return domain.IDFormatError
 	}
 
-	input := new(models.PatchBoardByIDRequest)
+	input := new(http_models.PatchBoardByIDRequest)
 	input.Move.NewPosition = -1
 	input.Move.RowID = -1
 	if err := c.Bind(input); err != nil {
