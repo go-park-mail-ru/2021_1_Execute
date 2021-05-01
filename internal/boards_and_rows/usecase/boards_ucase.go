@@ -23,6 +23,28 @@ func NewBoardsUsecase(repo boards_and_rows.BoardRepository, userUsercase users.U
 	}
 }
 
+func (uc *boardsUsecase) checkAccessToBoard(ctx context.Context, boardID, requesterID int) error {
+	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	adminsID, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	adminsID = append(adminsID, ownerID)
+
+	for _, id := range adminsID {
+		if requesterID == id {
+			return nil
+		}
+	}
+
+	return domain.ForbiddenError
+}
+
 func (uc *boardsUsecase) AddBoard(ctx context.Context, board boards_and_rows.Board, userID int) (int, error) {
 	boardID, err := uc.boardsRepo.AddBoard(ctx, board)
 	if err != nil {
@@ -48,6 +70,13 @@ func (uc *boardsUsecase) GetFullBoardInfo(ctx context.Context, boardID int, requ
 	if err != nil {
 		return models.FullBoardInfo{}, domain.DBErrorToServerError(err)
 	}
+
+	// adminsID, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
+	// if err != nil {
+	// 	return models.FullBoardInfo{}, domain.DBErrorToServerError(err)
+	// }
+
+	// checkAccess
 
 	if requesterID != ownerID {
 		return models.FullBoardInfo{}, domain.ForbiddenError
