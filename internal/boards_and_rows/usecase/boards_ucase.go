@@ -151,7 +151,11 @@ func (uc *boardsUsecase) changeBoardsAdmins(ctx context.Context, boardID int, ne
 	if err != nil {
 		return domain.DBErrorToServerError(err)
 	}
+
 	adminsIDs, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
 
 	requesterIsAdmin := false
 	for id := range adminsIDs {
