@@ -75,9 +75,14 @@ type rowsMove struct {
 }
 
 func BoardToGetResponce(board models.FullBoardInfo) GetBoardByIDResponce {
+	var admins []boardUser
+	for _, usr := range board.Admins {
+		admins = append(admins, boardUser{ID: usr.ID, Avatar: usr.Avatar})
+	}
+
 	boardUsers := boardUsers{
 		Owner:   boardUser{ID: board.Owner.ID, Avatar: board.Owner.Avatar},
-		Admins:  []boardUser{},
+		Admins:  admins,
 		Members: []boardUser{},
 	}
 

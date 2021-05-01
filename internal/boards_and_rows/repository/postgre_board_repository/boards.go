@@ -123,9 +123,13 @@ func (repo *PostgreBoardRepository) GetBoard(ctx context.Context, boardID int) (
 func (repo *PostgreBoardRepository) GetUsersBoards(ctx context.Context, userID int) ([]boards_and_rows.Board, error) {
 	rows, err := repo.Pool.Query(ctx,
 		`select boards.id, boards.name, boards.description
-	from boards
-	inner join owners
-	on owners.user_id = $1::int and owners.board_id = boards.id`, userID)
+		from owners
+	    inner join owners as o
+            on o.user_id = $1::int
+		left join administrators
+		    on administrators.user_id = $1::int
+		inner join boards 
+            on boards.id = owners.board_id or boards.id = administrators.board_id`, userID)
 
 	if err != nil {
 		return []boards_and_rows.Board{}, errors.Wrap(err, "Unable to get user's boards")
@@ -182,4 +186,48 @@ func (repo *PostgreBoardRepository) GetBoardsOwner(ctx context.Context, boardID 
 	rows.Close()
 
 	return owner, nil
+}
+
+func (repo *PostgreBoardRepository) GetBoardsAdmins(ctx context.Context, boardID int) ([]int, error) {
+	rows, err := repo.Pool.Query(ctx, "select user_id from administrators where board_id = $1::int", boardID)
+	if err != nil {
+		return []int{}, errors.Wrap(err, "Unable to get admins")
+	}
+
+	var admins []int
+
+	for rows.Next() {
+		var id int
+		err = rows.Scan(&id)
+		if err != nil {
+			return []int{}, errors.Wrap(err, "Unable to read admin")
+		}
+		admins = append(admins, id)
+	}
+
+	rows.Close()
+
+	return admins, nil
+}
+
+func (repo *PostgreBoardRepository) AddAdminToBoard(ctx context.Context, boardID int, userID int) error {
+	rows, err := repo.Pool.Query(ctx, "insert into administrators (user_id, board_id) values ($1::int, $2::int)", userID, boardID)
+
+	if err != nil {
+		return errors.Wrap(err, "Unable to link user and board")
+	}
+
+	rows.Close()
+
+	return nil
+}
+
+func (repo *PostgreBoardRepository) DeleteAdminFromBoard(ctx context.Context, boardID int, userID int) error {
+	rows, err := repo.Pool.Query(ctx, "delete from administrators where user_id = $1::int and board_id = $2::int", userID, boardID)
+	if err != nil {
+		return errors.Wrap(err, "Unable to delete admin")
+	}
+	rows.Close()
+
+	return nil
 }
