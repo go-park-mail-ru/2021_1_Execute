@@ -135,6 +135,15 @@ func (uc *tasksUsecase) GetTask(ctx context.Context, taskID, requesterID int) (t
 		return tasks.Task{}, domain.DBErrorToServerError(err)
 	}
 
+	checklists, err := uc.tasksRepo.GetTasksChecklists(ctx, taskID)
+	if err != nil {
+		return tasks.Task{}, domain.DBErrorToServerError(err)
+	}
+
+	if len(checklists) > 0 {
+		task.Checklists = checklists
+	}
+
 	return task, nil
 }
 

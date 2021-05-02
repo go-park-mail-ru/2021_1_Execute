@@ -3,10 +3,22 @@ package tasks
 import "context"
 
 type Task struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Position    int    `json:"position"`
-	Description string `json:"description"`
+	ID          int         `json:"id"`
+	Name        string      `json:"name"`
+	Position    int         `json:"position"`
+	Description string      `json:"description"`
+	Checklists  []Checklist `json:"checklists,omitempty"`
+}
+
+type Field struct {
+	Name string `json:"name"`
+	Done bool   `json:"isDone"`
+}
+
+type Checklist struct {
+	ID     int     `json:"id"`
+	Name   string  `json:"name"`
+	Fields []Field `json:"fields"`
 }
 
 type TaskUsecase interface {
@@ -22,6 +34,10 @@ type TaskUsecase interface {
 	GetTasksRowID(ctx context.Context, taskID, requesterID int) (int, error)
 
 	MoveTask(ctx context.Context, cardID, newPosition, requesterID int) error
+
+	AddChecklist(ctx context.Context, taskID int, checklist Checklist, requesterID int) (int, error)
+	DeleteChecklist(ctx context.Context, checklistID, requesterID int) error
+	UpdateChecklist(ctx context.Context, checklistID int, checklist Checklist, requesterID int) error
 }
 
 type TaskRepository interface {
@@ -35,4 +51,10 @@ type TaskRepository interface {
 	GetTask(ctx context.Context, taskID int) (Task, error)
 	GetTasksBoardID(ctx context.Context, taskID int) (int, error)
 	GetTasksRowID(ctx context.Context, taskID int) (int, error)
+
+	AddChecklist(ctx context.Context, taskID int, checklist Checklist) (int, error)
+	DeleteChecklist(ctx context.Context, checklistID int) error
+	UpdateChecklist(ctx context.Context, checklistID int, checklist Checklist) error
+	GetTasksChecklists(ctx context.Context, taskID int) ([]Checklist, error)
+	GetChecklistsTaskID(ctx context.Context, checklistID int) (int, error)
 }
