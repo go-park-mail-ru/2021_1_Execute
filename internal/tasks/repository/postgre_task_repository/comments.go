@@ -15,6 +15,7 @@ func (repo *PostgreTaskRepository) AddComment(ctx context.Context, comment tasks
 	if err != nil {
 		return -1, errors.Wrap(err, "Unable to create comment")
 	}
+	defer rows.Close()
 
 	var commentID int = -1
 
@@ -32,8 +33,6 @@ func (repo *PostgreTaskRepository) AddComment(ctx context.Context, comment tasks
 		return -1, errors.Wrap(err, "Invalid comment id")
 	}
 
-	rows.Close()
-
 	return commentID, nil
 }
 
@@ -43,6 +42,7 @@ func (repo *PostgreTaskRepository) getTasksComments(ctx context.Context, taskID 
 	if err != nil {
 		return []tasks.Comment{}, errors.Wrap(err, "Unable to get task's comments")
 	}
+	defer rows.Close()
 
 	var comments []tasks.Comment
 
@@ -55,8 +55,6 @@ func (repo *PostgreTaskRepository) getTasksComments(ctx context.Context, taskID 
 		comments = append(comments, comment)
 	}
 
-	rows.Close()
-
 	return comments, nil
 }
 
@@ -66,6 +64,7 @@ func (repo *PostgreTaskRepository) GetComment(ctx context.Context, commentID int
 	if err != nil {
 		return tasks.Comment{}, errors.Wrap(err, "Unable to get comment")
 	}
+	defer rows.Close()
 
 	var comment tasks.Comment
 
@@ -75,8 +74,6 @@ func (repo *PostgreTaskRepository) GetComment(ctx context.Context, commentID int
 			return tasks.Comment{}, errors.Wrap(err, "Unable to read comment")
 		}
 	}
-
-	rows.Close()
 
 	return comment, nil
 }
@@ -98,6 +95,7 @@ func (repo *PostgreTaskRepository) GetCommentsTaskID(ctx context.Context, commen
 	if err != nil {
 		return -1, errors.Wrap(err, "Unable to get comment's taskID")
 	}
+	defer rows.Close()
 
 	var taskID int = -1
 
@@ -107,8 +105,6 @@ func (repo *PostgreTaskRepository) GetCommentsTaskID(ctx context.Context, commen
 			return -1, errors.Wrap(err, "Unable to read comment's taskID")
 		}
 	}
-
-	rows.Close()
 
 	if taskID == -1 {
 		return -1, domain.ServerNotFoundError
