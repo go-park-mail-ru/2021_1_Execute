@@ -25,13 +25,9 @@ func (uc *tasksUsecase) AddTask(ctx context.Context, task tasks.Task, rowID, req
 		return -1, domain.DBErrorToServerError(err)
 	}
 
-	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	_, err = uc.checkAccessToBoard(ctx, boardID, requesterID)
 	if err != nil {
-		return -1, domain.DBErrorToServerError(err)
-	}
-
-	if requesterID != ownerID {
-		return -1, domain.ForbiddenError
+		return -1, err
 	}
 
 	taskID, err := uc.tasksRepo.AddTask(ctx, task, rowID)
@@ -258,54 +254,24 @@ func (uc *tasksUsecase) checkRights(ctx context.Context, taskID, requesterID int
 	return domain.ForbiddenError
 }
 
-func (uc *tasksUsecase) AddComment(ctx context.Context, comment tasks.Comment, taskID, requesterID int) (int, error) {
-	err := uc.checkRights(ctx, taskID, requesterID)
+func (uc *tasksUsecase) checkAccessToBoard(ctx context.Context, boardID, requesterID int) ([]int, error) {
+	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
 	if err != nil {
-		return -1, err
+		return []int{}, domain.DBErrorToServerError(err)
 	}
 
-	commentID, err := uc.tasksRepo.AddComment(ctx, comment, taskID)
+	adminsID, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
 	if err != nil {
-		return -1, domain.DBErrorToServerError(err)
+		return []int{}, domain.DBErrorToServerError(err)
 	}
 
-	return commentID, nil
-}
+	adminsID = append(adminsID, ownerID)
 
-func (uc *tasksUsecase) GetComment(ctx context.Context, commentID, requesterID int) (tasks.Comment, error) {
-	taskID, err := uc.tasksRepo.GetCommentsTaskID(ctx, commentID)
-	if err != nil {
-		return tasks.Comment{}, domain.DBErrorToServerError(err)
+	for _, id := range adminsID {
+		if requesterID == id {
+			return adminsID, nil
+		}
 	}
 
-	err = uc.checkRights(ctx, taskID, requesterID)
-	if err != nil {
-		return tasks.Comment{}, err
-	}
-
-	comment, err := uc.tasksRepo.GetComment(ctx, commentID)
-	if err != nil {
-		return tasks.Comment{}, domain.DBErrorToServerError(err)
-	}
-
-	return comment, nil
-}
-
-func (uc *tasksUsecase) DeleteComment(ctx context.Context, commentID, requesterID int) error {
-	taskID, err := uc.tasksRepo.GetCommentsTaskID(ctx, commentID)
-	if err != nil {
-		return domain.DBErrorToServerError(err)
-	}
-
-	err = uc.checkRights(ctx, taskID, requesterID)
-	if err != nil {
-		return err
-	}
-
-	err = uc.tasksRepo.DeleteComment(ctx, commentID)
-	if err != nil {
-		return domain.DBErrorToServerError(err)
-	}
-
-	return nil
+	return []int{}, domain.ForbiddenError
 }
