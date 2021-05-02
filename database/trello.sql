@@ -82,6 +82,7 @@ create table if not exists Comments (
   user_id integer not null,
 
   foreign key (user_id) references USERS (id) on delete cascade,
+  foreign key (task_id) references TASKS (id) on delete cascade,
   check (text != '')
 );
 
