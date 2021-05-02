@@ -135,6 +135,21 @@ func (uc *tasksUsecase) GetTask(ctx context.Context, taskID, requesterID int) (t
 		return tasks.Task{}, domain.DBErrorToServerError(err)
 	}
 
+	users, err := uc.tasksRepo.GetTasksAssignments(ctx, taskID)
+	if err != nil {
+		return tasks.Task{}, domain.DBErrorToServerError(err)
+	}
+
+	var assignments []tasks.Assignment
+
+	for _, user := range users {
+		assignments = append(assignments, tasks.Assignment{UserID: user})
+	}
+
+	if len(assignments) > 0 {
+		task.Assignments = assignments
+	}
+
 	return task, nil
 }
 
