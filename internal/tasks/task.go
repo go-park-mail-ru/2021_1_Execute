@@ -3,10 +3,17 @@ package tasks
 import "context"
 
 type Task struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Position    int    `json:"position"`
-	Description string `json:"description"`
+	ID          int          `json:"id"`
+	Name        string       `json:"name"`
+	Position    int          `json:"position"`
+	Description string       `json:"description"`
+	Attachments []Attachment `json:"attaches,omitempty"`
+}
+
+type Attachment struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Path string `json:"path"`
 }
 
 type TaskUsecase interface {
@@ -35,4 +42,6 @@ type TaskRepository interface {
 	GetTask(ctx context.Context, taskID int) (Task, error)
 	GetTasksBoardID(ctx context.Context, taskID int) (int, error)
 	GetTasksRowID(ctx context.Context, taskID int) (int, error)
+
+	AddAttachment(ctx context.Context, taskID int, attachment Attachment) (int, error)
 }

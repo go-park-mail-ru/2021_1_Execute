@@ -74,6 +74,15 @@ create table if not exists Tasks_Users (
   foreign key (user_id) references USERS (id) on delete cascade
 );
 
+create table if not exists Attachments (
+  id serial primary key,
+  file_name text,
+  path text,
+
+  task_id integer not null,
+  foreign key (task_id) references TASKS (id) on delete cascade
+);
+
 
 
 create table if not exists Sessions (
