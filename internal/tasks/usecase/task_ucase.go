@@ -135,6 +135,15 @@ func (uc *tasksUsecase) GetTask(ctx context.Context, taskID, requesterID int) (t
 		return tasks.Task{}, domain.DBErrorToServerError(err)
 	}
 
+	attachments, err := uc.tasksRepo.GetTasksAttachments(ctx, taskID)
+	if err != nil {
+		return tasks.Task{}, domain.DBErrorToServerError(err)
+	}
+
+	if len(attachments) > 0 {
+		task.Attachments = attachments
+	}
+
 	return task, nil
 }
 

@@ -3,10 +3,17 @@ package tasks
 import "context"
 
 type Task struct {
-	ID          int    `json:"id"`
-	Name        string `json:"name"`
-	Position    int    `json:"position"`
-	Description string `json:"description"`
+	ID          int          `json:"id"`
+	Name        string       `json:"name"`
+	Position    int          `json:"position"`
+	Description string       `json:"description"`
+	Attachments []Attachment `json:"attaches,omitempty"`
+}
+
+type Attachment struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Path string `json:"path"`
 }
 
 type TaskUsecase interface {
@@ -22,6 +29,10 @@ type TaskUsecase interface {
 	GetTasksRowID(ctx context.Context, taskID, requesterID int) (int, error)
 
 	MoveTask(ctx context.Context, cardID, newPosition, requesterID int) error
+
+	AddAttachment(ctx context.Context, taskID int, attachment Attachment, requesterID int) (int, error)
+	DeleteAttachment(ctx context.Context, attachmentID, requesterID int) error
+	GetAttachment(ctx context.Context, attachmentID, requesterID int) (Attachment, error)
 }
 
 type TaskRepository interface {
@@ -35,4 +46,10 @@ type TaskRepository interface {
 	GetTask(ctx context.Context, taskID int) (Task, error)
 	GetTasksBoardID(ctx context.Context, taskID int) (int, error)
 	GetTasksRowID(ctx context.Context, taskID int) (int, error)
+
+	AddAttachment(ctx context.Context, taskID int, attachment Attachment) (int, error)
+	DeleteAttachment(ctx context.Context, attachmentID int) error
+	GetTasksAttachments(ctx context.Context, taskID int) ([]Attachment, error)
+	GetAttachmentTaskID(ctx context.Context, attachmentID int) (int, error)
+	GetAttachment(ctx context.Context, attachmentID int) (Attachment, error)
 }
