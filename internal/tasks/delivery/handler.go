@@ -25,4 +25,5 @@ func NewTasksHandler(e *echo.Echo, sessionHD session.SessionHandler, taskUC task
 	e.POST("api/tasks/", handler.PostTask)
 	e.PATCH("api/tasks/:id/", handler.PatchTask)
 	e.DELETE("api/tasks/:id/", handler.DeleteTask)
+	e.DELETE("/api/attachments/:id/", handler.DeleteAttachment)
 }
