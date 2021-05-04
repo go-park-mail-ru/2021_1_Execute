@@ -29,6 +29,10 @@ type TaskUsecase interface {
 	GetTasksRowID(ctx context.Context, taskID, requesterID int) (int, error)
 
 	MoveTask(ctx context.Context, cardID, newPosition, requesterID int) error
+
+	AddAttachment(ctx context.Context, taskID int, attachment Attachment, requesterID int) (int, error)
+	DeleteAttachment(ctx context.Context, attachmentID, requesterID int) error
+	GetAttachment(ctx context.Context, attachmentID, requesterID int) (Attachment, error)
 }
 
 type TaskRepository interface {
@@ -44,4 +48,8 @@ type TaskRepository interface {
 	GetTasksRowID(ctx context.Context, taskID int) (int, error)
 
 	AddAttachment(ctx context.Context, taskID int, attachment Attachment) (int, error)
+	DeleteAttachment(ctx context.Context, attachmentID int) error
+	GetTasksAttachments(ctx context.Context, taskID int) ([]Attachment, error)
+	GetAttachmentTaskID(ctx context.Context, attachmentID int) (int, error)
+	GetAttachment(ctx context.Context, attachmentID int) (Attachment, error)
 }

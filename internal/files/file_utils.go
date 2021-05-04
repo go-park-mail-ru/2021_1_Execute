@@ -66,3 +66,12 @@ func (fileUtil *fileUtil) GetExtension(filename string) string {
 	}
 	return ""
 }
+
+func (fileUtil *fileUtil) GetOriginalFilename(filename string) string {
+	for i := len(filename) - 1; i >= 0; i-- {
+		if filename[i] == '.' {
+			return filename[:i]
+		}
+	}
+	return ""
+}

@@ -80,7 +80,10 @@ create table if not exists Attachments (
   path text,
 
   task_id integer not null,
-  foreign key (task_id) references TASKS (id) on delete cascade
+  foreign key (task_id) references TASKS (id) on delete cascade,
+
+  check (path != ''),
+  check (file_name != '')
 );
 
 
