@@ -74,7 +74,22 @@ create table if not exists Tasks_Users (
   foreign key (user_id) references USERS (id) on delete cascade
 );
 
+create table if not exists Tags (
+  id serial primary key,
+  color text,
+  name text,
+  board_id integer,
 
+  foreign key (board_id) references BOARDS (id) on delete cascade
+);
+
+create table if not exists Tags_Tasks (
+  tag_id integer not null,
+  task_id integer not null,
+
+  foreign key (tag_id) references Tags (id) on delete cascade,
+  foreign key (task_id) references TASKS (id) on delete cascade
+);
 
 create table if not exists Sessions (
   session_token text not null unique,
