@@ -58,4 +58,6 @@ type TaskRepository interface {
 	DeleteTagFromBoard(ctx context.Context, tagID int) error
 	GetTasksTags(ctx context.Context, taskID int) ([]Tag, error)
 	GetBoardsTags(ctx context.Context, boardID int) ([]Tag, error)
+	GetTagsBoardID(ctx context.Context, tagID int) (int, error)
+	GetTagsTaskID(ctx context.Context, tagID int) (int, error)
 }

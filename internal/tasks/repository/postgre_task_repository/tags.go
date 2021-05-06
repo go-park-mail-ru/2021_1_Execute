@@ -128,3 +128,47 @@ func (repo *PostgreTaskRepository) GetBoardsTags(ctx context.Context, boardID in
 
 	return tags, nil
 }
+
+func (repo *PostgreTaskRepository) GetTagsBoardID(ctx context.Context, tagID int) (int, error) {
+	rows, err := repo.Pool.Query(ctx, "select board_id from tags where id = $1::int", tagID)
+	if err != nil {
+		return -1, errors.Wrap(err, "Unable to get tag's board id")
+	}
+
+	var boardID int = -1
+
+	for rows.Next() {
+		err = rows.Scan(&boardID)
+		if err != nil {
+			return -1, errors.Wrap(err, "Unable to read tag's board id")
+		}
+	}
+
+	if boardID < 1 {
+		return -1, errors.New("Invalid board id")
+	}
+
+	return boardID, nil
+}
+
+func (repo *PostgreTaskRepository) GetTagsTaskID(ctx context.Context, tagID int) (int, error) {
+	rows, err := repo.Pool.Query(ctx, "select task_id from tags_tasks where tag_id = $1::int", tagID)
+	if err != nil {
+		return -1, errors.Wrap(err, "Unable to get tag's task id")
+	}
+
+	var taskID int = -1
+
+	for rows.Next() {
+		err = rows.Scan(&taskID)
+		if err != nil {
+			return -1, errors.Wrap(err, "Unable to read tag's task id")
+		}
+	}
+
+	if taskID < 1 {
+		return -1, errors.New("Invalid task id")
+	}
+
+	return taskID, nil
+}

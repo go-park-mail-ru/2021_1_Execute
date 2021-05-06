@@ -75,3 +75,29 @@ func (uc *tasksUsecase) DeleteTagFromBoard(ctx context.Context, boardID, tagID, 
 
 	return nil
 }
+
+func (uc *tasksUsecase) DeleteTag(ctx context.Context, tagID, requesterID int) error {
+	boardID, err := uc.tasksRepo.GetTagsBoardID(ctx, tagID)
+
+	if err == nil {
+		_, err := uc.checkAccessToBoard(ctx, boardID, requesterID)
+		if err != nil {
+			return err
+		}
+	} else {
+		taskID, err := uc.tasksRepo.GetTagsTaskID(ctx, tagID)
+		if err == nil {
+			err = uc.checkRights(ctx, taskID, requesterID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	err = uc.tasksRepo.DeleteTag(ctx, tagID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
+	}
+
+	return nil
+}
