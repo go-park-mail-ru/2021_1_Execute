@@ -23,7 +23,7 @@ func (handler *TasksHandler) PostComment(c echo.Context) error {
 		return errors.Wrap(domain.BadRequestError, err.Error())
 	}
 
-	commentID, err := handler.taskUC.AddComment(context.Background(), models.CommentRequestToComment(input), input.TaskID, userID)
+	commentID, err := handler.taskUC.AddComment(context.Background(), models.CommentRequestToComment(input, userID), input.TaskID, userID)
 
 	if err != nil {
 		return err

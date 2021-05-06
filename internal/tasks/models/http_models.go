@@ -40,20 +40,18 @@ func PatchTaskToTask(req *PatchTaskRequest) tasks.Task {
 }
 
 type PostCommentRequest struct {
-	TaskID int       `json:"taskId"`
-	Text   string    `json:"text"`
-	Author int       `json:"author"`
-	Time   time.Time `json:"time"`
+	TaskID int    `json:"taskId"`
+	Text   string `json:"text"`
 }
 
 type PostCommentResponse struct {
 	ID int `json:"id"`
 }
 
-func CommentRequestToComment(input *PostCommentRequest) tasks.Comment {
+func CommentRequestToComment(input *PostCommentRequest, author int) tasks.Comment {
 	return tasks.Comment{
 		Text:   input.Text,
-		Author: input.Author,
-		Time:   input.Time,
+		Author: author,
+		Time:   time.Now(),
 	}
 }
