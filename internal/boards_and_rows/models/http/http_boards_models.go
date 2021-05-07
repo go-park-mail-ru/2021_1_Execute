@@ -33,7 +33,7 @@ func BoardsToGetResponce(boards []boards_and_rows.Board) GetBoardsResponce {
 }
 
 type PostBoardRequest struct {
-	Name string `json:"name" validate:"name"`
+	Name string `json:"name"`
 }
 type PostBoardResponce struct {
 	ID int `json:"id"`
@@ -64,8 +64,8 @@ type boardUsers struct {
 type PatchBoardByIDRequest struct {
 	Access      string     `json:"access,omitempty"`
 	IsStared    bool       `json:"isStared,omitempty"`
-	Name        string     `json:"name,omitempty" valid:"name"`
-	Description string     `json:"description,omitempty" valid:"description"`
+	Name        string     `json:"name,omitempty"`
+	Description string     `json:"description,omitempty"`
 	Users       boardUsers `json:"users,omitempty"`
 	Move        rowsMove   `json:"move,omitempty"`
 }

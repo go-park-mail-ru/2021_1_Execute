@@ -7,7 +7,7 @@ import (
 
 type PostTaskRequest struct {
 	RowID    int    `json:"row_id"`
-	Name     string `json:"name" valid:"name"`
+	Name     string `json:"name"`
 	Position int    `json:"position"`
 }
 
@@ -27,8 +27,8 @@ type GetTaskResponse struct {
 }
 
 type PatchTaskRequest struct {
-	Name        string `json:"name,omitempty" valid:"name"`
-	Description string `json:"description,omitempty" valid:"description"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 func PatchTaskToTask(req *PatchTaskRequest) tasks.Task {

@@ -7,7 +7,7 @@ import (
 
 type PostRowRequest struct {
 	BoardID  int    `json:"board_id"`
-	Name     string `json:"name" valid:"name"`
+	Name     string `json:"name"`
 	Position int    `json:"position"`
 }
 
@@ -56,7 +56,7 @@ func FullRowInfoToBoardRow(row models.FullRowInfo) boardRow {
 }
 
 type PatchRowRequest struct {
-	Name      string     `json:"name,omitempty" valid:"name"`
+	Name      string     `json:"name,omitempty"`
 	CarryOver MoveObject `json:"carry_over,omitempty"`
 	Move      MoveObject `json:"move,omitempty"`
 }
