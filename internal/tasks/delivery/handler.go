@@ -24,4 +24,7 @@ func NewTasksHandler(e *echo.Echo, sessionHD session.SessionHandler, taskUC task
 	e.DELETE("api/tasks/:id/", handler.DeleteTask)
 	e.POST("api/comments/", handler.PostComment)
 	e.DELETE("api/comments/:id/", handler.DeleteComment)
+
+	e.POST("api/tasks/:taskId/assigners/:userId/", handler.PostAssignment)
+	e.DELETE("api/tasks/:taskId/assigners/:userId/", handler.DeleteAssignment)
 }

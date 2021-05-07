@@ -4,12 +4,17 @@ import (
 	"context"
 )
 
+type Assignment struct {
+	UserID int `json:"id"`
+}
+
 type Task struct {
-	ID          int       `json:"id"`
-	Name        string    `json:"name"`
-	Position    int       `json:"position"`
-	Description string    `json:"description"`
-	Comments    []Comment `json:"comments,omitempty"`
+	ID          int          `json:"id"`
+	Name        string       `json:"name"`
+	Position    int          `json:"position"`
+	Description string       `json:"description"`
+	Comments    []Comment    `json:"comments,omitempty"`
+	Assignments []Assignment `json:"users,omitempty"`
 }
 
 type Comment struct {
@@ -36,6 +41,7 @@ type TaskUsecase interface {
 	AddComment(ctx context.Context, comment Comment, taskID, requesterID int) (int, error)
 	GetComment(ctx context.Context, commentID, requesterID int) (Comment, error)
 	DeleteComment(ctx context.Context, commentID, requesterID int) error
+	Assignment(ctx context.Context, taskID, userID, requesterID int, typeOfAction string) error
 }
 
 type TaskRepository interface {
@@ -54,4 +60,7 @@ type TaskRepository interface {
 	GetComment(ctx context.Context, commentID int) (Comment, error)
 	DeleteComment(ctx context.Context, commentID int) error
 	GetCommentsTaskID(ctx context.Context, commentID int) (int, error)
+	AddUserToTask(ctx context.Context, taskID, userID int) error
+	DeleteUserFromTask(ctx context.Context, taskID, userID int) error
+	GetTasksAssignments(ctx context.Context, taskID int) ([]int, error)
 }
