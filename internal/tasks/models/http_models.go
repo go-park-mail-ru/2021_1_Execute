@@ -52,6 +52,6 @@ func CommentRequestToComment(input *PostCommentRequest, author int) tasks.Commen
 	return tasks.Comment{
 		Text:   input.Text,
 		Author: author,
-		Time:   time.Now().UTC(),
+		Time:   time.Now().UTC().Format(time.RFC3339),
 	}
 }

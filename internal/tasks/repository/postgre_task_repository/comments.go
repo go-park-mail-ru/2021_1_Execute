@@ -10,7 +10,7 @@ import (
 
 func (repo *PostgreTaskRepository) AddComment(ctx context.Context, comment tasks.Comment, taskID int) (int, error) {
 	rows, err := repo.Pool.Query(ctx, "insert into comments (text, time, task_id, user_id) values ($1::text, timestamp $2::text, $3::int, $4::int) returning id",
-		comment.Text, comment.Time.String(), taskID, comment.Author)
+		comment.Text, comment.Time, taskID, comment.Author)
 
 	if err != nil {
 		return -1, errors.Wrap(err, "Unable to create comment")

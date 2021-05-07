@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"context"
-	"time"
 )
 
 type Task struct {
@@ -14,10 +13,10 @@ type Task struct {
 }
 
 type Comment struct {
-	ID     int       `json:"id"`
-	Text   string    `json:"text"`
-	Author int       `json:"author"`
-	Time   time.Time `json:"time"`
+	ID     int    `json:"id"`
+	Text   string `json:"text"`
+	Author int    `json:"author"`
+	Time   string `json:"time"`
 }
 
 type TaskUsecase interface {
