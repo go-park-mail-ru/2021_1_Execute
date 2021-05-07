@@ -10,6 +10,7 @@ type FullBoardInfo struct {
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 	Owner       users.User    `json:"-"`
+	Admins      []users.User  `json:"-"`
 	Rows        []FullRowInfo `json:"rows"`
 }
 type FullRowInfo struct {

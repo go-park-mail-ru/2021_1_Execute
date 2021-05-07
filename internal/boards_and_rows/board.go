@@ -33,6 +33,9 @@ type BoardUsecase interface {
 	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)
 	GetFullRowInfo(ctx context.Context, rowID int, requesterID int) (models.FullRowInfo, error)
 	UpdateTasksPositions(ctx context.Context, rowID, taskID, newPos, requesterID int) error
+
+	AddAdminToBoard(ctx context.Context, boardID int, newUserID int, requesterID int) error
+	DeleteAdminFromBoard(ctx context.Context, boardID int, newUserID int, requesterID int) error
 }
 
 type BoardRepository interface {
@@ -50,7 +53,11 @@ type BoardRepository interface {
 	GetRow(ctx context.Context, rowID int) (Row, error)
 
 	GetUsersBoards(ctx context.Context, userID int) ([]Board, error)
+
 	GetBoardsOwner(ctx context.Context, boardID int) (int, error)
+	GetBoardsAdmins(ctx context.Context, boardID int) ([]int, error)
+	AddAdminToBoard(ctx context.Context, boardID int, userID int) error
+	DeleteAdminFromBoard(ctx context.Context, boardID int, userID int) error
 
 	GetBoardsRows(ctx context.Context, boardID int) ([]Row, error)
 	GetRowsTasks(ctx context.Context, rowID int) ([]tasks.Task, error)
