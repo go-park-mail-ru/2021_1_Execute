@@ -25,13 +25,9 @@ func (uc *tasksUsecase) AddTask(ctx context.Context, task tasks.Task, rowID, req
 		return -1, domain.DBErrorToServerError(err)
 	}
 
-	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	_, err = uc.checkAccessToBoard(ctx, boardID, requesterID)
 	if err != nil {
-		return -1, domain.DBErrorToServerError(err)
-	}
-
-	if requesterID != ownerID {
-		return -1, domain.ForbiddenError
+		return -1, err
 	}
 
 	taskID, err := uc.tasksRepo.AddTask(ctx, task, rowID)
@@ -116,6 +112,10 @@ func (uc *tasksUsecase) DeleteTask(ctx context.Context, taskID, requesterID int)
 	}
 
 	err = uc.MoveTask(ctx, taskID, len(rowsTasks)-1, requesterID)
+	if err != nil {
+		return err
+	}
+
 	err = uc.tasksRepo.DeleteTask(ctx, taskID)
 	if err != nil {
 		return domain.DBErrorToServerError(err)
@@ -235,12 +235,43 @@ func (uc *tasksUsecase) checkRights(ctx context.Context, taskID, requesterID int
 
 	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
 	if err != nil {
-		domain.DBErrorToServerError(err)
+		return domain.DBErrorToServerError(err)
 	}
 
-	if requesterID != ownerID {
-		return domain.ForbiddenError
+	admins, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
+	if err != nil {
+		return domain.DBErrorToServerError(err)
 	}
 
-	return nil
+	admins = append(admins, ownerID)
+
+	for _, admin := range admins {
+		if admin == requesterID {
+			return nil
+		}
+	}
+
+	return domain.ForbiddenError
+}
+
+func (uc *tasksUsecase) checkAccessToBoard(ctx context.Context, boardID, requesterID int) ([]int, error) {
+	ownerID, err := uc.boardsRepo.GetBoardsOwner(ctx, boardID)
+	if err != nil {
+		return []int{}, domain.DBErrorToServerError(err)
+	}
+
+	adminsID, err := uc.boardsRepo.GetBoardsAdmins(ctx, boardID)
+	if err != nil {
+		return []int{}, domain.DBErrorToServerError(err)
+	}
+
+	adminsID = append(adminsID, ownerID)
+
+	for _, id := range adminsID {
+		if requesterID == id {
+			return adminsID, nil
+		}
+	}
+
+	return []int{}, domain.ForbiddenError
 }

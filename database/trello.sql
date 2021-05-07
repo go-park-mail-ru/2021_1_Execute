@@ -74,6 +74,18 @@ create table if not exists Tasks_Users (
   foreign key (user_id) references USERS (id) on delete cascade
 );
 
+create table if not exists Comments (
+  id serial primary key,
+  text text,
+  time timestamp,
+  task_id integer not null,
+  user_id integer not null,
+
+  foreign key (user_id) references USERS (id) on delete cascade,
+  foreign key (task_id) references TASKS (id) on delete cascade,
+  check (text != '')
+);
+
 
 
 create table if not exists Sessions (
