@@ -27,4 +27,8 @@ func NewTasksHandler(e *echo.Echo, sessionHD session.SessionHandler, taskUC task
 
 	e.POST("api/tasks/:taskId/assigners/:userId/", handler.PostAssignment)
 	e.DELETE("api/tasks/:taskId/assigners/:userId/", handler.DeleteAssignment)
+
+	e.POST("api/checklists/", handler.PostChecklist)
+	e.DELETE("api/checklists/:id/", handler.DeleteChecklist)
+	e.PATCH("api/checklists/:id/", handler.PatchChecklist)
 }

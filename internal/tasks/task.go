@@ -15,6 +15,7 @@ type Task struct {
 	Description string       `json:"description"`
 	Comments    []Comment    `json:"comments,omitempty"`
 	Assignments []Assignment `json:"users,omitempty"`
+	Checklists  []Checklist  `json:"checklists,omitempty"`
 }
 
 type Comment struct {
@@ -22,6 +23,17 @@ type Comment struct {
 	Text   string `json:"text"`
 	Author int    `json:"author"`
 	Time   string `json:"time"`
+}
+
+type Field struct {
+	Name string `json:"name"`
+	Done bool   `json:"isDone"`
+}
+
+type Checklist struct {
+	ID     int     `json:"id"`
+	Name   string  `json:"name"`
+	Fields []Field `json:"fields"`
 }
 
 type TaskUsecase interface {
@@ -42,6 +54,9 @@ type TaskUsecase interface {
 	GetComment(ctx context.Context, commentID, requesterID int) (Comment, error)
 	DeleteComment(ctx context.Context, commentID, requesterID int) error
 	Assignment(ctx context.Context, taskID, userID, requesterID int, typeOfAction string) error
+	AddChecklist(ctx context.Context, taskID int, checklist Checklist, requesterID int) (int, error)
+	DeleteChecklist(ctx context.Context, checklistID, requesterID int) error
+	UpdateChecklist(ctx context.Context, checklistID int, checklist Checklist, requesterID int) error
 }
 
 type TaskRepository interface {
@@ -63,4 +78,9 @@ type TaskRepository interface {
 	AddUserToTask(ctx context.Context, taskID, userID int) error
 	DeleteUserFromTask(ctx context.Context, taskID, userID int) error
 	GetTasksAssignments(ctx context.Context, taskID int) ([]int, error)
+	AddChecklist(ctx context.Context, taskID int, checklist Checklist) (int, error)
+	DeleteChecklist(ctx context.Context, checklistID int) error
+	UpdateChecklist(ctx context.Context, checklistID int, checklist Checklist) error
+	GetTasksChecklists(ctx context.Context, taskID int) ([]Checklist, error)
+	GetChecklistsTaskID(ctx context.Context, checklistID int) (int, error)
 }

@@ -55,3 +55,39 @@ func CommentRequestToComment(input *PostCommentRequest, author int) tasks.Commen
 		Time:   time.Now().UTC().Format(time.RFC3339),
 	}
 }
+
+type PostChecklistRequest struct {
+	TaskID int      `json:"taskId"`
+	Name   string   `json:"name"`
+	Fields []string `json:"fields,omitempty"`
+}
+
+type PostChecklistResponse struct {
+	ID int `json:"id"`
+}
+
+func PostChecklistToChecklist(input *PostChecklistRequest) tasks.Checklist {
+	var fields []tasks.Field
+	for _, field := range input.Fields {
+		fields = append(fields, tasks.Field{
+			Name: field,
+			Done: false,
+		})
+	}
+	return tasks.Checklist{
+		Name:   input.Name,
+		Fields: fields,
+	}
+}
+
+type PatchChecklistRequest struct {
+	Name   string        `json:"name,omitempty"`
+	Fields []tasks.Field `json:"fields,omitempty"`
+}
+
+func PatchChecklistToChecklist(input *PatchChecklistRequest) tasks.Checklist {
+	return tasks.Checklist{
+		Name:   input.Name,
+		Fields: input.Fields,
+	}
+}

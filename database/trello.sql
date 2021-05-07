@@ -86,6 +86,16 @@ create table if not exists Comments (
   check (text != '')
 );
 
+create table if not exists CheckLists (
+  id serial primary key,
+  task_id integer not null,
+  name text,
+  fields text[],
+  bitmask bigint,
+
+  foreign key (task_id) references TASKS (id) on delete cascade
+);
+
 
 
 create table if not exists Sessions (
