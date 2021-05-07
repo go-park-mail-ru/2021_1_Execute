@@ -140,15 +140,20 @@ func (uc *tasksUsecase) GetTask(ctx context.Context, taskID, requesterID int) (t
 		return tasks.Task{}, domain.DBErrorToServerError(err)
 	}
 
-	checklists, err := uc.tasksRepo.GetTasksChecklists(ctx, taskID)
-	if err != nil {
-		return tasks.Task{}, domain.DBErrorToServerError(err)
-	}
-
 	var assignments []tasks.Assignment
 
 	for _, user := range users {
 		assignments = append(assignments, tasks.Assignment{UserID: user})
+	}
+
+	attachments, err := uc.tasksRepo.GetTasksAttachments(ctx, taskID)
+	if err != nil {
+		return tasks.Task{}, domain.DBErrorToServerError(err)
+	}
+
+	checklists, err := uc.tasksRepo.GetTasksChecklists(ctx, taskID)
+	if err != nil {
+		return tasks.Task{}, domain.DBErrorToServerError(err)
 	}
 
 	if len(assignments) > 0 {
@@ -156,6 +161,9 @@ func (uc *tasksUsecase) GetTask(ctx context.Context, taskID, requesterID int) (t
 	}
 	if len(checklists) > 0 {
 		task.Checklists = checklists
+	}
+	if len(attachments) > 0 {
+		task.Attachments = attachments
 	}
 
 	return task, nil

@@ -84,9 +84,9 @@ func main() {
 	boardUC := BoardUC.NewBoardsUsecase(boardRepo, userUC, taskUC)
 
 	UserHttpDelivery.NewUserHandler(e, userUC, sessionHandler)
-	FilesHttpDelivery.NewFilesHandler(e, userUC, fileUtil, sessionHandler)
+	FilesHttpDelivery.NewFilesHandler(e, userUC, taskUC, fileUtil, sessionHandler)
 	BoardsHttpDelivery.NewBoardsHandler(e, boardUC, sessionHandler, taskUC)
-	TasksHttpDelivery.NewTasksHandler(e, sessionHandler, taskUC)
+	TasksHttpDelivery.NewTasksHandler(e, sessionHandler, taskUC, fileUtil)
 
 	e.Logger.Fatal(e.Start(fmt.Sprint(":", *serverPort)))
 }

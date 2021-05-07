@@ -16,6 +16,7 @@ type Task struct {
 	Comments    []Comment    `json:"comments,omitempty"`
 	Assignments []Assignment `json:"users,omitempty"`
 	Checklists  []Checklist  `json:"checklists,omitempty"`
+	Attachments []Attachment `json:"attaches,omitempty"`
 }
 
 type Comment struct {
@@ -34,6 +35,12 @@ type Checklist struct {
 	ID     int     `json:"id"`
 	Name   string  `json:"name"`
 	Fields []Field `json:"fields"`
+}
+
+type Attachment struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Path string `json:"path"`
 }
 
 type TaskUsecase interface {
@@ -57,6 +64,9 @@ type TaskUsecase interface {
 	AddChecklist(ctx context.Context, taskID int, checklist Checklist, requesterID int) (int, error)
 	DeleteChecklist(ctx context.Context, checklistID, requesterID int) error
 	UpdateChecklist(ctx context.Context, checklistID int, checklist Checklist, requesterID int) error
+	AddAttachment(ctx context.Context, taskID int, attachment Attachment, requesterID int) (int, error)
+	DeleteAttachment(ctx context.Context, attachmentID, requesterID int) error
+	GetAttachment(ctx context.Context, attachmentID, requesterID int) (Attachment, error)
 }
 
 type TaskRepository interface {
@@ -83,4 +93,9 @@ type TaskRepository interface {
 	UpdateChecklist(ctx context.Context, checklistID int, checklist Checklist) error
 	GetTasksChecklists(ctx context.Context, taskID int) ([]Checklist, error)
 	GetChecklistsTaskID(ctx context.Context, checklistID int) (int, error)
+	AddAttachment(ctx context.Context, taskID int, attachment Attachment) (int, error)
+	DeleteAttachment(ctx context.Context, attachmentID int) error
+	GetTasksAttachments(ctx context.Context, taskID int) ([]Attachment, error)
+	GetAttachmentTaskID(ctx context.Context, attachmentID int) (int, error)
+	GetAttachment(ctx context.Context, attachmentID int) (Attachment, error)
 }
