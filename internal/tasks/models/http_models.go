@@ -1,6 +1,9 @@
 package models
 
-import "2021_1_Execute/internal/tasks"
+import (
+	"2021_1_Execute/internal/tasks"
+	"time"
+)
 
 type PostTaskRequest struct {
 	RowID    int    `json:"row_id"`
@@ -33,5 +36,22 @@ func PatchTaskToTask(req *PatchTaskRequest) tasks.Task {
 		Name:        req.Name,
 		Description: req.Description,
 		Position:    -1,
+	}
+}
+
+type PostCommentRequest struct {
+	TaskID int    `json:"taskId"`
+	Text   string `json:"text"`
+}
+
+type PostCommentResponse struct {
+	ID int `json:"id"`
+}
+
+func CommentRequestToComment(input *PostCommentRequest, author int) tasks.Comment {
+	return tasks.Comment{
+		Text:   input.Text,
+		Author: author,
+		Time:   time.Now().UTC().Format(time.RFC3339),
 	}
 }

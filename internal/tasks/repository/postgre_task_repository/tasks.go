@@ -131,6 +131,12 @@ func (repo *PostgreTaskRepository) GetTask(ctx context.Context, taskID int) (tas
 		return tasks.Task{}, domain.DBNotFoundError
 	}
 
+	comments, err := repo.getTasksComments(ctx, taskID)
+	if err != nil {
+		return tasks.Task{}, errors.Wrap(err, "Unable to get tasks's comments")
+	}
+	task.Comments = comments
+
 	return task, nil
 }
 
